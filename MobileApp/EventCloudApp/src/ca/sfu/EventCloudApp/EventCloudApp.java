@@ -24,7 +24,6 @@ import org.apache.cordova.*;
 
 public class EventCloudApp extends DroidGap
 {
-    @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);

@@ -1,42 +1,107 @@
 <!DOCTYPE html>
-<!--
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/index.css" />
-        <title>Hello World</title>
-    </head>
-    <body>
-        <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
-            </div>
-        </div>
-        <script type="text/javascript" src="cordova-2.7.0.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-        <script type="text/javascript">
-            app.initialize();
-        </script>
-    </body>
+<head>
+<title>EventCloud : Capture Video</title>
+
+<link rel="stylesheet" href="css/reset-min.css">
+<link rel="stylesheet" href="css/buttons.css">
+<link rel="stylesheet" href="css/custom.css">
+<link rel="stylesheet" href="css/font-awesome.css">
+
+<script type="text/javascript" charset="utf-8" src="cordova-2.7.0.js"></script>
+<script type="text/javascript" charset="utf-8" src="json2.js"></script>
+<script type="text/javascript" charset="utf-8">
+
+	var uploadURL = "http://54.214.248.120/development/workspace/EventCloud/index.php";
+
+	// Disable scrolling
+	window.addEventListener('load', function() {
+		document.body.addEventListener('touchmove', function(e) {
+			e.preventDefault();
+		}, false);
+	}, false);
+	
+	// Video
+	//
+	function captureVideo() {
+		// Launch device video recording application, 
+		// allowing user to capture up to 2 video clips
+		navigator.device.capture.captureVideo(captureSuccess, captureError);
+	}
+
+	function captureSuccess(mediaFiles) {
+		var i, len;
+		for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+			uploadVideoFile(mediaFiles[i]);
+		}
+	}
+
+	function captureError(error) {
+		if (error != CAPTURE_NO_MEDIA_FILES) {
+			var msg = 'An error occurred during capture: ' + error.code;
+			navigator.notification.alert(msg, null, 'Uh oh!');
+		}
+	}
+
+	// Photo
+	//
+	function capturePhoto() {
+		navigator.camera.getPicture(uploadPhotoFile, photoError, {
+			quality : 50,
+			destinationType : navigator.camera.DestinationType.FILE_URI
+		});
+	}
+
+	function photoError(message) {
+		var msg = 'An error occurred during capture: ' + error.code;
+		navigator.notification.alert(msg, null, 'Uh oh!');
+	}
+
+	// Upload files to server
+	function uploadVideoFile(mediaFile) {
+		var ft = new FileTransfer(), path = mediaFile.fullPath, name = mediaFile.name;
+	    ft.upload(path, uploadURL, up_win, up_fail, options);
+	}
+	
+	function uploadPhotoFile(imageURI) {
+	    var options = new FileUploadOptions();
+	    options.fileKey="file";
+	    options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);
+	    options.mimeType="image/jpeg";
+	
+	    var ft = new FileTransfer();
+	    ft.upload(imageURI, uploadURL, up_win, up_fail, options);
+	}
+	
+	function up_win(r) {
+        console.log("Code = " + r.responseCode);
+        console.log("Response = " + r.response);
+        console.log("Sent = " + r.bytesSent);
+        postUpload();
+    }
+
+    function up_fail(error) {
+        alert("An error has occurred: Code = " + error.code);
+        console.log("upload error source " + error.source);
+        console.log("upload error target " + error.target);
+    }
+    
+    function postUpload() {
+    	
+    }
+
+</script>
+</head>
+<body>
+	<div id="wrapper">
+	
+		<div style="margin:auto; width: 300px; color:white"> gallery here </div>
+	
+		<a id="camera" class="special-button button back" onclick="capturePhoto();"> <i class="icon-camera"></i></a> 
+		<a id="video" class="special-button button back" onclick="captureVideo();"> <i class="icon-facetime-video"></i></a> 
+		<a id="upload" class="special-button button back" href=""> <i class="icon-upload"></i></a> 
+		<a id="history" class="special-button button back" href=""> <i	class="icon-backward"></i></a> 
+		<a id="volume" class="special-button button back" href=""> <i class="icon-volume-up"></i></a> 
+	</div>
+</body>
 </html>
