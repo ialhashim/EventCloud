@@ -15,17 +15,39 @@
 <script type="text/javascript" charset="utf-8" src="js/global.js"></script>
 
 <script type="text/javascript" charset="utf-8">
+	$(document).ready(function() { 
+		
+		/* Using the button */
+		$('.loginButton').click(function() {
+			event.preventDefault();
+			$('body').animate({opacity:'0'}, 1);
+			$('a').fadeOut(fadeSpeed, function(){
+				$("#login-form").unbind("submit").submit();
+			});
+		});
+
+		/* Using submit actions */
+		$("#login-form").submit(function(e){
+		    e.preventDefault();
+			$('body').animate({opacity:'0'}, 1);
+			$('a').fadeOut(fadeSpeed, function(){
+		        $("#login-form").unbind("submit").submit();
+		    });
+			return false;
+		});
+	});
 </script>
 
 </head>
 <body>
 
-<form name="login" action="events.html">
-<div style="text-align: center" class="lable"><h1>Name?</h1></div> 
-<div style="text-align: center"><input class="inputField" type="text" name="username" maxlength="12" size="12"> </div>
-<div style="text-align: right"> <a class="button back blue login" href="#" onclick="document.login.submit(); return false;">Login</a> </div>
+<div>
+<form id="login-form" name="login" action="events.html">
+<div style="text-align: center" class="lable"><h1>Type your name</h1></div> 
+<div style="text-align: center"><input class="inputField" type="text" name="username" maxlength="12" size="12"> 
+<a class="button back blue loginButton" href="#" >Login</a> </div>
 </form>
-
+</div>
 
 </body>
 </html>

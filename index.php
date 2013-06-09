@@ -95,6 +95,8 @@
         <input type="file" name="file"> <input type="submit" value="Upload media">
         </form>
     </div>
+	
+	<a href="MobileApp/EventCloudApp/assets/www">Test</a>
     
     </body>
 </html>

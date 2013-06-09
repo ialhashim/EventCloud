@@ -1,4 +1,24 @@
 
+/* Global paths to server scripts */
+var uploadURL = "http://54.214.248.120/development/workspace/EventCloud/index.php";
+var galleryURL = "http://54.214.248.120/development/workspace/EventCloud/gallery.php";
+	
+var fadeSpeed = 1000;
+
+/* Default page display */
+$(document).ready(function() { 
+	$('body').css('transition-duration', fadeSpeed + 'ms');
+	$('body').css({opacity:1});
+	
+	$("a").click(function(event){
+		event.preventDefault();
+		$('body').animate({opacity:'0'}, 1);
+		$('a').fadeOut(fadeSpeed, function(){
+			window.location = this.href;
+		});
+	});
+});
+
 /* Extract url variables */
 $.extend({
   getUrlVars: function(){
