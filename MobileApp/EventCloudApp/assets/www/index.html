@@ -19,6 +19,7 @@
 		
 		/* Using the button */
 		$('.loginButton').click(function() {
+			$('#username').blur();
 			event.preventDefault();
 			$('body').animate({opacity:'0'}, 1);
 			$('a').fadeOut(fadeSpeed, function(){
@@ -28,6 +29,7 @@
 
 		/* Using submit actions */
 		$("#login-form").submit(function(e){
+			$('#username').blur();
 		    e.preventDefault();
 			$('body').animate({opacity:'0'}, 1);
 			$('a').fadeOut(fadeSpeed, function(){
@@ -39,12 +41,12 @@
 </script>
 
 </head>
-<body>
+<body onload="onBodyLoad()">
 
 <div>
 <form id="login-form" name="login" action="events.html">
 <div style="text-align: center" class="lable"><h1>Type your name</h1></div> 
-<div style="text-align: center"><input class="inputField" type="text" name="username" maxlength="12" size="12"> 
+<div style="text-align: center"><input id="username" class="inputField" type="text" name="username" maxlength="12" size="12"> 
 <a class="button back blue loginButton" href="#" >Login</a> </div>
 </form>
 </div>

@@ -193,7 +193,7 @@ class MySQL {
 	
 	
 	// Gets a single row from $from where $where is true
-	function Select($from, $where='', $orderBy='', $limit='', $like=false, $operand='AND',$cols='*'){
+	function Select($from, $where='', $cols='*', $orderBy='', $limit='', $like=false, $operand='AND'){
 		// Catch Exceptions
 		if(trim($from) == ''){
 			return false;

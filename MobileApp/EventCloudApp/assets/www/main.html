@@ -14,13 +14,18 @@
 
 <script type="text/javascript" charset="utf-8">
 	var username;
-	var eventname;
+	var eid;
+	var eventname = '';
 	
 	$(document).ready(function() { 
 		username = $.getUrlVar('username');
-		eventname = $.getUrlVar('event');
+		EID = $.getUrlVar('eid');
 		
-		$("h2#greeting").replaceWith( "<h2 id='greeting'> " + toTitleCase(username) + " @ " + eventname + " </h2>" );
+		// Get event name
+		$.get(eventsManager, { request: "name", eid: EID }, function(data){ 
+			eventname = data.name; 
+			$("h2#greeting").replaceWith( "<h2 id='greeting'> " + toTitleCase(username) + " @ " + eventname + " </h2>" );
+		});
 	});
 	
 	// Disable scrolling
@@ -112,11 +117,11 @@
 
 </script>
 </head>
-<body>
+
+<body onload="onBodyLoad()">
 	<div id="wrapper">
-	
-		<div style="text-align:center"> <h2 id="greeting">Hello!</h2> </div>
-		<div id="gallery" style="margin:auto; width: 300px; color:white"> gallery here </div>
+		<div style="text-align:center"> <h2 id="greeting">Signing in..</h2> </div>
+		<div id="gallery" style="margin:auto; width: 300px; color:white"> </div>
 	
 		<a id="camera" class="special-button button back" onclick="capturePhoto();"> <i class="icon-camera"></i></a> 
 		<a id="video" class="special-button button back" onclick="captureVideo();"> <i class="icon-facetime-video"></i></a> 

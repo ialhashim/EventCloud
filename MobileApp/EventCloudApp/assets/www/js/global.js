@@ -1,21 +1,23 @@
-
 /* Global paths to server scripts */
-var uploadURL = "http://54.214.248.120/development/workspace/EventCloud/index.php";
-var galleryURL = "http://54.214.248.120/development/workspace/EventCloud/gallery.php";
+var uploadURL = "/index.php";
+var galleryURL = "/gallery.php";
+
+var eventsManager = "/events.php";
 	
-var fadeSpeed = 1000;
 
 /* Default page display */
+var fadeSpeed = 1000;
 $(document).ready(function() { 
 	$('body').css('transition-duration', fadeSpeed + 'ms');
 	$('body').css({opacity:1});
 	
-	$("a").click(function(event){
+	$('body').on("click", ".outlink", function(event){
 		event.preventDefault();
 		$('body').animate({opacity:'0'}, 1);
 		$('a').fadeOut(fadeSpeed, function(){
 			window.location = this.href;
 		});
+		return false;
 	});
 });
 
@@ -43,3 +45,15 @@ function toTitleCase(str) {
         return match.toUpperCase();
     });
 }
+
+/* Need these? */
+function onBodyLoad(){
+	document.addEventListener("deviceready",onDeviceReady,false);
+}
+function onDeviceReady(){
+	document.addEventListener("resume", onResume, false);
+	onResume();
+}
+function onResume(){
+}
+

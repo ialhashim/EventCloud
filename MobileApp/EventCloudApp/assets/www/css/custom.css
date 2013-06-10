@@ -4,7 +4,6 @@
 }
 
 html {
-	/*background: url('../img/bg_tile.jpg') #161718 !important;*/
 	color: white;
 	
 	background-color:#444 !important;
@@ -94,4 +93,27 @@ h1{
 
 .button{
 	font-size: 0.75em;
+}
+
+.loading{
+    color: #555;
+}
+
+#column1-wrap{
+    float: left;
+    width: 100%;
+}
+#column1{
+    margin-right: 200px;
+}
+#column2{
+    float: left;
+    width: 200px;
+    margin-left: -200px;
+    font-size: 0.9em;
+}
+
+#eventsBox{
+	overflow:auto;
+    overflow-y: scroll;
 }

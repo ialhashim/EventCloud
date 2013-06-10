@@ -19,6 +19,7 @@
 
 package ca.sfu.EventCloudApp;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import org.apache.cordova.*;
 
@@ -29,7 +30,9 @@ public class EventCloudApp extends DroidGap
         super.onCreate(savedInstanceState);
         // Set by <content src="index.html" /> in config.xml
         super.loadUrl(Config.getStartUrl());
-        //super.loadUrl("file:///android_asset/www/index.html")
+        
+        // Fix flashing white screen between pages
+        appView.setBackgroundColor( Color.parseColor("#444444") );
     }
 }
 
