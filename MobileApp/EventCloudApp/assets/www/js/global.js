@@ -1,10 +1,10 @@
 /* Global paths to server scripts */
-var uploadURL = "/index.php";
-var galleryURL = "/gallery.php";
+var rootFolder = "http://54.214.248.120/development/workspace/EventCloud/";
 
-var eventsManager = "/events.php";
+var uploadURL = rootFolder + "index.php";
+var galleryURL = rootFolder + "gallery.php";
+var eventsManager = rootFolder + "events.php";
 	
-
 /* Default page display */
 var fadeSpeed = 1000;
 $(document).ready(function() { 
