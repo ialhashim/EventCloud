@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>EventCloud : Welcome!</title>
+
+<link rel="stylesheet" href="css/reset-min.css">
+<link rel="stylesheet" href="css/buttons.css">
+<link rel="stylesheet" href="css/custom.css">
+<link rel="stylesheet" href="css/font-awesome.css">
+
+
+<script type="text/javascript" charset="utf-8" src="js/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="cordova-2.7.0.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/global.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+
+$(document).ready(function() { 
+	var username = $.getUrlVar('username');
+	
+	$("h2#greeting").replaceWith( "<h2 id='greeting'> Welcome " + toTitleCase(username) + "! </h2>" );
+	
+	/* Load and list all events */
+	{
+		var options = { request: "all" };
+		
+		$.get(eventsManager, options, function(data) {
+			var i = 0;
+		    var colorList = ['blue', 'green', 'orange', 'pink'];
+		    
+		    // Hide loading message
+		    $('.loading').fadeOut('slow', function() {
+		    	data.forEach(function(entry) {
+				    // Debug
+					console.log(entry);
+				    
+				    // Assign color
+				    var curColor = colorList[(i++) % data.length];
+				    
+				    $("#eventsList").append(
+				    	$('<li>').append( $('<a>')
+		    			.attr('href','main.html?username=' + username + "&eid=" + entry.eid)
+		    			.addClass('outlink button back ' + curColor)
+		    			.append( entry.name )).hide()
+				    );
+				    
+				    $("#eventsList li").fadeIn();
+				});
+		    });
+		});
+	}
+});
+
+</script>
+
+</head>
+
+<body onload="onBodyLoad()" style="text-align:center">
+
+<div style="padding:1em">
+	<div id="column1-wrap">
+		
+		<div id="column1">
+			<h1>Live events</h1>
+			<span class='loading'>Loading...</span>
+			<div id="eventsBox">
+				<ul id="eventsList"></ul>
+			</div>
+		</div>
+	</div>
+	
+	<div id="column2">	
+		<div><h2 id="greeting">Welcome!</h2></div>
+		<div><a class="outlink button back red" href="#">Create event</a></div>
+</div>
+</div>
+
+</body>
+</html>
