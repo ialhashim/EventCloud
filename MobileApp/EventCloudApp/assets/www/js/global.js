@@ -1,6 +1,10 @@
 /* Global paths to server scripts */
 var rootFolder = "http://54.214.248.120/development/workspace/EventCloud/";
 
+/* When using local host */
+var rootFolder = 'http://192.168.0.10/';
+//var rootFolder = '/';
+
 var uploadURL = rootFolder + "index.php";
 var galleryURL = rootFolder + "gallery.php";
 var eventsManager = rootFolder + "events.php";
