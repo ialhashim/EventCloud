@@ -17,7 +17,7 @@
 	}
 	
 	if($request == "name"){
-		$result = $mysql->Select( 'events', ["eid" => $eid], 'name' );
+		$result = $mysql->Select( 'events', array("eid" => $eid), 'name' );
 	}
 
 	echo json_encode($result);
