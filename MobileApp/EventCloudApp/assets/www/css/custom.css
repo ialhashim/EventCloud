@@ -26,6 +26,14 @@ body {
   	transition-timing-function: ease-in-out;
   	opacity: 0;
 }
+
+#mainScreen{
+	margin: auto; 
+	height: 100%; 
+	width: 100%; 
+	/*border:10px red solid;*/
+}
+
 .special-button {
 	position: absolute;
 	min-width: 4em;
@@ -34,6 +42,8 @@ body {
 
 #wrapper {
 	min-height: 100%;
+	position: relative;
+	overflow: hidden;
 }
 
 #camera {
@@ -118,13 +128,33 @@ h1{
     overflow-y: scroll;
 }
 
-.thumbnail{
-	width: 200px;
-}
-
 .scroll-pane
 {
 	width: 100%;
-	height: 150px;
+	height: 170px;
 	overflow: auto;
+}
+
+.thumbnail{
+	position: relative;
+	width: 10em;
+	padding-right: 3px;
+}
+
+.thumbnail-img{
+	width: 100%;
+}
+
+.loading-icon-wrapper{
+    text-align:center;
+    z-index: 1;
+}
+
+.loading-icon{
+    position: absolute;
+    top:40%;
+    
+    font-size: 2em;
+    color: #777;
+    z-index: -99;
 }

@@ -17,7 +17,15 @@
 		$imgFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url.$img;
 		//$imgFullPath = $upload_url.$img;
 		
-		echo '<img class="thumbnail" src="'.$imgFullPath.'" /><br />';
+		echo '<div class="thumbnail">';
+		
+		echo '<div class="loading-icon-wrapper">';
+		echo '<i class="loading-icon icon-refresh icon-spin" style=""></i>';
+		echo '</div>';
+		
+		echo '<img class="thumbnail-img" src="'.$imgFullPath.'" /><br />';
+		
+		echo '</div>';
 	} 
 	
 	echo "</div>";
