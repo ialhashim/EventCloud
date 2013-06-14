@@ -78,23 +78,11 @@
                 else
                 {
                 	// Resize and assign a name
-                	$thumb = new Imagick($finalFileName);
-                	$thumb->setCompressionQuality(100); 
-					$thumb->resizeImage(500, 500, Imagick::FILTER_CATROM, 1, true);
-					$fileCount = count (glob ($upload_dir.'*.jpg'));
-					$newName = ($fileCount + 1) . '.jpg';
-					
-					$thumb->setImageCompression(imagick::COMPRESSION_JPEG); 
-					$thumb->setImageCompressionQuality(100); 
-					$thumb->stripImage(); 
-					$thumb->writeImage($upload_dir . $newName);
-					$thumb->destroy(); 
-					
-                    // set proper permissions on the new file
-					chmod($upload_dir . $newName, 0644);
-					
-					// delete full version file
-                	unlink($finalFileName);
+					if(endsWith($finalFileName,'.jpg'))	createThumbnailImage($finalFileName, 500, $upload_dir);
+					if(endsWith($finalFileName,'.mp4'))	createThumbnailVideo($finalFileName, 500, 30, $upload_dir);
+                    
+					// Delete full uploaded version of file
+                	//unlink($finalFileName);
                 	
                     echo "<p class='message-box ok'> File uploaded :) </p>";
                 }

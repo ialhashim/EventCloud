@@ -76,8 +76,14 @@
 
 	// Upload files to server
 	function uploadVideoFile(mediaFile) {
-		var ft = new FileTransfer(), path = mediaFile.fullPath, name = mediaFile.name;
-	    ft.upload(path, uploadURL, up_win, up_fail, options);
+		var ft = new FileTransfer(),
+        	path = mediaFile.fullPath,
+        	name = mediaFile.name;
+            
+		//var options = new FileUploadOptions();
+		//options.fileName = name;
+		
+	    ft.upload(path, uploadURL, up_win, up_fail, { fileName: name }, true);
 	}
 	
 	function uploadPhotoFile(imageURI) {
@@ -87,11 +93,11 @@
 	    options.mimeType="image/jpeg";
 	
 	    var ft = new FileTransfer();
-	    ft.upload(imageURI, uploadURL, up_win, up_fail, options);
+	    ft.upload(imageURI, uploadURL, up_win, up_fail, options, true);
 	}
 	
 	function up_win(r) {
-        console.log("Code = " + r.responseCode);
+        console.log("Upload OK, Code = " + r.responseCode);
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
         postUpload();
