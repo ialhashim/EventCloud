@@ -1,16 +1,15 @@
 /* Disable highlight color */
-*{
-	-webkit-tap-highlight-color: rgba(255, 255, 255, 0); 
+* {
+	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
 html {
 	color: white;
-	
-	background-color:#444 !important;
-	background-size:16px 16px;
+	background-color: #444 !important;
+	background-size: 16px 16px;
 }
 
-html,body {
+html, body {
 	width: 100%;
 	height: 100%;
 	min-height: 100%;
@@ -21,16 +20,15 @@ html,body {
 body {
 	/*background: url('../img/bg_center.jpg') no-repeat center center;*/
 	overflow: hidden;
-	
 	transition-property: all;
-  	transition-timing-function: ease-in-out;
-  	opacity: 0;
+	transition-timing-function: ease-in-out;
+	opacity: 0;
 }
 
-#mainScreen{
-	margin: auto; 
-	height: 100%; 
-	width: 100%; 
+#mainScreen {
+	margin: auto;
+	height: 100%;
+	width: 100%;
 	/*border:10px red solid;*/
 }
 
@@ -75,86 +73,134 @@ body {
 	top: 0em;
 }
 
-.lable{
+.lable {
 	color: white;
 }
 
-
-h1{
+h1 {
 	padding: 0.25em;
 	font-size: 1em;
 	line-height: 1em;
-	text-shadow:1px 5px 5px #222;
+	text-shadow: 1px 5px 5px #222;
 }
 
-.inputField{
+.inputField {
 	border: 3px solid #ebe6e2;
 	border-radius: 5px;
 	width: 6em;
 	box-shadow: 1px 5px 5px #222;
 	color: hsl(208, 50%, 30%);
 	font-weight: normal;
-	padding:0.1em;
+	padding: 0.1em;
 }
 
-#greeting{
+#greeting {
 	margin: 1em;
 }
 
-.button{
+.button {
 	font-size: 0.75em;
 }
 
-.loading{
-    color: #555;
+.loading {
+	color: #555;
 }
 
-#column1-wrap{
-    float: left;
-    width: 100%;
-}
-#column1{
-    margin-right: 300px;
-}
-#column2{
-    float: left;
-    width: 300px;
-    margin-left: -300px;
-    font-size: 0.9em;
-}
-
-#eventsBox{
-	overflow:auto;
-    overflow-y: scroll;
-}
-
-.scroll-pane
-{
+#column1-wrap {
+	float: left;
 	width: 100%;
-	height: 170px;
+}
+#column1 {
+	margin-right: 300px;
+}
+#column2 {
+	float: left;
+	width: 300px;
+	margin-left: -300px;
+	font-size: 0.9em;
+}
+
+#eventsBox {
+	overflow: auto;
+	overflow-y: scroll;
+}
+
+.scroll-pane {
+	width: 100%;
+	height: 250px;
 	overflow: auto;
 }
 
-.thumbnail{
+.thumbnail {
 	position: relative;
 	width: 10em;
-	padding-right: 3px;
 }
 
-.thumbnail-img{
+.thumbnail-item {
 	width: 100%;
 }
 
-.loading-icon-wrapper{
-    text-align:center;
-    z-index: 1;
+.loading-icon-wrapper {
+	text-align: center;
+	z-index: 1;
 }
 
-.loading-icon{
-    position: absolute;
-    top:40%;
-    
-    font-size: 2em;
-    color: #777;
-    z-index: -99;
+.loading-icon {
+	position: absolute;
+	top: 40%;
+	font-size: 2em;
+	color: #777;
+	z-index: 99;
+}
+
+/* Polaroids effect */
+/* Rotate all even images 2 degrees */
+.polaroids {
+	background: #fff;
+	padding: 10px 10px 15px;
+	text-align: center;
+	box-shadow: 0 3px 6px rgba(0,0,0,.25);
+	
+	margin-right: -2em;
+}
+
+.polaroids {
+	-webkit-transform: rotate(-2deg);
+	-moz-transform: rotate(-2deg);
+}
+
+/* Rotate all even images 2 degrees */
+.polaroids:nth-child(even) {
+	-webkit-transform: rotate(2deg);
+	-moz-transform: rotate(2deg);
+}
+
+/* Don't rotate every third image, but offset its position */
+.polaroids:nth-child(3n) {
+	-webkit-transform: none;
+	-moz-transform: none;
+	position: relative;
+	top: -5px;
+}
+
+/* Rotate every fifth image by 5 degrees and offset it */
+.polaroids:nth-child(5n) {
+	-webkit-transform: rotate(5deg);
+	-moz-transform: rotate(5deg);
+	position: relative;
+	right: 5px;
+}
+
+/* Keep default rotate for every eighth, but offset it */
+.polaroids:nth-child(8n) {
+	position: relative;
+	top: 8px;
+	right: 5px;
+}
+
+/* Keep default rotate for every eleventh, but offset it */
+.polaroids:nth-child(11n) {
+	position: relative;
+	top: 3px;
+	left: -5px;
 }

@@ -19,6 +19,33 @@ function endsWith($haystack, $needle){
     return (substr($haystack, -$length) === $needle);
 }
 
+function newGuid() { 
+    $s = strtoupper(md5(uniqid(rand(),true))); 
+    $guidText = 
+        substr($s,0,8) . '-' . 
+        substr($s,8,4) . '-' . 
+        substr($s,12,4). '-' . 
+        substr($s,16,4). '-' . 
+        substr($s,20); 
+    return $guidText;
+}
+
+function round_down_pow2($x) {
+   $x = $x | ($x >> 1); 
+   $x = $x | ($x >> 2); 
+   $x = $x | ($x >> 4); 
+   $x = $x | ($x >> 8); 
+   $x = $x | ($x >>16); 
+   return $x - ($x >> 1); 
+} 
+
+function moveFile($fromFileName, $toFileName){
+	if (copy($fromFileName,$toFileName)) {
+	  unlink($fromFileName);
+	}	
+}
+
+
 function createThumbnailImage($fromImageFile, $resolution, $toImageFile) { 
 	$thumb = new Imagick($fromImageFile);
 	$thumb->setCompressionQuality(100); 
@@ -27,60 +54,70 @@ function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
 	// When a folder is given
 	if(!endsWith($toImageFile, '.jpg')){
 		$fileCount = count (glob ($toImageFile.'*.jpg'));
-		$newName = $toImageFile . sprintf("%08d",$fileCount + 1) . '.jpg';
+		$newNameFull = $toImageFile . sprintf("%08d",$fileCount + 1) . '.jpg';
 	}else{
-		$newName = $toImageFile;
+		$newNameFull = $toImageFile;
 	}
 
 	$thumb->setImageCompression(imagick::COMPRESSION_JPEG); 
 	$thumb->setImageCompressionQuality(100); 
 	$thumb->stripImage(); 
-	$thumb->writeImage($newName);
+	$thumb->writeImage($newNameFull);
 	$thumb->destroy();
 	
 	// set proper permissions on the new file
-	chmod($newName, 0644);					
+	chmod($newNameFull, 0644);					
 } 
 
-require 'videoThumbnail.php';
-function createThumbnailVideo($fromVideoFile, $resolution, $numFrames, $toVideoFile) { 
-	// where ffmpeg is located, such as /usr/sbin/ffmpeg
-	$ffmpeg = 'ffmpeg';
+function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnailFile) { 
 
-	// the input video file
-	$video = $fromVideoFile;
-
-	// extract one frame at 10% of the length, one at 30% and so on
-	$frames = array('10%', '30%', '50%', '70%', '90%');
+	$uid = newGuid();
+	$ext = 'mp4';
 	
-	$N = 5;
-	
-	$frames = array();
-	for ($i = 1; $i < $N; $i++) {
-		$frames[] = (((float)$i / $N) * 100).'%';
-	}
-
-	// set the delay between frames in the output GIF
-	$joiner = new VideoThumbnailJoin(1);
-	
-	// loop through the extracted frames and add them to the joiner object
-	$allFrames = new VideoThumbnail($video, $frames, $resolution.'x'.$resolution, $ffmpeg);
-	foreach ($allFrames as $key => $frame) {
-		$joiner->add($frame);
-	}
+	$seconds = min(9, $seconds);
 	
 	// When a folder is given
-	if(!endsWith($toVideoFile, '.gif')){
-		$fileCount = count (glob ($toVideoFile.'*.gif'));
-		$newName = $toVideoFile . sprintf("%08d",$fileCount + 1) . '.gif';
+	if(!endsWith($toThumbnailFile, $ext)){
+		$fileCount = count (glob ($toThumbnailFile.'*'.$ext));
+		$newName = sprintf("%08d",$fileCount + 1) . '.' . $ext;
+		$newNameFull = $toThumbnailFile . $newName;
+		$newNamePath = $toThumbnailFile;
 	}else{
-		$newName = $toVideoFile;
+		$newNameFull = $toThumbnailFile;
+	}
+
+	echo "<pre>";
+		
+	if($ext == 'gif')
+	{
+		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -t 00:00:0{$seconds} -vf scale=$resolution:-1 {$newNamePath}tmp/{$uid}%02d.png";
+		$convert_cmd = "convert -delay 4 -loop 0 {$newNamePath}tmp/{$uid}*.png $newNameFull";
+		$convert_cmd_pause = "convert $newNameFull ( -clone 0 -set delay 100 ) -layers OptimizePlus -layers OptimizeTransparency +map $newNameFull";
+	
+		system($ffmpeg_cmd);
+		system($convert_cmd);
+		system($convert_cmd_pause);
+		
+		array_map('unlink', glob( $toThumbnailFile."tmp/{$uid}*.png" ) );
 	}
 	
-	$joiner->save($newName);
-	
+	if($ext == 'mp4')
+	{
+		// Create poster image
+		$posterFile = str_replace("mp4", "png", $newName);
+		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -r 1/1 -vf scale=".round_down_pow2($resolution).":-1 -f mjpeg {$newNamePath}poster/$posterFile";
+		system($ffmpeg_cmd);
+		
+		// Create short clip
+		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -t 00:00:05 -an -vf scale=".round_down_pow2($resolution).":-1 $newNameFull";
+		system($ffmpeg_cmd);
+	}
+
 	// set proper permissions on the new file
-	chmod($newName, 0644);	
+	echo "File:".$newNameFull;
+	chmod($newNameFull, 0644);	
+	
+	echo "</pre>";
 }
 
 ?>

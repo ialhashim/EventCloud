@@ -35,6 +35,7 @@
 		    if(!$('.scroll-pane').has($(e.target)).length)
 		        e.preventDefault();
 		});
+		
 	});
 	
 	
@@ -124,8 +125,15 @@
    	        
 
    			$("#gallery").wrapInner("<table cellspacing='30'><tr>");
-   			$(".thumbnail").wrap("<td></td>");
+   			$(".thumbnail").wrap("<td class='polaroids'></td>");
    			
+	   			
+			// Hide loading icon
+			$("img").one('load', function() {
+			  $(this).prev().hide();
+			}).each(function() {
+			  if(this.complete) $(this).load();
+			});
    	    });
     }
     

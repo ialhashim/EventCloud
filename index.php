@@ -79,10 +79,12 @@
                 {
                 	// Resize and assign a name
 					if(endsWith($finalFileName,'.jpg'))	createThumbnailImage($finalFileName, 500, $upload_dir);
-					if(endsWith($finalFileName,'.mp4'))	createThumbnailVideo($finalFileName, 500, 30, $upload_dir);
+					if(endsWith($finalFileName,'.mp4'))	createThumbnailVideo($finalFileName, 500, 5, $upload_dir);
                     
 					// Delete full uploaded version of file
                 	//unlink($finalFileName);
+                	// Move full version
+                	moveFile( $finalFileName, $upload_dir."full/".$name );
                 	
                     echo "<p class='message-box ok'> File uploaded :) </p>";
                 }

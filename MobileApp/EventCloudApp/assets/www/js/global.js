@@ -2,7 +2,7 @@
 var rootFolder = "http://54.214.248.120/development/workspace/EventCloud/";
 
 /* When using local host */
-var rootFolder = 'http://192.168.0.10/';
+var rootFolder = 'http://96.49.252.141/';
 //var rootFolder = '/';
 
 var uploadURL = rootFolder + "index.php";
