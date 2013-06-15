@@ -1,8 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>EventCloud : Welcome!</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Welcome! | EventCloud</title>
 
 <link rel="stylesheet" href="css/reset-min.css">
 <link rel="stylesheet" href="css/buttons.css">
@@ -19,6 +19,8 @@
 		
 		/* Using the button */
 		$('.loginButton').click(function() {
+			//$('#username').val( encode_utf8( $('#username').val() ) );
+			
 			$('#username').blur();
 			event.preventDefault();
 			$('body').animate({opacity:'0'}, 1);
@@ -29,6 +31,8 @@
 
 		/* Using submit actions */
 		$("#login-form").submit(function(e){
+			
+			
 			$('#username').blur();
 		    e.preventDefault();
 			$('body').animate({opacity:'0'}, 1);
@@ -44,7 +48,7 @@
 <body onload="onBodyLoad()">
 
 <div>
-<form id="login-form" name="login" action="events.html">
+<form id="login-form" name="login" action="events.html" accept-charset="UTF-8">
 <div style="text-align: center" class="lable"><h1>Type your name</h1></div> 
 <div style="text-align: center"><input id="username" class="inputField" type="text" name="username" maxlength="12" size="12" value="user"> 
 <a class="button back blue loginButton" href="#" >Login</a> </div>

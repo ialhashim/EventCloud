@@ -66,7 +66,7 @@
                 }
             
                 
-                $finalFileName =  $upload_dir . $name;
+                $finalFileName =  $upload_dir. "tmp/" . $name;
                 
                 // preserve file from temporary directory
                 $success = move_uploaded_file($myFile["tmp_name"], $finalFileName);

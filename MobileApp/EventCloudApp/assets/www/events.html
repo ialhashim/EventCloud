@@ -1,8 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>EventCloud : Welcome!</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Events | EventCloud</title>
 
 <link rel="stylesheet" href="css/reset-min.css">
 <link rel="stylesheet" href="css/buttons.css">
@@ -17,9 +17,9 @@
 <script type="text/javascript" charset="utf-8">
 
 $(document).ready(function() { 
-	var username = $.getUrlVar('username');
+	var username = getParameterByName('username');
 	
-	$("h2#greeting").replaceWith( "<h2 id='greeting'> Welcome " + toTitleCase(username) + "! </h2>" );
+	$("h2#eventsGreeting").replaceWith( "<h2 id='eventsGreeting'> Welcome " + toTitleCase(username) + "! </h2>" );
 	
 	/* Load and list all events */
 	{
@@ -38,6 +38,7 @@ $(document).ready(function() {
 				    // Assign color
 				    var curColor = colorList[(i++) % data.length];
 				    
+				    // Generate link
 				    $("#eventsList").append(
 				    	$('<li>').append( $('<a>')
 		    			.attr('href','main.html?username=' + username + "&eid=" + entry.eid)
@@ -60,20 +61,23 @@ $(document).ready(function() {
 
 <div style="padding:1em">
 	<div id="column1-wrap">
-		
 		<div id="column1">
-			<h1>Live events</h1>
-			<span class='loading'>Loading...</span>
-			<div id="eventsBox">
-				<ul id="eventsList"></ul>
+			<div>
+				<div><h2 id="eventsGreeting">Welcome!</h2></div>
+				<div><a class="outlink button back red" href="createEvent.html">Create event</a></div>
 			</div>
 		</div>
 	</div>
 	
 	<div id="column2">	
-		<div><h2 id="greeting">Welcome!</h2></div>
-		<div><a class="outlink button back red" href="#">Create event</a></div>
-</div>
+			<div>
+				<h1>Live events</h1>
+				<span class='loading'>Loading...</span>
+				<div id="eventsBox">
+					<ul id="eventsList"> </ul>
+				</div>
+			</div>
+	</div>
 </div>
 
 </body>

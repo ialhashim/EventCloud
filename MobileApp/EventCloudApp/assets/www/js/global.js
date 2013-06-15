@@ -17,37 +17,37 @@ $(document).ready(function() {
 	
 	$('body').on("click", ".outlink", function(event){
 		event.preventDefault();
+		
 		$('body').animate({opacity:'0'}, 1);
 		$('a').fadeOut(fadeSpeed, function(){
-			window.location = this.href;
+			window.location = event.currentTarget.href;
 		});
+		
 		return false;
 	});
 });
 
-/* Extract url variables */
-$.extend({
-  getUrlVars: function(){
-	var vars = [], hash;
-	var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-	for(var i = 0; i < hashes.length; i++)
-	{
-	  hash = hashes[i].split('=');
-	  vars.push(hash[0]);
-	  vars[hash[0]] = hash[1];
-	}
-	return vars;
-  },
-  getUrlVar: function(name){
-	return $.getUrlVars()[name];
-  }
-});
+function encode_utf8(s) {
+  return unescape(htmlentities(s));
+}
+
+function decode_utf8(s) {
+  return htmlentities(escape(s));
+}
 
 /* Change to title case */
 function toTitleCase(str) {
     return str.replace(/(?:^|\s)\w/g, function(match) {
         return match.toUpperCase();
     });
+}
+
+/* Extract url variables */
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
 /* Need these? */

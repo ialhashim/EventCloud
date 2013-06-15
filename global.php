@@ -45,6 +45,9 @@ function moveFile($fromFileName, $toFileName){
 	}	
 }
 
+function readableTime($time){
+	return date("F d Y H:i:s", $time);
+}
 
 function createThumbnailImage($fromImageFile, $resolution, $toImageFile) { 
 	$thumb = new Imagick($fromImageFile);
@@ -109,7 +112,7 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 		system($ffmpeg_cmd);
 		
 		// Create short clip
-		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -t 00:00:05 -an -vf scale=".round_down_pow2($resolution).":-1 $newNameFull";
+		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -t 00:00:05 -vol 0 -vf scale=".round_down_pow2($resolution).":-1 $newNameFull";
 		system($ffmpeg_cmd);
 	}
 

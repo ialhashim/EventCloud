@@ -4,53 +4,73 @@
     error_reporting(E_ALL);
     
 	include_once('global.php');
-	
     $verbose = true;
     
 	$images = glob($upload_dir."*.{jpg,png,gif}", GLOB_BRACE);
 	$videos = glob($upload_dir."*.{mp4}", GLOB_BRACE);
+
+	$media_files = array();
+
+	// Fill array with media
+	foreach($images as $image) $media_files[] = array('type' => 'image', 'file' => $image, 'time' => filectime($image));
+	foreach($videos as $video) $media_files[] = array('type' => 'video', 'file' => $video, 'time' => filectime($video));
 	
-	echo "<div id='gallery'>";
+	// Sort by time
+	usort($media_files, function($a, $b) {return $a['time'] - $b['time'];});
+		
+	$media_count = count($media_files);
 	
-	// Images
-	foreach($images as $image) {
-		$img = basename($image);
-		$imgFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url.$img;
-		
-		echo '<div class="thumbnail">';
-		
-		// Loading image
-		echo '<div class="loading-icon-wrapper">';
-		echo '<i class="loading-icon icon-refresh icon-spin" style=""></i>';
-		echo '</div>';
-		
-		// Actual image
-		echo '<img class="thumbnail-item" src="'.$imgFullPath.'" /><br />';
-		
-		echo '</div>';
-	} 
+	// Slice based on given arguments
+	if(isset($_GET["start"])) $start = $_GET["start"]; else $start = 0;
+	if(isset($_GET["count"])) $count = $_GET["count"]; else $count = 3;
 	
-	// Videos
-	foreach($videos as $video) {
-		$vid = basename($video);
-		$vidFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url.$vid;
-		$posterFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url."poster/".str_replace("mp4", "png", $vid);
+	$media_files = array_slice($media_files, $start, $count);
+	
+	foreach($media_files as $media) {
+		$type = $media['type'];
+		$filename = $media['file'];
+		$time = $media['time'];
 		
-		echo '<div class="thumbnail">';
-		
-		// Loading image
-		echo '<div class="loading-icon-wrapper">';
-		//echo '<i class="loading-icon icon-refresh icon-spin" style=""></i>';
-		echo '</div>';
-		
-		// Actual video
-		echo "<video class='thumbnail-item' poster='$posterFullPath'>";
-		echo "<source src='{$vidFullPath}' type='video/mp4'>";
-		echo '</video> <br />';
+		/// Images
+		if($type == "image")
+		{
+			$img = basename($filename);
+			$imgFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url.$img;
 			
-		echo '</div>';
-	}
-	
-	echo "</div>";
+			echo '<div class="thumbnail">';
+			
+			// Loading image
+			echo '<div class="loading-icon-wrapper">';
+			echo '<i class="loading-icon icon-refresh icon-spin" style=""></i>';
+			echo '</div>';
+			
+			// Actual image
+			echo '<img class="thumbnail-item" src="'.$imgFullPath.'" /><br />';
+			
+			echo '</div>';
+		}
+		
+		/// Videos
+		if($type == "video")
+		{
+			$vid = basename($filename);
+			$vidFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url.$vid;
+			$posterFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url."poster/".str_replace("mp4", "png", $vid);
+			
+			echo '<div class="thumbnail">';
+			
+			// Loading image
+			echo '<div class="loading-icon-wrapper">';
+			//echo '<i class="loading-icon icon-refresh icon-spin" style=""></i>';
+			echo '</div>';
+			
+			// Actual video
+			echo "<video class='thumbnail-item' poster='$posterFullPath' muted autoplay loop webkit-playsinline>";
+			echo "<source src='{$vidFullPath}' type='video/mp4'>";
+			echo '</video> <br />';
+				
+			echo '</div>';
+		}
+	} 
 	
 ?>
