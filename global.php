@@ -123,4 +123,23 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 	echo "</pre>";
 }
 
+function array_shift_circular(array $array, $steps = 1)
+{
+    if ($steps === 0) {
+        return $array;
+    }
+
+    $l = count($array);
+
+    if ($l === 0) {
+        return $array;
+    }
+    
+    $steps = $steps % $l;
+    $steps *= -1;
+
+    return array_merge(array_slice($array, $steps),
+                       array_slice($array, 0, $steps));
+}
+
 ?>

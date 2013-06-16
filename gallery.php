@@ -21,8 +21,15 @@
 	$media_count = count($media_files);
 	
 	// Slice based on given arguments
-	if(isset($_GET["start"])) $start = $_GET["start"]; else $start = 0;
-	if(isset($_GET["count"])) $count = $_GET["count"]; else $count = 3;
+	if(isset($_GET["start"])) $start = intval($_GET["start"]); else $start = 0;
+	if(isset($_GET["count"])) $count = intval($_GET["count"]); else $count = 3;
+	
+	// Circular access test
+	if(true)
+	{
+		$media_files = array_shift_circular($media_files, -$start);
+		$start = 0;
+	}
 	
 	$media_files = array_slice($media_files, $start, $count);
 	
@@ -40,9 +47,9 @@
 			echo '<div class="thumbnail">';
 			
 			// Loading image
-			echo '<div class="loading-icon-wrapper">';
-			echo '<i class="loading-icon icon-refresh icon-spin" style=""></i>';
-			echo '</div>';
+			//echo '<div class="loading-icon-wrapper">';
+			//echo '<i class="loading-icon icon-refresh icon-spin" style=""></i>';
+			//echo '</div>';
 			
 			// Actual image
 			echo '<img class="thumbnail-item" src="'.$imgFullPath.'" /><br />';
@@ -60,17 +67,19 @@
 			echo '<div class="thumbnail">';
 			
 			// Loading image
-			echo '<div class="loading-icon-wrapper">';
+			//echo '<div class="loading-icon-wrapper">';
 			//echo '<i class="loading-icon icon-refresh icon-spin" style=""></i>';
-			echo '</div>';
+			//echo '</div>';
 			
 			// Actual video
-			echo "<video class='thumbnail-item' poster='$posterFullPath' muted autoplay loop webkit-playsinline>";
+			echo "<video class='thumbnail-item' poster='$posterFullPath' controls muted autoplay loop webkit-playsinline>";
 			echo "<source src='{$vidFullPath}' type='video/mp4'>";
 			echo '</video> <br />';
 				
 			echo '</div>';
 		}
 	} 
+	
+	//echo "<!-- Start={$start}, Count={$count} -->";
 	
 ?>
