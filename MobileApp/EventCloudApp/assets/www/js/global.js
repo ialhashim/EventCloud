@@ -10,7 +10,7 @@ var galleryURL = rootFolder + "gallery.php";
 var eventsManager = rootFolder + "events.php";
 	
 /* Default page display */
-var fadeSpeed = 1000;
+var fadeSpeed = 500;
 $(document).ready(function() { 
 	$('body').css('transition-duration', fadeSpeed + 'ms');
 	$('body').css({opacity:1});
@@ -40,6 +40,44 @@ function toTitleCase(str) {
     return str.replace(/(?:^|\s)\w/g, function(match) {
         return match.toUpperCase();
     });
+}
+
+
+/// Form actions
+function actionSubmitForm( $sender, $form ){
+	
+	if($sender.is('a')) eventType ='click';
+	if($sender.is('form')) eventType ='submit';
+	
+	$sender.on(eventType,function() {
+		$('*').blur();
+		event.preventDefault();
+		$('body').animate({opacity:'0'}, 1);
+		$('a').fadeOut(fadeSpeed, function(){
+			$form.unbind("submit").submit();
+			});
+		return false;
+	});
+}
+
+function defaultValues( $item, defaultText ){
+	$item
+		.on('focus', function(){
+			var $this = $(this);
+			if($this.val() == defaultText){
+				$this.val('');
+				$this.css('color', 'hsl(208, 50%, 30%)');
+			}
+		})
+		.on('blur', function(){
+			var $this = $(this);
+			if($this.val() == ''){
+				$this.val(defaultText);
+				$this.css('color', 'hsl(0, 0%, 70%)');
+			}
+		});
+
+	$item.css('color', 'hsl(0, 0%, 70%)');
 }
 
 /* Extract url variables */

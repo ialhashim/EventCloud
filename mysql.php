@@ -164,6 +164,13 @@ class MySQL {
 		return $this->ExecuteSQL($query);
 	}
 	
+	function NewInsertID($table) {
+	    $result = mysql_query('SHOW TABLE STATUS LIKE "'.$table.'"');
+		$row = mysql_fetch_array($result);
+		$nextId = $row['Auto_increment'];  
+		return $nextId;
+	}
+	
 	// Deletes a record from the database
 	function Delete($table, $where='', $limit='', $like=false){
 		$query = "DELETE FROM `{$table}` WHERE ";

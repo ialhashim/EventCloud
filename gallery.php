@@ -5,7 +5,14 @@
     
 	include_once('global.php');
     $verbose = true;
-    
+	
+	// Assign correct upload path
+	if(!empty($_POST["eid"])) $eid = intval( $_POST['eid'] );
+	if(!empty($_GET["eid"])) $eid = intval( $_GET['eid'] );
+	
+	$upload_dir .= $eid.'/';
+	$upload_url .= $eid.'/';
+	
 	$images = glob($upload_dir."*.{jpg,png,gif}", GLOB_BRACE);
 	$videos = glob($upload_dir."*.{mp4}", GLOB_BRACE);
 
@@ -52,7 +59,7 @@
 			//echo '</div>';
 			
 			// Actual image
-			echo '<img class="thumbnail-item" src="'.$imgFullPath.'" /><br />';
+			echo '<img class="thumbnail-item" src="'.$imgFullPath.'" />';
 			
 			echo '</div>';
 		}
@@ -61,7 +68,7 @@
 		if($type == "video")
 		{
 			$vid = basename($filename);
-			$vidFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url.$vid;
+			$vidThumbFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url.$vid;
 			$posterFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url."poster/".str_replace("mp4", "png", $vid);
 			
 			echo '<div class="thumbnail">';
@@ -72,8 +79,8 @@
 			//echo '</div>';
 			
 			// Actual video
-			echo "<video class='thumbnail-item' poster='$posterFullPath' controls muted autoplay loop webkit-playsinline>";
-			echo "<source src='{$vidFullPath}' type='video/mp4'>";
+			echo "<video class='thumbnail-item NoSwiping' poster='$posterFullPath' muted>";
+			echo "<source src='{$vidThumbFullPath}' type='video/mp4'>";
 			echo '</video> <br />';
 				
 			echo '</div>';

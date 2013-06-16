@@ -30,10 +30,14 @@
     
     <div id="uploadResult">
     <?php
-        if (!empty($_FILES["file"])) 
+        if (!empty($_FILES["file"]) && !empty($_POST['eid'])) 
         {
+        	// Assign correct upload path
+        	$eid = intval( $_POST['eid'] );
+			$upload_dir .= $eid.'/';
+			
             $myFile = $_FILES["file"];
-            
+			
             // Check upload is fine
             if ($myFile["error"] !== UPLOAD_ERR_OK) {
                 echo "<p class='message-box error'> ERROR: An error occurred with the upload. Here is what I got: </p>";
@@ -64,10 +68,13 @@
                     $i++;
                     $name = $parts["filename"] . "-" . $i . "." . $parts["extension"];
                 }
-            
                 
                 $finalFileName =  $upload_dir. "tmp/" . $name;
                 
+				// Erase if exists
+				if(file_exists($finalFileName))
+				    unlink($finalFileName); //remove the file
+				
                 // preserve file from temporary directory
                 $success = move_uploaded_file($myFile["tmp_name"], $finalFileName);
                 
@@ -83,7 +90,8 @@
                     
 					// Delete full uploaded version of file
                 	//unlink($finalFileName);
-                	// Move full version
+                	
+                	// Move full version from temporary location
                 	moveFile( $finalFileName, $upload_dir."full/".$name );
                 	
                     echo "<p class='message-box ok'> File uploaded :) </p>";
@@ -100,6 +108,7 @@
     
     <div id="uploadForm">
         <form action="index.php" method="post" enctype="multipart/form-data">
+        <input type="text" name="eid" value="3">
         <input type="file" name="file"> <input type="submit" value="Upload media">
         </form>
     </div>

@@ -19,6 +19,28 @@
 	if($request == "name"){
 		$result = $mysql->Select( 'events', array("eid" => $eid), 'name' );
 	}
-
+	
+	if($request == "create"){
+		$name = $_GET["eventname"];
+		$chunks = intval($_GET["numchunks"]);
+		
+		$vars = array('name' => $name, 'chunks' => $chunks);
+		
+		// Create new event
+		$eid = $mysql->NewInsertID( 'events' );
+		$result = $mysql->Insert( $vars, 'events' );
+		
+		if(!$result) 
+			$eid = -1;
+		else{
+			mkdir($upload_dir.$eid, 0777);
+			mkdir($upload_dir.$eid.'/tmp', 0777);
+			mkdir($upload_dir.$eid.'/full', 0777);
+			mkdir($upload_dir.$eid.'/poster', 0777);
+		}
+		
+		$result = intval($eid);
+	}
+	
 	echo json_encode($result);
 ?>

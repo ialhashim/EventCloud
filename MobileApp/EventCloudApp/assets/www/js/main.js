@@ -9,10 +9,10 @@ var cf;
 	
 $(document).ready(function() { 
 	username = getParameterByName('username');
-	EID = getParameterByName('eid');
+	eid = getParameterByName('eid');
 	
 	// Get event name
-	$.get(eventsManager, { request: "name", eid: EID }, function(data){ 
+	$.get(eventsManager, { request: "name", eid: eid }, function(data){ 
 		eventname = data.name; 
 		$("h2#greeting").replaceWith( "<h2 id='greeting'> " + toTitleCase(username) + " @ " + eventname + " </h2>" );
 	});
@@ -55,6 +55,9 @@ function uploadFile(){
 		console.log($('#tempForm')[0]);
 		
 	    var formData = new FormData($('#tempForm')[0]);
+	    formData.append("eid", eid);
+	    formData.append("username", username);
+	    
 	    $.ajax({
 	        url: uploadURL,  //server script to process data
 	        type: 'POST',
@@ -120,11 +123,21 @@ function uploadVideoFile(mediaFile) {
 	var ft = new FileTransfer(),
     	path = mediaFile.fullPath,
     	name = mediaFile.name;
-        
-	//var options = new FileUploadOptions();
-	//options.fileName = name;
+	var options = new FileUploadOptions();
+	options.fileName = name;
 	
-    ft.upload(path, uploadURL, up_win, up_fail, { fileName: name }, true);
+	// Submission parameters
+	{
+		var params = {};
+		params.eid = eid;
+		params.username = username;
+		
+		getLocation();
+		
+		options.params = params;
+	}
+	
+    ft.upload(path, uploadURL, up_win, up_fail, options, true);
 }
 
 function uploadPhotoFile(imageURI) {
@@ -133,9 +146,16 @@ function uploadPhotoFile(imageURI) {
     options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);
     options.mimeType="image/jpeg";
 
-	navigator.geolocation.getCurrentPosition(onGeoSuccess,onGeoError);
-
-	getLocation();
+	// Submission parameters
+	{
+		var params = {};
+		params.eid = eid;
+		params.username = username;
+		
+		getLocation();
+		
+		options.params = params;
+	}
 
     var ft = new FileTransfer();
     ft.upload(imageURI, uploadURL, up_win, up_fail, options, true);
@@ -156,14 +176,7 @@ function up_fail(error) {
 
 function getLocation(){
 	var onLocationSuccess = function(position) {
-	    console.log('Latitude: '          + position.coords.latitude          + '\n' +
-	          		'Longitude: '         + position.coords.longitude         + '\n' +
-	          		'Altitude: '          + position.coords.altitude          + '\n' +
-	          		'Accuracy: '          + position.coords.accuracy          + '\n' +
-	          		'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-	          		'Heading: '           + position.coords.heading           + '\n' +
-	          		'Speed: '             + position.coords.speed             + '\n' +
-	          		'Timestamp: '         + position.timestamp                + '\n');
+	    console.log('Coordinates: ' + position.coords.latitude + ',' + position.coords.longitude);
 	};
 	
 	// onError Callback receives a PositionError object
@@ -181,7 +194,8 @@ function getPhotos(count, start, callBack){
 	
 	var requestData = {
 		count : count,
-		start : start
+		start : start,
+		eid: eid
 	};
 
 	var request = $.ajax({
@@ -246,6 +260,7 @@ function initialSlides() {
 			pagination : '.pagination-main',
 			slidesPerSlide : slidesCount,
 			mousewheelControl: true,
+			preventClassNoSwiping: true,
 			//etc..
 			onTouchMove: function(){
 				
@@ -268,7 +283,16 @@ function initialSlides() {
 				    	var h = Math.max(slideWidth, slideHeight);
 				    	
 				    	mainSwiper.appendSlide( mainSwiper.createSlide( $(el).html() ) );
-				    	mainSwiper.removeSlide(0);
+				    	//mainSwiper.removeSlide(0);
+				    	
+						$(".thumbnail-item").hover(
+						  function () {
+						    $(this).attr("controls", 'controls');
+						  },
+						  function () {
+						    $(this).removeAttr('controls');
+						  }
+						);
 					});
 				});
 			}

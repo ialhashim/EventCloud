@@ -21,6 +21,8 @@ $(document).ready(function() {
 	
 	$("h2#eventsGreeting").replaceWith( "<h2 id='eventsGreeting'> Welcome " + toTitleCase(username) + "! </h2>" );
 	
+	$("#createEventLink").attr('href', 'createEvent.html?username=' + username);
+	
 	/* Load and list all events */
 	{
 		var options = { request: "all" };
@@ -36,7 +38,7 @@ $(document).ready(function() {
 					console.log(entry);
 				    
 				    // Assign color
-				    var curColor = colorList[(i++) % data.length];
+				    var curColor = colorList[(i++) % 4];
 				    
 				    // Generate link
 				    $("#eventsList").append(
@@ -59,26 +61,29 @@ $(document).ready(function() {
 
 <body onload="onBodyLoad()" style="text-align:center">
 
-<div style="padding:1em">
-	<div id="column1-wrap">
-		<div id="column1">
-			<div>
-				<div><h2 id="eventsGreeting">Welcome!</h2></div>
-				<div><a class="outlink button back red" href="createEvent.html">Create event</a></div>
+	<div id="mainScreen">
+		<div class="centerBoth" style="-webkit-text-stroke: 0.5px; width:500px;" >
+			<div style="padding:1em">
+				<div id="column1-wrap">
+					<div id="column1">
+						<div>
+							<div><h2 id="eventsGreeting">Welcome!</h2></div>
+							<div style=" margin-top: 1em;" ><a id='createEventLink' class="outlink button back red" href="">Create event</a></div>
+						</div>
+					</div>
+				</div>
+				
+				<div id="column2">	
+					<div>
+						<h1 style="margin-bottom:1em">Live events</h1>
+						<span class='loading'>Loading...</span>
+						<div id="eventsBox">
+							<ul id="eventsList"> </ul>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	
-	<div id="column2">	
-			<div>
-				<h1>Live events</h1>
-				<span class='loading'>Loading...</span>
-				<div id="eventsBox">
-					<ul id="eventsList"> </ul>
-				</div>
-			</div>
-	</div>
-</div>
-
 </body>
 </html>

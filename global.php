@@ -56,7 +56,7 @@ function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
 	
 	// When a folder is given
 	if(!endsWith($toImageFile, '.jpg')){
-		$fileCount = count (glob ($toImageFile.'*.jpg'));
+		$fileCount = count (glob ($toImageFile."*.{jpg,png,gif,mp4}", GLOB_BRACE));
 		$newNameFull = $toImageFile . sprintf("%08d",$fileCount + 1) . '.jpg';
 	}else{
 		$newNameFull = $toImageFile;
@@ -81,10 +81,12 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 	
 	// When a folder is given
 	if(!endsWith($toThumbnailFile, $ext)){
-		$fileCount = count (glob ($toThumbnailFile.'*'.$ext));
-		$newName = sprintf("%08d",$fileCount + 1) . '.' . $ext;
-		$newNameFull = $toThumbnailFile . $newName;
 		$newNamePath = $toThumbnailFile;
+		
+		$fileCount = count (glob ($newNamePath."*.{jpg,png,gif,mp4}", GLOB_BRACE));
+		$newName = sprintf("%08d",$fileCount + 1) . '.' . $ext;
+		
+		$newNameFull = $newNamePath . $newName;
 	}else{
 		$newNameFull = $toThumbnailFile;
 	}

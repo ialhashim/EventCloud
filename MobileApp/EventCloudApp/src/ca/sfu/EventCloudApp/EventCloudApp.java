@@ -27,6 +27,8 @@ public class EventCloudApp extends DroidGap
 {
     public void onCreate(Bundle savedInstanceState)
     {
+    	System.setProperty("http.keepAlive", "false"); 
+    	
         super.onCreate(savedInstanceState);
         // Set by <content src="index.html" /> in config.xml
         super.loadUrl(Config.getStartUrl());

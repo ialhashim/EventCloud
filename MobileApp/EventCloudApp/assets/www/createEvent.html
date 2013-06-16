@@ -13,18 +13,79 @@
 <script type="text/javascript" charset="utf-8" src="js/jquery-1.10.1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="cordova-2.7.0.js"></script>
 <script type="text/javascript" charset="utf-8" src="js/global.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/spin.min.js"></script>
+
 
 <script type="text/javascript" charset="utf-8">
+	var username;
+
+	function createEvent(){
+
+		$("#spinner").fadeIn('fast',function(){
+			var target = document.getElementById('spinner');
+			var spinner = new Spinner({ color: '#FFF', shadow: true }).spin(target);
+			
+			var requestData = {
+				request : 'create',
+				eventname : $("#eventname").val(),
+				numchunks: $("#numchunks").val()
+			};
+	
+			var request = $.ajax({
+				url : eventsManager,
+				type : "GET",
+				data : requestData,
+				success: function( data ){
+					$('*').blur();
+					
+					$('body').animate({opacity:'0'}, 1);
+						$('a').fadeOut(fadeSpeed, function(){
+							window.location = 'main.html?username=' + username + "&eid=" + data;
+					});
+				}
+			}); 
+		});
+	}
+	
+	$(document).ready(function() { 
+		username = getParameterByName('username');
+		$("#username").attr("value", username);
+		
+		$("#spinner").hide();
+		
+		// Defaults
+		$('#numchunks').css('color', 'hsl(0, 0%, 70%)');
+		defaultValues( $('#eventname'), 'Event Name' );
+		
+		// Register submit behavior
+		$('#createEventForm').submit(function() { createEvent(); return false; });
+		$('#createButton').click(function(){ $('#createEventForm').submit(); });
+	});
 </script>
 
 </head>
-<body onload="">
+<body onload="onBodyLoad()">
+	<div id="mainScreen">
+		<div class="centerBoth" style="-webkit-text-stroke: 0.6px;" >
+			<h2 style="font-size: 2em; font-weight: bold">Create Event</h2>
+			<h3 style="margin-top: 0.4em; color: #999">It's free and always will be.</h3>
+			
+			<div style="margin-top: 1em">
+				<form class="niceForm" id="createEventForm" name="create" action="" accept-charset="UTF-8">
+					<input type="hidden" name="request" value="create">
+					<input id="username" type="hidden" name="username" value="">
 
-<div>
-
-
-
-</div>
-
+					<input id="eventname" style="width: 260px;" type="text" name="eventname" value="Event Name" /> <a id="createButton" class="button back blue createButton" href="#" >Create</a> <br/>
+					<input id="numchunks" style="width: 3em;"type="number" name="numchunks" value="60" min="1" max="1024" /> <span>Num chunks</span>
+					
+					<!-- Enter submit trick -->
+					<div class="hidden-submit" style="border:0 none;height:0;width:0;overflow:hidden"><input type="submit" tabindex="-1"/></div>
+				</form>
+			</div>
+			
+		</div>
+		
+		<div id="spinner" class="myspinner">  </div>
+	</div>
 </body>
 </html>
