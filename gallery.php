@@ -49,7 +49,7 @@
 		if($type == "image")
 		{
 			$img = basename($filename);
-			$imgFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url.$img;
+			$imgFullPath = $server_address.$upload_url.$img;
 			
 			echo '<div class="thumbnail">';
 			
@@ -59,7 +59,7 @@
 			//echo '</div>';
 			
 			// Actual image
-			echo '<img class="thumbnail-item" src="'.$imgFullPath.'" />';
+			echo '<a href='.$server_address.$upload_url.'full/'.$img.'><img class="thumbnail-item" src="'.$imgFullPath.'" /></a>';
 			
 			echo '</div>';
 		}
@@ -68,8 +68,8 @@
 		if($type == "video")
 		{
 			$vid = basename($filename);
-			$vidThumbFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url.$vid;
-			$posterFullPath = 'http://'.$_SERVER['SERVER_ADDR'].$upload_url."poster/".str_replace("mp4", "png", $vid);
+			$vidThumbFullPath = $server_address.$upload_url.$vid;
+			$posterFullPath = $server_address.$upload_url."poster/".str_replace("mp4", "png", $vid);
 			
 			echo '<div class="thumbnail">';
 			

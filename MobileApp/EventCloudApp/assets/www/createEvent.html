@@ -61,6 +61,26 @@
 		$('#createEventForm').submit(function() { createEvent(); return false; });
 		$('#createButton').click(function(){ $('#createEventForm').submit(); });
 	});
+	
+	function clearAllEvents(){
+		var requestData = {
+			request : 'clearAll'
+		};
+		
+		var request = $.ajax({
+			url : eventsManager,
+			type : "GET",
+			data : requestData,
+			success: function( data ){
+				$('*').blur();
+				$('body').animate({opacity:'0'}, 1);
+					$('a').fadeOut(fadeSpeed, function(){
+						//window.location = 'events.html?username=' + username;
+						console.log( data );
+				});
+			}
+		}); 
+	}
 </script>
 
 </head>
@@ -75,12 +95,16 @@
 					<input type="hidden" name="request" value="create">
 					<input id="username" type="hidden" name="username" value="">
 
-					<input id="eventname" style="width: 260px;" type="text" name="eventname" value="Event Name" /> <a id="createButton" class="button back blue createButton" href="#" >Create</a> <br/>
-					<input id="numchunks" style="width: 3em;"type="number" name="numchunks" value="60" min="1" max="1024" /> <span>Num chunks</span>
+					<input id="eventname" style="width: 260px;" type="text" name="eventname" value="Event Name" /> <a id="createButton" class="button blue createButton" href="#" >Create</a> <br/>
+					<input id="numchunks" style="width: 3em;"type="number" name="numchunks" value="60" min="1" max="1024" /> <span>Num chunks</span> 	
+					
+					<a style="font-size:0.5em; float:right; margin-right: 1.3em; opacity:0.1" class="button pink red createButton" href="#" onclick="clearAllEvents()"><i class="icon-remove-sign"> </i>Clear All</a>
+			
 					
 					<!-- Enter submit trick -->
 					<div class="hidden-submit" style="border:0 none;height:0;width:0;overflow:hidden"><input type="submit" tabindex="-1"/></div>
 				</form>
+				
 			</div>
 			
 		</div>

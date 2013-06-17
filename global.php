@@ -7,6 +7,7 @@ $MYSQL_PASS = "chixchix";
 //$upload_dir = "/var/www/html/uploads/";
 $upload_dir = dirname(__FILE__). "/uploads/";
 $upload_url = "/uploads/";
+$server_address = 'http://96.49.252.141';
 
 function startsWith($haystack, $needle){
     return !strncmp($haystack, $needle, strlen($needle));
@@ -57,7 +58,8 @@ function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
 	// When a folder is given
 	if(!endsWith($toImageFile, '.jpg')){
 		$fileCount = count (glob ($toImageFile."*.{jpg,png,gif,mp4}", GLOB_BRACE));
-		$newNameFull = $toImageFile . sprintf("%08d",$fileCount + 1) . '.jpg';
+		$baseName = sprintf("%08d",$fileCount + 1) . '.jpg';
+		$newNameFull = $toImageFile . $baseName;
 	}else{
 		$newNameFull = $toImageFile;
 	}
@@ -69,11 +71,15 @@ function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
 	$thumb->destroy();
 	
 	// set proper permissions on the new file
-	chmod($newNameFull, 0644);					
+	chmod($newNameFull, 0644);
+	
+	return $baseName;				
 } 
 
 function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnailFile) { 
 
+	echo "<pre>";
+		
 	$uid = newGuid();
 	$ext = 'mp4';
 	
@@ -91,8 +97,6 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 		$newNameFull = $toThumbnailFile;
 	}
 
-	echo "<pre>";
-		
 	if($ext == 'gif')
 	{
 		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -t 00:00:0{$seconds} -vf scale=$resolution:-1 {$newNamePath}tmp/{$uid}%02d.png";
@@ -123,6 +127,8 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 	chmod($newNameFull, 0644);	
 	
 	echo "</pre>";
+	
+	return $newName;
 }
 
 function array_shift_circular(array $array, $steps = 1)

@@ -84,15 +84,17 @@
                 }
                 else
                 {
+                	$newName = '';
+					
                 	// Resize and assign a name
-					if(endsWith($finalFileName,'.jpg'))	createThumbnailImage($finalFileName, 500, $upload_dir);
-					if(endsWith($finalFileName,'.mp4'))	createThumbnailVideo($finalFileName, 500, 5, $upload_dir);
+					if(endsWith($finalFileName,'.jpg'))	$newName = createThumbnailImage($finalFileName, 500, $upload_dir);
+					if(endsWith($finalFileName,'.mp4'))	$newName = createThumbnailVideo($finalFileName, 500, 5, $upload_dir);
                     
 					// Delete full uploaded version of file
                 	//unlink($finalFileName);
                 	
                 	// Move full version from temporary location
-                	moveFile( $finalFileName, $upload_dir."full/".$name );
+                	moveFile( $finalFileName, $upload_dir."full/".$newName );
                 	
                     echo "<p class='message-box ok'> File uploaded :) </p>";
                 }
@@ -113,7 +115,8 @@
         </form>
     </div>
 	
-	<a href="MobileApp/EventCloudApp/assets/www">Test</a>
+	<a href="MobileApp/EventCloudApp/assets/www">Test</a> <br/>
+	<a href="/EventCloudApp.apk">EventCloud APK</a>
     
     </body>
 </html>

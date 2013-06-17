@@ -42,5 +42,10 @@
 		$result = intval($eid);
 	}
 	
+	if($request == "clearAll"){
+		$query = "TRUNCATE TABLE events";
+		$result = $mysql->ExecuteSQL($query);
+	}
+	
 	echo json_encode($result);
 ?>
