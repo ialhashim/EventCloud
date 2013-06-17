@@ -268,3 +268,12 @@ h1 {
    margin-top: -500px;
    background: rgba(68, 68, 68, 0.8);
 }
+
+.spinner-container{
+	
+}
+.spinner-item{
+	padding: 2em;
+	margin: auto;
+	width: 50px;
+}

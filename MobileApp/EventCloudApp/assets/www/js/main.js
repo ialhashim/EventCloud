@@ -23,8 +23,62 @@ $(document).ready(function() {
 	        e.preventDefault();
 	});
 	
+	// Single reference copy of spinner element
+	$s = $('<div id="refSpinner" class="spinner-item"></div>').spin( { color: '#FFF', shadow: true } );
+	$refSpinner = $('<div class="spinner-container"></div>').append( $s );
+	
 	initialSlides();
 });
+
+/// Spinner stuff
+var $refSpinner;
+(function($) {
+	$.fn.spin = function(opts, color) {
+                if (arguments.length == 1 && opts == false) {
+                        return this.each(function() {
+                                var $this = $(this),
+                                data = $this.data();
+ 
+                                if (data.spinner) {
+                                        data.spinner.stop();
+                                        delete data.spinner;
+                                }
+                        });
+                }
+		var presets = {
+			"tiny": { lines: 8, length: 2, width: 2, radius: 3 },
+			"small": { lines: 8, length: 4, width: 3, radius: 5 },
+			"large": { lines: 10, length: 8, width: 4, radius: 8 }
+		};
+		if (Spinner) {
+			return this.each(function() {
+				var $this = $(this),
+					data = $this.data();
+				
+				if (data.spinner) {
+					data.spinner.stop();
+					delete data.spinner;
+				}
+				if (opts !== false) {
+					if (typeof opts === "string") {
+						if (opts in presets) {
+							opts = presets[opts];
+						} else {
+							opts = {};
+						}
+						if (color) {
+							opts.color = color;
+						}
+					}
+					data.spinner = new Spinner($.extend({color: $this.css('color')}, opts)).spin(this);
+				}
+			});
+		} else {
+			throw "Spinner class not available.";
+		}
+	};
+})(jQuery);
+
 
 // Upload file
 //
@@ -235,6 +289,7 @@ function resizeSwiper(){
 	
 	mainSwiper.reInit();
 }
+	
 
 function initialSlides() {
 	
@@ -246,7 +301,9 @@ function initialSlides() {
 	var count = slidesCount;
 	var start = currentStart;
 	
-	getPhotos(count, start, function(d){
+	var numActiveSlides = 9;
+	
+	getPhotos(numActiveSlides, start, function(d){
 			
 		$data = $(d);
 		
@@ -254,6 +311,18 @@ function initialSlides() {
 	    	var slideHeight = $(el).height();
 	    	$(el).appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" style="height:' + slideHeight + 'px" />');
 		});
+		
+		leftOver = numActiveSlides - $data.length;
+		
+		for (var i = 0; i < leftOver; i++)
+		{ 
+			$emptyItem = $refSpinner.clone();
+			$emptyItem.appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" />');
+			
+			
+		}
+		
+		console.log( leftOver );
 		
 	    mainSwiper = $('.swiper-container').swiper({
 			//Your options here:
@@ -282,7 +351,7 @@ function initialSlides() {
 				    	var slideHeight = $(el).height();
 				    	var h = Math.max(slideWidth, slideHeight);
 				    	
-				    	mainSwiper.appendSlide( mainSwiper.createSlide( $(el).html() ) );
+				    	//mainSwiper.appendSlide( mainSwiper.createSlide( $(el).html() ) );
 				    	//mainSwiper.removeSlide(0);
 				    	
 						$(".thumbnail-item").hover(

@@ -20,6 +20,11 @@ function endsWith($haystack, $needle){
     return (substr($haystack, -$length) === $needle);
 }
 
+function right($string,$chars){ 
+    $vright = substr($string, strlen($string)-$chars,$chars); 
+    return $vright; 
+} 
+
 function newGuid() { 
     $s = strtoupper(md5(uniqid(rand(),true))); 
     $guidText = 
@@ -55,10 +60,12 @@ function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
 	$thumb->setCompressionQuality(100); 
 	$thumb->resizeImage($resolution, $resolution, Imagick::FILTER_CATROM, 1, true);
 	
+	$ext = right($fromImageFile, 4);
+	
 	// When a folder is given
-	if(!endsWith($toImageFile, '.jpg')){
+	if(!endsWith($toImageFile, $ext)){
 		$fileCount = count (glob ($toImageFile."*.{jpg,png,gif,mp4}", GLOB_BRACE));
-		$baseName = sprintf("%08d",$fileCount + 1) . '.jpg';
+		$baseName = sprintf("%08d",$fileCount + 1) . $ext;
 		$newNameFull = $toImageFile . $baseName;
 	}else{
 		$newNameFull = $toImageFile;
@@ -131,6 +138,11 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 	return $newName;
 }
 
+function makePublicFolder($folderpath){
+	if(!file_exists($folderpath))
+		mkdir($folderpath, 0777);
+}
+
 function array_shift_circular(array $array, $steps = 1)
 {
     if ($steps === 0) {
@@ -148,6 +160,23 @@ function array_shift_circular(array $array, $steps = 1)
 
     return array_merge(array_slice($array, $steps),
                        array_slice($array, 0, $steps));
+}
+
+function handleFile($file, $upload_dir){
+	$newName = '';
+					
+	// Create thumbnails
+	if(endsWith($file,'.jpg') || endsWith($file,'.png'))	$newName = createThumbnailImage($file, 500, $upload_dir);
+	if(endsWith($file,'.mp4'))	$newName = createThumbnailVideo($file, 500, 5, $upload_dir);
+	
+	// Delete full uploaded version of file
+	//unlink($file);
+	
+	// Move full version from a temporary location
+	$fullFileName = $upload_dir."/full/".$newName;
+	moveFile( $file, $fullFileName );
+	
+	return $fullFileName;
 }
 
 ?>

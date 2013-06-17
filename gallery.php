@@ -23,7 +23,7 @@
 	foreach($videos as $video) $media_files[] = array('type' => 'video', 'file' => $video, 'time' => filectime($video));
 	
 	// Sort by time
-	usort($media_files, function($a, $b) {return $a['time'] - $b['time'];});
+	//usort($media_files, function($a, $b) {return $a['time'] - $b['time'];});
 		
 	$media_count = count($media_files);
 	
@@ -48,9 +48,6 @@
 		/// Images
 		if($type == "image")
 		{
-			$img = basename($filename);
-			$imgFullPath = $server_address.$upload_url.$img;
-			
 			echo '<div class="thumbnail">';
 			
 			// Loading image
@@ -59,8 +56,8 @@
 			//echo '</div>';
 			
 			// Actual image
-			echo '<a href='.$server_address.$upload_url.'full/'.$img.'><img class="thumbnail-item" src="'.$imgFullPath.'" /></a>';
-			
+			makeImageItem( basename($filename), $upload_url, $server_address );
+
 			echo '</div>';
 		}
 		
@@ -68,9 +65,7 @@
 		if($type == "video")
 		{
 			$vid = basename($filename);
-			$vidThumbFullPath = $server_address.$upload_url.$vid;
-			$posterFullPath = $server_address.$upload_url."poster/".str_replace("mp4", "png", $vid);
-			
+
 			echo '<div class="thumbnail">';
 			
 			// Loading image
@@ -79,9 +74,7 @@
 			//echo '</div>';
 			
 			// Actual video
-			echo "<video class='thumbnail-item NoSwiping' poster='$posterFullPath' muted>";
-			echo "<source src='{$vidThumbFullPath}' type='video/mp4'>";
-			echo '</video> <br />';
+			makeVideoItem($vid, $upload_url, $server_address);
 				
 			echo '</div>';
 		}
@@ -89,4 +82,23 @@
 	
 	//echo "<!-- Start={$start}, Count={$count} -->";
 	
+	function makeImageItem($img, $upload_url, $server_address, $withLink = false){
+		if($withLink)
+			echo '<a href='.$server_address.$upload_url.'full/'.$img.'><img class="thumbnail-item" src="'.$server_address.$upload_url.$img.'" /></a>';
+		else
+			echo '<img class="thumbnail-item" src="'.$server_address.$upload_url.$img.'" />';
+	}
+	
+	function makeVideoItem($vid, $upload_url, $server_address, $withLink = false){
+		$posterFullPath = $server_address.$upload_url."poster/".str_replace("mp4", "png", $vid);
+		$vidThumbFullPath = $server_address.$upload_url.$vid;
+			
+		if($withLink){
+			
+		}else{
+			echo "<video class='thumbnail-item NoSwiping' poster='$posterFullPath' muted>";
+			echo "<source src='{$vidThumbFullPath}' type='video/mp4'>";
+			echo '</video> <br />';
+		}
+	}
 ?>

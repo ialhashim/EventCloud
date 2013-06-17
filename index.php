@@ -58,17 +58,8 @@
             // ensure a safe filename
             $name = preg_replace("/[^A-Z0-9._-]/i", "_", $myFile["name"]);
             
-            // don't overwrite an existing file
-            $i = 0;
-            $parts = pathinfo($name);
-            
             if(strlen($name))
             {
-                while (file_exists($upload_dir . $name)) {
-                    $i++;
-                    $name = $parts["filename"] . "-" . $i . "." . $parts["extension"];
-                }
-                
                 $finalFileName =  $upload_dir. "tmp/" . $name;
                 
 				// Erase if exists
@@ -84,18 +75,8 @@
                 }
                 else
                 {
-                	$newName = '';
-					
-                	// Resize and assign a name
-					if(endsWith($finalFileName,'.jpg'))	$newName = createThumbnailImage($finalFileName, 500, $upload_dir);
-					if(endsWith($finalFileName,'.mp4'))	$newName = createThumbnailVideo($finalFileName, 500, 5, $upload_dir);
-                    
-					// Delete full uploaded version of file
-                	//unlink($finalFileName);
-                	
-                	// Move full version from temporary location
-                	moveFile( $finalFileName, $upload_dir."full/".$newName );
-                	
+                	handleFile($finalFileName, $upload_dir);
+
                     echo "<p class='message-box ok'> File uploaded :) </p>";
                 }
             }

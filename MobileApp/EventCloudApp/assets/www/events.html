@@ -33,9 +33,17 @@ $(document).ready(function() {
 		    
 		    // Hide loading message
 		    $('.loading').fadeOut('slow', function() {
+		    	
+		    	// Make sure its an array
+		    	if (!(data instanceof Array)){
+		    		if(data.eid != undefined)
+		    			data = [data];
+		    	}
+		    	
+		    	if(data instanceof Array)
 		    	data.forEach(function(entry) {
 				    // Debug
-					console.log(entry);
+					//console.log(entry);
 				    
 				    // Assign color
 				    var curColor = colorList[(i++) % 4];
