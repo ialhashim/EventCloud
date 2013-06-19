@@ -4,10 +4,21 @@ $MYSQL_NAME = "event_cloud";
 $MYSQL_USER = "root";
 $MYSQL_PASS = "chixchix";
 
+// Global DB object
+include_once('mysql.php');
+$db = new MySQL($MYSQL_NAME, $MYSQL_USER, $MYSQL_PASS);
+
 //$upload_dir = "/var/www/html/uploads/";
 $upload_dir = dirname(__FILE__). "/uploads/";
 $upload_url = "/uploads/";
 $server_address = 'http://96.49.252.141';
+
+// Global variables sent to PHP scripts - its research code :P
+if(isset($_POST["request"]))	$request 	= $_POST["request"]; else 	$request 	= "";
+if(isset($_POST["eid"]))		$eid 		= $_POST["eid"]; 	else 	$eid 		= -1;
+if(isset($_POST["uid"]))		$uid 		= $_POST["uid"]; 	else 	$uid 		= -1;
+if(isset($_POST["mid"]))		$mid 		= $_POST["mid"]; 	else 	$mid 		= -1;
+if(isset($_POST["username"]))	$username	= $_POST["username"]; else 	$username	= "";
 
 function startsWith($haystack, $needle){
     return !strncmp($haystack, $needle, strlen($needle));
@@ -162,21 +173,5 @@ function array_shift_circular(array $array, $steps = 1)
                        array_slice($array, 0, $steps));
 }
 
-function handleFile($file, $upload_dir){
-	$newName = '';
-					
-	// Create thumbnails
-	if(endsWith($file,'.jpg') || endsWith($file,'.png'))	$newName = createThumbnailImage($file, 500, $upload_dir);
-	if(endsWith($file,'.mp4'))	$newName = createThumbnailVideo($file, 500, 5, $upload_dir);
-	
-	// Delete full uploaded version of file
-	//unlink($file);
-	
-	// Move full version from a temporary location
-	$fullFileName = $upload_dir."/full/".$newName;
-	moveFile( $file, $fullFileName );
-	
-	return $fullFileName;
-}
 
 ?>

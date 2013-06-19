@@ -1,4 +1,5 @@
 
+var userid;
 var username;
 var eid;
 var eventname = '';
@@ -8,11 +9,12 @@ var itemCount = 4;
 var cf;  
 	
 $(document).ready(function() { 
-	username = getParameterByName('username');
+	userid = getParameterByName('uid');
+	username = getUserName( userid );
 	eid = getParameterByName('eid');
 	
 	// Get event name
-	$.get(eventsManager, { request: "name", eid: eid }, function(data){ 
+	$.post(eventsManager, { request: "name", eid: eid }, function(data){ 
 		eventname = data.name; 
 		$("h2#greeting").replaceWith( "<h2 id='greeting'> " + toTitleCase(username) + " @ " + eventname + " </h2>" );
 	});
@@ -254,7 +256,7 @@ function getPhotos(count, start, callBack){
 
 	var request = $.ajax({
 		url : galleryURL,
-		type : "GET",
+		type : "POST",
 		data : requestData,
 		success: function( d ){
 			callBack(d);
@@ -287,7 +289,8 @@ function resizeSwiper(){
 	// Placements
 	$('#swiper-main-container').css('top', ( ($('body').height() * 0.5) - (slideHeight * 0.5) ));
 	
-	mainSwiper.reInit();
+	if(!mainSwiper == undefined)
+		mainSwiper.reInit();
 }
 	
 
@@ -299,71 +302,46 @@ function initialSlides() {
 	//});
 	
 	var count = slidesCount;
-	var start = currentStart;
 	
 	var numActiveSlides = 9;
 	
-	getPhotos(numActiveSlides, start, function(d){
+	getPhotos(numActiveSlides, 0, function(d){
 			
+		// Load initial set of slides
 		$data = $(d);
-		
 		$.each( $data, function( i, el ) {
 	    	var slideHeight = $(el).height();
 	    	$(el).appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" style="height:' + slideHeight + 'px" />');
 		});
 		
+		// Generate left over slides
 		leftOver = numActiveSlides - $data.length;
-		
 		for (var i = 0; i < leftOver; i++)
 		{ 
-			$emptyItem = $refSpinner.clone();
+			//$emptyItem = $refSpinner.clone();
+			$emptyItem = $('<div>BB</div>');
 			$emptyItem.appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" />');
-			
-			
 		}
 		
 		console.log( leftOver );
 		
 	    mainSwiper = $('.swiper-container').swiper({
 			//Your options here:
-			pagination : '.pagination-main',
+			loop: true,
 			slidesPerSlide : slidesCount,
 			mousewheelControl: true,
 			preventClassNoSwiping: true,
+			pagination : '.pagination-main',
+			mode:'horizontal',
+			loopStopLeft: true,
+			loopStopIndex: 0,
+			
 			//etc..
 			onTouchMove: function(){
-				
+				mainSwiper.virtualIndex = mainSwiper.activeIndex;
 			},
 			onTouchStart: function(){
 				
-				var idx = mainSwiper.activeIndex + slidesCount;
-				
-				getPhotos(3, idx, function(d){ 
-					$newData = $(d);
-					
-					// Skip when on new slides arrive
-					if(!$newData.length) return;
-					
-					console.log( $newData );
-			
-					$.each( $newData, function( i, el ) {
-						var slideWidth = $(el).width();
-				    	var slideHeight = $(el).height();
-				    	var h = Math.max(slideWidth, slideHeight);
-				    	
-				    	//mainSwiper.appendSlide( mainSwiper.createSlide( $(el).html() ) );
-				    	//mainSwiper.removeSlide(0);
-				    	
-						$(".thumbnail-item").hover(
-						  function () {
-						    $(this).attr("controls", 'controls');
-						  },
-						  function () {
-						    $(this).removeAttr('controls');
-						  }
-						);
-					});
-				});
 			}
 		});
 		
@@ -372,6 +350,8 @@ function initialSlides() {
 	    $(window).resize(function() {
 		  resizeSwiper();
 		});
+		
+		mainSwiper.swipeTo(0,1,false);
 		
 	});
 }

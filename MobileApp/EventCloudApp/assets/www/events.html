@@ -17,17 +17,18 @@
 <script type="text/javascript" charset="utf-8">
 
 $(document).ready(function() { 
-	var username = getParameterByName('username');
+	var userid = getParameterByName('uid');
+	var username = getUserName( userid );
 	
 	$("h2#eventsGreeting").replaceWith( "<h2 id='eventsGreeting'> Welcome " + toTitleCase(username) + "! </h2>" );
 	
-	$("#createEventLink").attr('href', 'createEvent.html?username=' + username);
+	$("#createEventLink").attr('href', 'createEvent.html?uid=' + userid);
 	
 	/* Load and list all events */
 	{
 		var options = { request: "all" };
 		
-		$.get(eventsManager, options, function(data) {
+		$.post(eventsManager, options, function(data) {
 			var i = 0;
 		    var colorList = ['blue', 'green', 'orange', 'pink'];
 		    
@@ -51,7 +52,7 @@ $(document).ready(function() {
 				    // Generate link
 				    $("#eventsList").append(
 				    	$('<li>').append( $('<a>')
-		    			.attr('href','main.html?username=' + username + "&eid=" + entry.eid)
+		    			.attr('href','main.html?uid=' + userid + "&eid=" + entry.eid)
 		    			.addClass('outlink button ' + curColor)
 		    			.append( entry.name )).hide()
 				    );

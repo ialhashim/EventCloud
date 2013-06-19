@@ -17,39 +17,11 @@
 
 
 <script type="text/javascript" charset="utf-8">
-	var username;
+	var userid;
 
-	function createEvent(){
-
-		$("#spinner").fadeIn('fast',function(){
-			var target = document.getElementById('spinner');
-			var spinner = new Spinner({ color: '#FFF', shadow: true }).spin(target);
-			
-			var requestData = {
-				request : 'create',
-				eventname : $("#eventname").val(),
-				numchunks: $("#numchunks").val()
-			};
-	
-			var request = $.ajax({
-				url : eventsManager,
-				type : "GET",
-				data : requestData,
-				success: function( data ){
-					$('*').blur();
-					
-					$('body').animate({opacity:'0'}, 1);
-						$('a').fadeOut(fadeSpeed, function(){
-							window.location = 'main.html?username=' + username + "&eid=" + data;
-					});
-				}
-			}); 
-		});
-	}
-	
 	$(document).ready(function() { 
-		username = getParameterByName('username');
-		$("#username").attr("value", username);
+		userid = getParameterByName('uid');
+		$("#uid").val( userid );
 		
 		$("#spinner").hide();
 		
@@ -61,6 +33,35 @@
 		$('#createEventForm').submit(function() { createEvent(); return false; });
 		$('#createButton').click(function(){ $('#createEventForm').submit(); });
 	});
+	
+	function createEvent(){
+
+		$("#spinner").fadeIn('fast',function(){
+			var target = document.getElementById('spinner');
+			var spinner = new Spinner({ color: '#FFF', shadow: true }).spin(target);
+			
+			var requestData = {
+				request : 'create',
+				eventname : $("#eventname").val(),
+				numchunks: $("#numchunks").val(),
+				uid: $("#uid").val()
+			};
+	
+			var request = $.ajax({
+				url : eventsManager,
+				type : "POST",
+				data : requestData,
+				success: function( data ){
+					$('*').blur();
+					
+					$('body').animate({opacity:'0'}, 1);
+						$('a').fadeOut(fadeSpeed, function(){
+							window.location = 'main.html?uid=' + userid + "&eid=" + data;
+					});
+				}
+			}); 
+		});
+	}
 	
 	function clearAllEvents(){
 		var requestData = {
@@ -75,7 +76,7 @@
 				$('*').blur();
 				$('body').animate({opacity:'0'}, 1);
 					$('a').fadeOut(fadeSpeed, function(){
-						window.location = 'events.html?username=' + username;
+						window.location = 'events.html?uid=' + userid;
 				});
 			}
 		}); 
@@ -92,7 +93,7 @@
 			<div style="margin-top: 1em">
 				<form class="niceForm" id="createEventForm" name="create" action="" accept-charset="UTF-8">
 					<input type="hidden" name="request" value="create">
-					<input id="username" type="hidden" name="username" value="">
+					<input id="uid" type="hidden" name="uid" value="-1">
 
 					<input id="eventname" style="width: 260px;" type="text" name="eventname" value="Event Name" /> <a id="createButton" class="button blue createButton" href="#" >Create</a> <br/>
 					<input id="numchunks" style="width: 3em;"type="number" name="numchunks" value="60" min="1" max="1024" /> <span>Num chunks</span> 	

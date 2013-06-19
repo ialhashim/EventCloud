@@ -1,24 +1,24 @@
 /* Global paths to server scripts */
-var rootFolder = "http://54.214.248.120/development/workspace/EventCloud/";
+var website = "http://54.214.248.120/development/workspace/EventCloud/";
 
 /* When using local host */
-var rootFolder = 'http://96.49.252.141/';
-//var rootFolder = '/';
+var website = 'http://96.49.252.141/';
 
-var uploadURL = rootFolder + "index.php";
-var galleryURL = rootFolder + "gallery.php";
-var eventsManager = rootFolder + "events.php";
-	
+var uploadURL = website + "index.php";
+var galleryURL = website + "gallery.php";
+var eventsManager = website + "eventsManager.php";
+var usersManager = website + "usersManager.php";
+
 /* Default page display */
 var fadeSpeed = 500;
 $(document).ready(function() { 
-	$('body').css('transition-duration', fadeSpeed + 'ms');
-	$('body').css({opacity:1});
+	$('#mainScreen').css('transition-duration', fadeSpeed + 'ms');
+	$('#mainScreen').css({opacity:1});
 	
-	$('body').on("click", ".outlink", function(event){
+	$('#mainScreen').on("click", ".outlink", function(event){
 		event.preventDefault();
 		
-		$('body').animate({opacity:'0'}, 1);
+		$('#mainScreen').animate({opacity:'0'}, 1);
 		$('a').fadeOut(fadeSpeed, function(){
 			window.location = event.currentTarget.href;
 		});
@@ -44,7 +44,7 @@ function toTitleCase(str) {
 
 
 /// Form actions
-function actionSubmitForm( $sender, $form ){
+function actionSubmitForm( $sender, $form, callBack ){
 	
 	if($sender.is('a')) eventType ='click';
 	if($sender.is('form')) eventType ='submit';
@@ -52,10 +52,10 @@ function actionSubmitForm( $sender, $form ){
 	$sender.on(eventType,function() {
 		$('*').blur();
 		event.preventDefault();
-		$('body').animate({opacity:'0'}, 1);
+		$('#mainScreen').animate({opacity:'0'}, 1);
 		$('a').fadeOut(fadeSpeed, function(){
-			$form.unbind("submit").submit();
-			});
+			callBack();
+		});
 		return false;
 	});
 }
@@ -86,6 +86,19 @@ function getParameterByName(name) {
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
         results = regex.exec(location.search);
     return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function getUserName( userid ){
+	$.ajax({
+        url: usersManager,
+        data: "uid=" + userid,
+        type: "POST",
+        async: false,
+        success: function(data) {
+            userid = data;
+        }
+    });
+    return userid;
 }
 
 /* Need these? */

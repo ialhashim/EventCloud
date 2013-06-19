@@ -113,6 +113,8 @@ var Swiper = function (selector, params, callback) {
         useCSS3Transforms : true,
         queueStartCallbacks : false,
         queueEndCallbacks : false,
+        loopStopLeft: true,
+        loopStopIndex: 0,
         //Namespace
         slideElement : 'div',
         slideClass : 'swiper-slide',
@@ -135,6 +137,10 @@ var Swiper = function (selector, params, callback) {
     if (params.slidesPerSlide=='auto') {
         _widthFromCSS = true;
         params.slidesPerSlide = 1;
+    }
+    
+    if (params.loopStopLeft){
+    	_this.virtualIndex = params.loopStopIndex;
     }
     
     //Default Vars
@@ -808,6 +814,7 @@ var Swiper = function (selector, params, callback) {
     var isTouchEvent = false; 
     var allowThresholdMove; 
     function onTouchStart(event) {
+    	
         //Exit if slider is already was touched
         if (_this.isTouched || params.onlyExternal) {
             return false
@@ -894,7 +901,25 @@ var Swiper = function (selector, params, callback) {
             
         }
     }
+    
+    function isStopLoop(){
+    	if(_this.params.loopStopLeft){
+    		if(_this.virtualIndex == _this.params.loopStopIndex){
+    			delta = _this.touches.current - _this.touches.start;
+    			if(delta > 0){
+	    			console.log('will stop');
+	    			return true;
+    			}
+    		}
+    	}
+    	
+    	return false;
+    }
+    
     function onTouchMove(event) {
+    	
+    	if(isStopLoop()) return;
+    	
         // If slider is not touched - exit
         if (!_this.isTouched || params.onlyExternal) return;
         if (isTouchEvent && event.type=='mousemove') return;

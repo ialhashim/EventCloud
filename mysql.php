@@ -136,9 +136,14 @@ class MySQL {
 		}
 	}
 	
+	function InsertReturnId($vars, $table, $isReplace = false, $exclude = ''){
+		$newID = $this->NewInsertID($table);
+		$this->Insert( $vars, $table, $isReplace, $exclude );
+		return $newID;
+	}
 	
 	// Adds a record to the database based on the array key names
-	function Insert($vars, $table, $exclude = ''){
+	function Insert($vars, $table, $isReplace = false, $exclude = ''){
 		
 		// Catch Exclusions
 		if($exclude == ''){
@@ -150,7 +155,8 @@ class MySQL {
 		// Prepare Variables
 		$vars = $this->SecureData($vars);
 		
-		$query = "INSERT INTO `{$table}` SET ";
+		$command = $isReplace ? 'REPLACE' : 'INSERT';
+		$query = $command . " INTO `{$table}` SET ";
 		foreach($vars as $key=>$value){
 			if(in_array($key, $exclude)){
 				continue;

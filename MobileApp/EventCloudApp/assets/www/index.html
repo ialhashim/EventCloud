@@ -16,29 +16,53 @@
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function() { 
+		$("#login-message").hide();
 		
-		actionSubmitForm( $('.loginButton'), $("#login-form") ); /* Using the button */
-		actionSubmitForm( $('#login-form'), $("#login-form") ); /* Using submit actions */
-
 		defaultValues( $('#username'), 'User' );
+
+		function callBack(){
+			$("#login-message").fadeIn('fast');
+			
+			// Create / retrieve user
+			$.ajax({
+			  type: "POST",
+			  url: usersManager,
+			  data: { username : $("#username").val() },
+			  success: function(data){
+				$("#login-message").fadeOut('fast',function(){
+					//alert(data);
+					$("#uid").val(data);
+					$("#login-form").unbind("submit").submit();
+				});
+			  }
+			});
+		}
+		
+		actionSubmitForm( $('.loginButton'), $("#login-form"), callBack ); /* Using the button */
+		actionSubmitForm( $('#login-form'), $("#login-form"), callBack ); /* Using submit actions */
 	});
 </script>
 
 </head>
 <body onload="onBodyLoad()">
+			
+	<h3 id="login-message" style="font-size: 1em; text-align: center; margin-top: 2em;">Logging in..</h3>
+	
 	<div id="mainScreen">
-	<div class="centerBoth" style="-webkit-text-stroke: 0.6px;" >
-		<h2 style="font-size: 1.5em; color:#999;margin-bottom:0.5em;">Welcome to</h2>
-		<h2 style="font-size: 2em; font-weight: bold; margin-bottom:0.5em;">Eventful Cloud!</h2>
-		<h3 style="text-align: right; color: #999; margin-top: 0.4em; margin-right: 65px;">You are in the event.</h3>
-		
-		<div style="margin-top: 2em">
-			<form class="niceForm" id="login-form" name="login" action="events.html" accept-charset="UTF-8">
-				<input id="username" style="width: 260px;" type="text" name="username" value="User"> 
-				<a class="button blue loginButton" href="#" >Login</a> 
-			</form>
+		<div class="centerBoth" style="-webkit-text-stroke: 0.6px;" >
+			<h2 style="font-size: 1.5em; color:#999;margin-bottom:0.5em;">Welcome to</h2>
+			<h2 style="font-size: 2em; font-weight: bold; margin-bottom:0.5em;">Eventful Cloud!</h2>
+			<h3 style="text-align: right; color: #999; margin-top: 0.4em; margin-right: 65px;">You are in the event.</h3>
+			
+			<div style="margin-top: 2em">
+				<form class="niceForm" id="login-form" name="login" action="events.html" accept-charset="UTF-8">
+					<input id="username" style="width: 260px;" type="text" name="username" value="User"> 
+					<input id="uid" type="hidden" name="uid" value="-1">
+					<a class="button blue loginButton" href="#" >Login</a> 
+				</form>
+			</div>
 		</div>
 	</div>
-	</div>
+	
 </body>
 </html>

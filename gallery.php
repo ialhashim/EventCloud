@@ -7,9 +7,6 @@
     $verbose = true;
 	
 	// Assign correct upload path
-	if(!empty($_POST["eid"])) $eid = intval( $_POST['eid'] );
-	if(!empty($_GET["eid"])) $eid = intval( $_GET['eid'] );
-	
 	$upload_dir .= $eid.'/';
 	$upload_url .= $eid.'/';
 	
@@ -24,12 +21,13 @@
 	
 	// Sort by time
 	//usort($media_files, function($a, $b) {return $a['time'] - $b['time'];});
+	usort($media_files, function($a, $b) {return $a['file'] > $b['file'];});
 		
 	$media_count = count($media_files);
 	
 	// Slice based on given arguments
-	if(isset($_GET["start"])) $start = intval($_GET["start"]); else $start = 0;
-	if(isset($_GET["count"])) $count = intval($_GET["count"]); else $count = 3;
+	if(isset($_POST["start"])) $start = intval($_POST["start"]); else $start = 0;
+	if(isset($_POST["count"])) $count = intval($_POST["count"]); else $count = 3;
 	
 	// Circular access test
 	if(true)
