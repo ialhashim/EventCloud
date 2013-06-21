@@ -355,14 +355,14 @@ function initialSlides() {
 			initialSlide : 0,
 			onSlideChangeEnd: function(){
 				//console.log('Last Direction: ' + mainSwiper.lastDirection);
-				
+				var count = slidesCount;
+						
 				if(mainSwiper.lastDirection === 'next')
 				{
 					// Start dynamic loading when we are at the middle
 					if(mainSwiper.activeIndex >= 0.5 * numActiveSlides)
 					{
 						var start = mainSwiper.virtualIndex + numActiveSlides;
-						var count = slidesCount;
 						
 						var $media = $( getMoreMedia( start, count ) );
 						mainSwiper.virtualIndex += $media.children().length;
@@ -375,7 +375,13 @@ function initialSlides() {
 				{
 					if(mainSwiper.activeIndex <= 0.5 * numActiveSlides)
 					{
-						mainSwiper.removeEndAddStart( [ $refSpinner.html(), $refSpinner.html() ] );	
+						var start = mainSwiper.virtualIndex - count;
+						
+						var $media = $( getMoreMedia( start, count ) );
+						mainSwiper.virtualIndex -= $media.children().length;
+						mainSwiper.removeStartAddEnd( $media );	
+						
+						mainSwiper.removeEndAddStart( $media );	
 					}
 				}
 			}

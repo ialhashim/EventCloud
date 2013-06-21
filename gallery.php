@@ -29,6 +29,9 @@
 	if(isset($_POST["start"])) $start = intval($_POST["start"]); else $start = 0;
 	if(isset($_POST["count"])) $count = intval($_POST["count"]); else $count = 3;
 	
+	// Bounds limit
+	$start = max(0, $start);
+	
 	// Circular access test
 	if(true)
 	{
