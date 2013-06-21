@@ -6,6 +6,7 @@
     $verbose = true;
     
 	include_once('global.php');
+	include_once('mediaManager.php');
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -34,7 +35,6 @@
         {
         	// Assign correct upload path
         	$eid = intval( $_POST['eid'] );
-			$upload_dir .= $eid.'/';
 			
             $myFile = $_FILES["file"];
 			
@@ -45,14 +45,14 @@
             }
             
             // Check directory
-            if (file_exists($upload_dir) && is_writable($upload_dir))
+            if (file_exists($upload_dir.$eid.'/') && is_writable($upload_dir.$eid.'/'))
             {
                 echo "<p class='message-box ok'> Info: Directory ok :) </p>";
                 //mkdir($upload_dir."ok_upload",0700);
             }
             else 
             {
-                echo "<p class='message-box error'> ERROR: Upload directory is not writable, or does not exist: [ " . $upload_dir . " ] </p>" ;
+                echo "<p class='message-box error'> ERROR: Upload directory is not writable, or does not exist: [ " . $upload_dir.$eid.'/' . " ] </p>" ;
             }
             
             // ensure a safe filename
@@ -60,7 +60,7 @@
             
             if(strlen($name))
             {
-                $finalFileName =  $upload_dir. "tmp/" . $name;
+                $finalFileName =  $upload_dir.$eid.'/tmp/' . $name;
                 
 				// Erase if exists
 				if(file_exists($finalFileName))
@@ -75,7 +75,7 @@
                 }
                 else
                 {
-                	handleFile($finalFileName, $upload_dir);
+                	insertMedia($finalFileName, $eid, $uid);
 
                     echo "<p class='message-box ok'> File uploaded :) </p>";
                 }
@@ -91,7 +91,8 @@
     
     <div id="uploadForm">
         <form action="index.php" method="post" enctype="multipart/form-data">
-        <input type="text" name="eid" value="3">
+        <input type="text" name="eid" value="1">
+        <input type="text" name="uid" value="1">
         <input type="file" name="file"> <input type="submit" value="Upload media">
         </form>
     </div>

@@ -245,9 +245,8 @@ function getLocation(){
 	navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError);
 }
 
-function getPhotos(count, start, callBack){
-	var data;
-	
+function getInitialMedia(count, start, callBack){
+
 	var requestData = {
 		count : count,
 		start : start,
@@ -270,6 +269,7 @@ function postUpload(){
 
 var currentStart = 0;
 var slidesCount = 3;
+var numActiveSlides = 12;
 var mainSwiper;
 
 function resizeSwiper(){
@@ -292,57 +292,97 @@ function resizeSwiper(){
 	if(!mainSwiper == undefined)
 		mainSwiper.reInit();
 }
+
+var mediaUID = 1;
+function getMoreMedia( start, count ){
+	var $media = $('<div id="media"/>');
 	
+	var requestData = {
+		start : start,
+		count : count,
+		eid: eid
+	};
+	
+	for(var i = 0; i < count; i++){
+		var myuid = "uid-" + (mediaUID++);
+		$media.append( $refSpinner.clone().addClass( myuid ) );
+	}
+	
+	$.ajax({
+  		type: 'POST',
+  		url: galleryURL,
+  		data: requestData,
+  		success: function(d) {
+  			$data = $(d);
+			for(var i = 0; i < $data.length; i++){
+				var oldMediaItem = $( $media ).children()[i];
+				myuid = $(oldMediaItem).attr('class').split(' ').pop();
+				$('.' + myuid).replaceWith( $data[i] );
+			}
+		},
+  		async:true
+	});
+	
+	return $media;
+}
 
 function initialSlides() {
 	
-    //$.each( $data, function( i, el ) {
-    //	var slideHeight = $(el).height();
-    //	$(el).appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" style="height:' + slideHeight + 'px" />');
-	//});
-	
 	var count = slidesCount;
 	
-	var numActiveSlides = 9;
-	
-	getPhotos(numActiveSlides, 0, function(d){
+	getInitialMedia(numActiveSlides, 0, function(d){
 			
 		// Load initial set of slides
-		$data = $(d);
-		$.each( $data, function( i, el ) {
+		$initData = $(d);
+		$.each( $initData, function( i, el ) {
 	    	var slideHeight = $(el).height();
 	    	$(el).appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" style="height:' + slideHeight + 'px" />');
 		});
 		
 		// Generate left over slides
-		leftOver = numActiveSlides - $data.length;
-		for (var i = 0; i < leftOver; i++)
-		{ 
+		leftOver = numActiveSlides - $initData.length;
+		for (var i = 0; i < leftOver; i++){ 
 			//$emptyItem = $refSpinner.clone();
-			$emptyItem = $('<div>BB</div>');
-			$emptyItem.appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" />');
+			$($refSpinner.html()).appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" />');
 		}
-		
-		console.log( leftOver );
 		
 	    mainSwiper = $('.swiper-container').swiper({
 			//Your options here:
-			loop: true,
-			slidesPerSlide : slidesCount,
-			mousewheelControl: true,
+			slidesPerView : slidesCount,
 			preventClassNoSwiping: true,
 			pagination : '.pagination-main',
 			mode:'horizontal',
-			loopStopLeft: true,
-			loopStopIndex: 0,
-			
-			//etc..
-			onTouchMove: function(){
-				mainSwiper.virtualIndex = mainSwiper.activeIndex;
-			},
-			onTouchStart: function(){
+			initialSlide : 0,
+			onSlideChangeEnd: function(){
+				//console.log('Last Direction: ' + mainSwiper.lastDirection);
 				
+				if(mainSwiper.lastDirection === 'next')
+				{
+					// Start dynamic loading when we are at the middle
+					if(mainSwiper.activeIndex >= 0.5 * numActiveSlides)
+					{
+						var start = mainSwiper.virtualIndex + numActiveSlides;
+						var count = slidesCount;
+						
+						var $media = $( getMoreMedia( start, count ) );
+						mainSwiper.virtualIndex += $media.children().length;
+						mainSwiper.removeStartAddEnd( $media );	
+					}
+								
+				}
+				
+				if(mainSwiper.lastDirection === 'prev')
+				{
+					if(mainSwiper.activeIndex <= 0.5 * numActiveSlides)
+					{
+						mainSwiper.removeEndAddStart( [ $refSpinner.html(), $refSpinner.html() ] );	
+					}
+				}
 			}
+		});
+		
+		$(document).on('mousemove mousewheel',function(e) {
+			$("#vidx").text( 'v = ' + mainSwiper.virtualIndex + ", active idx = " + mainSwiper.activeIndex);
 		});
 		
 	    // Automatically resize
@@ -350,9 +390,7 @@ function initialSlides() {
 	    $(window).resize(function() {
 		  resizeSwiper();
 		});
-		
-		mainSwiper.swipeTo(0,1,false);
-		
 	});
 }
+
 

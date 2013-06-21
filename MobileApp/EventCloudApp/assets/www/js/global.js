@@ -27,6 +27,17 @@ $(document).ready(function() {
 	});
 });
 
+/* jQuery: small extensions */
+jQuery.fn.outerHTML = function(s) {
+    return s
+        ? this.before(s).remove()
+        : jQuery("<p>").append(this.eq(0).clone()).html();
+};
+
+function executeAsync(func) {
+    setTimeout(func, 0);
+}
+
 function encode_utf8(s) {
   return unescape(htmlentities(s));
 }
