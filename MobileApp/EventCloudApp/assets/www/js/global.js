@@ -4,7 +4,7 @@ var website = "http://54.214.248.120/development/workspace/EventCloud/";
 /* When using local host */
 var website = 'http://96.49.252.141/';
 
-var uploadURL = website + "index.php";
+var uploadURL = website + "mediaManager.php";
 var galleryURL = website + "gallery.php";
 var eventsManager = website + "eventsManager.php";
 var usersManager = website + "usersManager.php";

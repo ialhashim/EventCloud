@@ -1,13 +1,11 @@
-
+/* Global variables */
+var eid;
 var userid;
 var username;
-var eid;
 var eventname = '';
 
 var itemCount = 4;
-			
-var cf;  
-	
+
 $(document).ready(function() { 
 	userid = getParameterByName('uid');
 	username = getUserName( userid );
@@ -82,169 +80,6 @@ var $refSpinner;
 })(jQuery);
 
 
-// Upload file
-//
-function uploadFile(){
-	$("<form/>", { action: uploadURL, enctype:"multipart/form-data", id: 'tempForm' }).appendTo("body");
-	$("#tempForm").hide();
-	
-	// Add hidden fields
-	$("<input/>", { type: 'file', name:"file", id: 'hiddenFile' }).appendTo("#tempForm");
-	$("<input/>", { type: 'button', value:'upload', id: 'hiddenSubmit' }).appendTo("#tempForm");
-	
-	// File validation and submit upon change
-	$('#hiddenFile').change(function(){
-	    var file = this.files[0];
-	    name = file.name;
-	    size = file.size;
-	    type = file.type;
-	    //your validation
-	    
-		$("#hiddenSubmit").trigger('click');
-	});
-	
-	// Upload then submit
-	$('#hiddenFile').click();
-	
-	// AJAX submit
-	$('#hiddenSubmit').click(function(){
-		console.log($('#tempForm')[0]);
-		
-	    var formData = new FormData($('#tempForm')[0]);
-	    formData.append("eid", eid);
-	    formData.append("username", username);
-	    
-	    $.ajax({
-	        url: uploadURL,  //server script to process data
-	        type: 'POST',
-	        xhr: function() {  // custom xhr
-	            var myXhr = $.ajaxSettings.xhr();
-	            if(myXhr.upload){ // check if upload property exists
-	                myXhr.upload.addEventListener('progress',function(){}, false); // for handling the progress of the upload
-	            }
-	            return myXhr;
-	        },
-	        //Ajax events
-	        beforeSend: function(){  },
-	        success: function(){ postUpload(); console.log('Upload okay!'); },
-	        error: function(){  console.log('ERROR: upload.');  },
-	        // Form data
-	        data: formData,
-	        //Options to tell JQuery not to process data or worry about content-type
-	        cache: false,
-	        contentType: false,
-	        processData: false
-	    });
-	});
-}
-
-// Video
-//
-function captureVideo() {
-	// Launch device video recording application, 
-	// allowing user to capture up to 2 video clips
-	navigator.device.capture.captureVideo(captureSuccess, captureError);
-}
-
-function captureSuccess(mediaFiles) {
-	var i, len;
-	for (i = 0, len = mediaFiles.length; i < len; i += 1) {
-		uploadVideoFile(mediaFiles[i]);
-	}
-}
-
-function captureError(error) {
-	if (error != CAPTURE_NO_MEDIA_FILES) {
-		var msg = 'An error occurred during capture: ' + error.code;
-		navigator.notification.alert(msg, null, 'Uh oh!');
-	}
-}
-
-// Photo
-//
-function capturePhoto() {
-	navigator.camera.getPicture(uploadPhotoFile, photoError, {
-		quality : 50,
-		destinationType : navigator.camera.DestinationType.FILE_URI
-	});
-}
-
-function photoError(message) {
-	var msg = 'An error occurred during capture: ' + error.code;
-	navigator.notification.alert(msg, null, 'Uh oh!');
-}
-
-// Upload files to server
-function uploadVideoFile(mediaFile) {
-	var ft = new FileTransfer(),
-    	path = mediaFile.fullPath,
-    	name = mediaFile.name;
-	var options = new FileUploadOptions();
-	options.fileName = name;
-	
-	// Submission parameters
-	{
-		var params = {};
-		params.eid = eid;
-		params.username = username;
-		
-		getLocation();
-		
-		options.params = params;
-	}
-	
-    ft.upload(path, uploadURL, up_win, up_fail, options, true);
-}
-
-function uploadPhotoFile(imageURI) {
-    var options = new FileUploadOptions();
-    options.fileKey="file";
-    options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);
-    options.mimeType="image/jpeg";
-
-	// Submission parameters
-	{
-		var params = {};
-		params.eid = eid;
-		params.username = username;
-		
-		getLocation();
-		
-		options.params = params;
-	}
-
-    var ft = new FileTransfer();
-    ft.upload(imageURI, uploadURL, up_win, up_fail, options, true);
-}
-
-function up_win(r) {
-    console.log("Upload OK, Code = " + r.responseCode);
-    console.log("Response = " + r.response);
-    console.log("Sent = " + r.bytesSent);
-    postUpload();
-}
-
-function up_fail(error) {
-    alert("An error has occurred: Code = " + error.code);
-    console.log("upload error source " + error.source);
-    console.log("upload error target " + error.target);
-}
-
-function getLocation(){
-	var onLocationSuccess = function(position) {
-	    console.log('Coordinates: ' + position.coords.latitude + ',' + position.coords.longitude);
-	};
-	
-	// onError Callback receives a PositionError object
-	//
-	function onLocationError(error) {
-	    console.log('code: '    + error.code    + '\n' +
-	          'message: ' + error.message + '\n');
-	}
-	
-	navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError);
-}
-
 function getInitialMedia(count, start, callBack){
 
 	var requestData = {
@@ -263,14 +98,11 @@ function getInitialMedia(count, start, callBack){
 	}); 
 }
 
-function postUpload(){
-	
-}
-
 var currentStart = 0;
 var slidesCount = 3;
 var numActiveSlides = 12;
 var mainSwiper;
+var mediaUID = 1;
 
 function resizeSwiper(){
 	var width = $('body').width();
@@ -293,7 +125,6 @@ function resizeSwiper(){
 		mainSwiper.reInit();
 }
 
-var mediaUID = 1;
 function getMoreMedia( start, count ){
 	var $media = $('<div id="media"/>');
 	
@@ -314,10 +145,17 @@ function getMoreMedia( start, count ){
   		data: requestData,
   		success: function(d) {
   			$data = $(d);
-			for(var i = 0; i < $data.length; i++){
+  			
+			for(var i = 0; $media.length; i++){
 				var oldMediaItem = $( $media ).children()[i];
 				myuid = $(oldMediaItem).attr('class').split(' ').pop();
-				$('.' + myuid).replaceWith( $data[i] );
+				
+				if(i < $data.length){
+					$('.' + myuid).replaceWith( $data[i] );	
+				}
+				else{
+					$('.' + myuid).css('display', 'none');
+				}
 			}
 		},
   		async:true
@@ -340,11 +178,11 @@ function initialSlides() {
 		});
 		
 		// Generate left over slides
-		leftOver = numActiveSlides - $initData.length;
-		for (var i = 0; i < leftOver; i++){ 
+		//leftOver = numActiveSlides - $initData.length;
+		//for (var i = 0; i < leftOver; i++){ 
 			//$emptyItem = $refSpinner.clone();
-			$($refSpinner.html()).appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" />');
-		}
+		//	$($refSpinner.html()).appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" />');
+		//}
 		
 	    mainSwiper = $('.swiper-container').swiper({
 			//Your options here:
@@ -363,7 +201,6 @@ function initialSlides() {
 					if(mainSwiper.activeIndex >= 0.5 * numActiveSlides)
 					{
 						var start = mainSwiper.virtualIndex + numActiveSlides;
-						
 						var $media = $( getMoreMedia( start, count ) );
 						mainSwiper.virtualIndex += $media.children().length;
 						mainSwiper.removeStartAddEnd( $media );	
@@ -376,12 +213,14 @@ function initialSlides() {
 					if(mainSwiper.activeIndex <= 0.5 * numActiveSlides)
 					{
 						var start = mainSwiper.virtualIndex - count;
-						
 						var $media = $( getMoreMedia( start, count ) );
-						mainSwiper.virtualIndex -= $media.children().length;
-						mainSwiper.removeStartAddEnd( $media );	
+						var c = $media.children().length;
 						
-						mainSwiper.removeEndAddStart( $media );	
+						if(mainSwiper.virtualIndex - c >= 0)
+						{
+							mainSwiper.virtualIndex -= c;
+							mainSwiper.removeEndAddStart( $media );	
+						}
 					}
 				}
 			}

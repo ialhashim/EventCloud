@@ -14,6 +14,7 @@
     <head>
         <title>EventCloud : Media Upload</title>
         <link rel="stylesheet" type="text/css" href="style.css">
+		
     </head>
 
     <body>
@@ -31,74 +32,36 @@
     
     <div id="uploadResult">
     <?php
-        if (!empty($_FILES["file"]) && !empty($_POST['eid'])) 
-        {
-        	// Assign correct upload path
-        	$eid = intval( $_POST['eid'] );
-			
-            $myFile = $_FILES["file"];
-			
-            // Check upload is fine
-            if ($myFile["error"] !== UPLOAD_ERR_OK) {
-                echo "<p class='message-box error'> ERROR: An error occurred with the upload. Here is what I got: </p>";
-                echo "<p'><pre>" . var_export($_FILES,true) . "</pre></p>";
-            }
-            
-            // Check directory
-            if (file_exists($upload_dir.$eid.'/') && is_writable($upload_dir.$eid.'/'))
-            {
-                echo "<p class='message-box ok'> Info: Directory ok :) </p>";
-                //mkdir($upload_dir."ok_upload",0700);
-            }
-            else 
-            {
-                echo "<p class='message-box error'> ERROR: Upload directory is not writable, or does not exist: [ " . $upload_dir.$eid.'/' . " ] </p>" ;
-            }
-            
-            // ensure a safe filename
-            $name = preg_replace("/[^A-Z0-9._-]/i", "_", $myFile["name"]);
-            
-            if(strlen($name))
-            {
-                $finalFileName =  $upload_dir.$eid.'/tmp/' . $name;
-                
-				// Erase if exists
-				if(file_exists($finalFileName))
-				    unlink($finalFileName); //remove the file
-				
-                // preserve file from temporary directory
-                $success = move_uploaded_file($myFile["tmp_name"], $finalFileName);
-                
-                if (!$success) 
-                {
-                    echo "<p class='message-box error'>Unable to save file : " . $myFile["name"]  . "</p>";    
-                }
-                else
-                {
-                	insertMedia($finalFileName, $eid, $uid);
-
-                    echo "<p class='message-box ok'> File uploaded :) </p>";
-                }
-            }
-            
-            // Show upload data
-            if( $verbose ){
-                //echo "<p class='message-box info'><pre>" . var_export($_FILES,true) . "</pre></p>";
-            }
-        }
+    	if(!empty($_FILES["file"]))
+		{
+	    	$log = "";
+        	$mid = saveUploadedMedia($log);
+			echo $log;
+			echo "<p class='message-box info'> New media ID: " . $mid. "</p>"; 		
+		}
     ?>
     </div>
     
     <div id="uploadForm">
         <form action="index.php" method="post" enctype="multipart/form-data">
-        <input type="text" name="eid" value="1">
-        <input type="text" name="uid" value="1">
+        <span>Event ID:</span><input type="text" name="eid" value="1">
+        <span>User ID:</span><input type="text" name="uid" value="1">
+        <input type="hidden" name="manual" value="manual">
         <input type="file" name="file"> <input type="submit" value="Upload media">
         </form>
     </div>
 	
-	<a href="MobileApp/EventCloudApp/assets/www">Test</a> <br/>
-	<a href="/EventCloudApp.apk">EventCloud APK</a>
-    
+	<div>
+		<a href="MobileApp/EventCloudApp/assets/www">Go to App page</a> <br/>
+		<a href="/EventCloudApp.apk">EventCloud APK</a>
+	</div>
+	
+	<div id="showGoogleMaps">
+		<form name="coord">
+			<input name="coords"/>
+		</form>
+		<a onclick=" coords = (document.coord.coords.value + '').replace(' ', ','); window.location.href = 'https://maps.google.ca/maps?q=' + coords; " href="#">Map it</a>
+	</div>
+	
     </body>
 </html>

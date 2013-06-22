@@ -1505,11 +1505,19 @@ var Swiper = function (selector, params) {
    }
    
    _this.removeEndAddStart = function( $items ){
-   		for (var i = 0; i < $items.length; i++)
+		$.each($items.children(), function( k, v ){
 			_this.removeLastSlide();
-	
-		for (var i = 0; i < $items.length; i++) {
-			_this.prependSlide( $refSpinner.html() );
+		});
+			
+		// Store in array
+		var newSlides = new Array();
+		$.each($items.children(), function( k, v ){
+			newSlides.push(  $(v).outerHTML() );
+		});
+		
+		// Add in reversed order
+		for(var i = newSlides.length - 1; i >= 0 ; i--){
+			_this.prependSlide( _this.createSlide(newSlides[i]) );
 			_this.swipeTo(_this.activeIndex + 1, 0, false);
 		}
    }

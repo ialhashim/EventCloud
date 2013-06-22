@@ -46,7 +46,10 @@
 				numchunks: $("#numchunks").val(),
 				uid: $("#uid").val()
 			};
-	
+			
+			// Maybe also send coordinates to Google Maps and get image of location
+			//http://maps.googleapis.com/maps/api/staticmap?center=49.27829460000000,-122.90392780000&zoom=15&size=600x300&maptype=roadmap&sensor=false&visual_refresh=true
+			
 			var request = $.ajax({
 				url : eventsManager,
 				type : "POST",

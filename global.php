@@ -73,14 +73,7 @@ function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
 	
 	$ext = right($fromImageFile, 4);
 	
-	// When a folder is given
-	if(!endsWith($toImageFile, $ext)){
-		$fileCount = count (glob ($toImageFile."*.{jpg,png,gif,mp4}", GLOB_BRACE));
-		$baseName = sprintf("%08d",$fileCount + 1) . $ext;
-		$newNameFull = $toImageFile . $baseName;
-	}else{
-		$newNameFull = $toImageFile;
-	}
+	$newNameFull = $toImageFile;
 
 	$thumb->setImageCompression(imagick::COMPRESSION_JPEG); 
 	$thumb->setImageCompressionQuality(100); 
@@ -89,9 +82,7 @@ function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
 	$thumb->destroy();
 	
 	// set proper permissions on the new file
-	chmod($newNameFull, 0644);
-	
-	return $baseName;				
+	chmod($newNameFull, 0644);			
 } 
 
 function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnailFile) { 
@@ -103,18 +94,8 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 	
 	$seconds = min(9, $seconds);
 	
-	// When a folder is given
-	if(!endsWith($toThumbnailFile, $ext)){
-		$newNamePath = $toThumbnailFile;
-		
-		$fileCount = count (glob ($newNamePath."*.{jpg,png,gif,mp4}", GLOB_BRACE));
-		$newName = sprintf("%08d",$fileCount + 1) . '.' . $ext;
-		
-		$newNameFull = $newNamePath . $newName;
-	}else{
-		$newNameFull = $toThumbnailFile;
-	}
-
+	$newNameFull = $toThumbnailFile;
+	
 	if($ext == 'gif')
 	{
 		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -t 00:00:0{$seconds} -vf scale=$resolution:-1 {$newNamePath}tmp/{$uid}%02d.png";
@@ -145,8 +126,6 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 	chmod($newNameFull, 0644);	
 	
 	echo "</pre>";
-	
-	return $newName;
 }
 
 function makePublicFolder($folderpath){
@@ -172,6 +151,5 @@ function array_shift_circular(array $array, $steps = 1)
     return array_merge(array_slice($array, $steps),
                        array_slice($array, 0, $steps));
 }
-
 
 ?>
