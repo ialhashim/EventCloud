@@ -103,6 +103,7 @@ var slidesCount = 3;
 var numActiveSlides = 12;
 var mainSwiper;
 var mediaUID = 1;
+var packetUID = 1;
 
 function resizeSwiper(){
 	var width = $('body').width();
@@ -126,7 +127,11 @@ function resizeSwiper(){
 }
 
 function getMoreMedia( start, count ){
-	var $media = $('<div id="media"/>');
+	var packetid = "packet-" + (packetUID++);
+	var $media = $('<div>', {class:  packetid});
+	
+	// bounds check
+	if(start < 0) return $media;
 	
 	var requestData = {
 		start : start,
@@ -146,10 +151,15 @@ function getMoreMedia( start, count ){
   		success: function(d) {
   			$data = $(d);
   			
-			for(var i = 0; $media.length; i++){
-				var oldMediaItem = $( $media ).children()[i];
-				myuid = $(oldMediaItem).attr('class').split(' ').pop();
-				
+  			N = $media.children().length;
+  			
+			for(var i = 0; i < N; i++)
+			{
+				var oldMediaItem = $media.children()[i];
+
+				var filterClass = $(oldMediaItem).attr('class');
+				myuid = filterClass ? filterClass.split(' ').pop() : 'undefined';
+
 				if(i < $data.length){
 					$('.' + myuid).replaceWith( $data[i] );	
 				}else{
@@ -160,7 +170,7 @@ function getMoreMedia( start, count ){
   		async:true
 	});
 	
-	return $media;
+	return $media.clone();
 }
 
 function initialSlides() {

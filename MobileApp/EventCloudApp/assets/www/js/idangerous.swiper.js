@@ -1493,7 +1493,9 @@ var Swiper = function (selector, params) {
     /*==================================================
         Ibraheem's Functions
     ====================================================*/
-   _this.removeStartAddEnd = function( $items ){	
+   _this.removeStartAddEnd = function( $items ){
+   		if($items.children().length < 1) return;
+   		
 		$.each($items.children(), function( k, v ){
 			_this.removeSlide(0);
 			_this.swipeTo(_this.activeIndex - 1, 0, false);	
@@ -1505,6 +1507,8 @@ var Swiper = function (selector, params) {
    }
    
    _this.removeEndAddStart = function( $items ){
+   		if($items.children().length < 1) return;
+   	
 		$.each($items.children(), function( k, v ){
 			_this.removeLastSlide();
 		});
@@ -1516,9 +1520,11 @@ var Swiper = function (selector, params) {
 		});
 		
 		// Add in reversed order
-		for(var i = newSlides.length - 1; i >= 0 ; i--){
-			_this.prependSlide( _this.createSlide(newSlides[i]) );
-			_this.swipeTo(_this.activeIndex + 1, 0, false);
+		if(newSlides.length > 0){
+			for(var i = newSlides.length - 1; i >= 0 ; i--){
+				_this.prependSlide( _this.createSlide(newSlides[i]) );
+				_this.swipeTo(_this.activeIndex + 1, 0, false);
+			}	
 		}
    }
     

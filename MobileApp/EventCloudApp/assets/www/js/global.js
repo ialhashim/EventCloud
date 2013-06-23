@@ -113,13 +113,12 @@ function getUserName( userid ){
 }
 
 /* Need these? */
-function onBodyLoad(){
-	document.addEventListener("deviceready",onDeviceReady,false);
-}
-function onDeviceReady(){
-	document.addEventListener("resume", onResume, false);
-	onResume();
-}
-function onResume(){
+if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
+  document.addEventListener("deviceready", onDeviceReady, false);
+} else {
+  //onDeviceReady(); //this is the browser
 }
 
+function onDeviceReady(){
+	
+}
