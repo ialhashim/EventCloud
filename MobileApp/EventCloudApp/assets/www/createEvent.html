@@ -37,18 +37,47 @@
 	function createEvent(){
 
 		$("#spinner").fadeIn('fast',function(){
+			
 			var target = document.getElementById('spinner');
 			var spinner = new Spinner({ color: '#FFF', shadow: true }).spin(target);
 			
-			var requestData = {
-				request : 'create',
-				eventname : $("#eventname").val(),
-				numchunks: $("#numchunks").val(),
-				uid: $("#uid").val()
-			};
+			navigator.geolocation.getCurrentPosition(function(position){
+				var requestData = {
+					request : 'create',
+					eventname : $("#eventname").val(),
+					numchunks: $("#numchunks").val(),
+					uid: $("#uid").val(),
+					maptype: $("#maptype").val(),
+					latitude: position.coords.latitude,
+    				longitude: position.coords.longitude
+				};
 			
-			// Maybe also send coordinates to Google Maps and get image of location
-			//http://maps.googleapis.com/maps/api/staticmap?center=49.27829460000000,-122.90392780000&zoom=15&size=600x300&maptype=roadmap&sensor=false&visual_refresh=true
+				// Maybe also send coordinates to Google Maps and get image of location
+				//http://maps.googleapis.com/maps/api/staticmap?center=49.27829460000000,-122.90392780000&zoom=15&size=600x300&maptype=roadmap&sensor=false&visual_refresh=true
+				
+				var request = $.ajax({
+					url : eventsManager,
+					type : "POST",
+					data : requestData,
+					success: function( data ){
+						$('*').blur();
+						
+						$('body').animate({opacity:'0'}, 1);
+							$('a').fadeOut(fadeSpeed, function(){
+								window.location = 'main.html?uid=' + userid + "&eid=" + data;
+						});
+					}
+				}); 
+			}, function(){ console.log( 'Location failed' ); });
+		});
+	}
+	
+	function clearAllEvents(){
+		if ( confirm("Are you sure you want to delete all data?") == true )
+		{
+			var requestData = {
+				request : 'clearAll'
+			};
 			
 			var request = $.ajax({
 				url : eventsManager,
@@ -56,33 +85,13 @@
 				data : requestData,
 				success: function( data ){
 					$('*').blur();
-					
 					$('body').animate({opacity:'0'}, 1);
 						$('a').fadeOut(fadeSpeed, function(){
-							window.location = 'main.html?uid=' + userid + "&eid=" + data;
+							window.location = 'events.html?uid=' + userid;
 					});
 				}
 			}); 
-		});
-	}
-	
-	function clearAllEvents(){
-		var requestData = {
-			request : 'clearAll'
-		};
-		
-		var request = $.ajax({
-			url : eventsManager,
-			type : "GET",
-			data : requestData,
-			success: function( data ){
-				$('*').blur();
-				$('body').animate({opacity:'0'}, 1);
-					$('a').fadeOut(fadeSpeed, function(){
-						window.location = 'events.html?uid=' + userid;
-				});
-			}
-		}); 
+		}
 	}
 </script>
 
@@ -103,6 +112,10 @@
 					
 					<a style="font-size:0.5em; float:right; margin-right: 1.3em; opacity:0.1" class="button pink red createButton" href="#" onclick="clearAllEvents()"><i class="icon-remove-sign"> </i>Clear All</a>
 			
+					<select id="maptype" name="maptype">
+					  <option value="real">real</option>
+					  <option value="virtual">virtual</option>
+					</select> <span>Map type</span>
 					
 					<!-- Enter submit trick -->
 					<div class="hidden-submit" style="border:0 none;height:0;width:0;overflow:hidden"><input type="submit" tabindex="-1"/></div>

@@ -16,15 +16,23 @@
 	}
 	
 	if($request == "clearAll"){
-		$query = "TRUNCATE TABLE events";
-		$result = $db->ExecuteSQL($query);
+		$result = $db->ExecuteSQL( "TRUNCATE TABLE events" );
+		$result = $db->ExecuteSQL( "TRUNCATE TABLE chunks" );
+		$result = $db->ExecuteSQL( "TRUNCATE TABLE media" );
+		
+		// Delete all media files and folders
+		deleteDir( $upload_dir );
+		makePublicFolder( $upload_dir );
 	}
 	
 	if($request == "create"){
 		$name = $_POST["eventname"];
 		$chunks = intval($_POST["numchunks"]);
+		$maptype = $_POST["maptype"];
+		$lat = $_POST["latitude"];
+		$long = $_POST["longitude"];
 		
-		$vars = array('name' => $name, 'chunks' => $chunks);
+		$vars = array('name' => $name, 'chunks' => $chunks, 'maptype' => $maptype, 'lat' => $lat, 'long' => $long);
 		
 		// Create new event
 		$eid = $db->NewInsertID( 'events' );
@@ -37,6 +45,36 @@
 			makePublicFolder($upload_dir.$eid.'/tmp');
 			makePublicFolder($upload_dir.$eid.'/full');
 			makePublicFolder($upload_dir.$eid.'/poster');
+			
+			// Make event poster using maps
+			if($maptype == 'real'){
+				$zoom = 17;
+				$latlng = $lat . "," . $long;
+				
+				$parts = array(
+			        'center'  => $latlng,
+			        'zoom'    => $zoom,
+			        'size'    => '500x500',
+			        'maptype' => 'roadmap',
+			        'sensor'  => 'false',
+			        'format'  => 'png',
+			        'visual_refresh' => 'true'
+			    );      
+			    $requestURL = "http://maps.googleapis.com/maps/api/staticmap?".http_build_query($parts);
+					
+				$eventPoster = $upload_dir.$eid.'/eventPoster.png';
+				
+				// Get image file from Google Maps
+				{
+					$ch = curl_init();
+					curl_setopt($ch, CURLOPT_URL, $requestURL);
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+					$file = curl_exec($ch);
+					curl_close($ch);
+					
+			    	file_put_contents($eventPoster, $file);
+				}
+			}
 			
 			// Add default initial images
 			{

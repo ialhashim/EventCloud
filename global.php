@@ -133,6 +133,12 @@ function makePublicFolder($folderpath){
 		mkdir($folderpath, 0777);
 }
 
+function deleteDir($path){
+    return is_file($path) ?
+            @unlink($path) :
+            array_map(__FUNCTION__, glob($path.'/*')) == @rmdir($path);
+}
+
 function array_shift_circular(array $array, $steps = 1)
 {
     if ($steps === 0) {

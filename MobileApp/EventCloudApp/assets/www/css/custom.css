@@ -252,7 +252,7 @@ h1 {
     background: none repeat scroll 0 0 #FFFFFF;
 }
 
-.niceForm input{
+.niceForm input, select{
 	margin: 4px;
 	padding: 8px 10px;
 	-webkit-border-radius: 5px;

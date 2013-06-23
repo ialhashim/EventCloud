@@ -17,21 +17,21 @@
        under the License.
  */
 
-package ca.sfu.EventCloudApp;
+package ca.sfu.EventfulCloud;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import org.apache.cordova.*;
+import android.graphics.Color;
 
-public class EventCloudApp extends DroidGap
+public class EventfulCloud extends DroidGap
 {
+    @Override
     public void onCreate(Bundle savedInstanceState)
     {
-    	System.setProperty("http.keepAlive", "false"); 
-    	
         super.onCreate(savedInstanceState);
         // Set by <content src="index.html" /> in config.xml
         super.loadUrl(Config.getStartUrl());
+        //super.loadUrl("file:///android_asset/www/index.html")
         
         // Fix flashing white screen between pages
         appView.setBackgroundColor( Color.parseColor("#444444") );

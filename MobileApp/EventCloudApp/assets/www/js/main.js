@@ -152,8 +152,7 @@ function getMoreMedia( start, count ){
 				
 				if(i < $data.length){
 					$('.' + myuid).replaceWith( $data[i] );	
-				}
-				else{
+				}else{
 					$('.' + myuid).css('display', 'none');
 				}
 			}
