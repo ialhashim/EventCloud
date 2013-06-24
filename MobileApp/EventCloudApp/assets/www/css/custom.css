@@ -30,12 +30,24 @@ html, body {
 	overflow: hidden;
 }
 
+@-webkit-keyframes slide {
+    from{
+        background-position:575px;
+    }
+    to{
+        background-position:1725px;
+    }
+}
+
 #mainScreen {
 	/*background: url('../img/bg_center.jpg') no-repeat center center;*/
 	overflow: hidden;
 	transition-property: all;
 	transition-timing-function: ease-in-out;
 	opacity: 0;
+	
+	background-image: url('../img/cloudsDark.png');
+	-webkit-animation: slide 90s linear infinite;
 }
 
 #mainScreen {
