@@ -12,7 +12,7 @@
 	}
 	
 	if($request == "name"){
-		$result = $db->Select( 'events', array("eid" => $eid), 'name' );
+		$result = $db->Select( 'events', array("eid" => $eid) );
 	}
 	
 	if($request == "clearAll"){
@@ -135,8 +135,10 @@
 				// Add an initial chunk[0]
 				$db->Insert(array('eid' => $eid, 'index' => 0), 'chunks');
 				
-				foreach ($slide_files as $file) {
-					insertMedia($file, $eid, $uid);
+				for($i = 0; $i < 3; $i++)
+				{
+					$mid = insertMedia($slide_files[$i], $eid, $uid);
+					updateMediaLocation($mid, $lat, $long);
 				}
 			}
 		}

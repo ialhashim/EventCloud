@@ -19,6 +19,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+function strsql($str){
+	return '`'.$str.'`';
+}
+
 // MySQL Class v0.8.1
 class MySQL {
 	

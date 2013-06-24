@@ -28,6 +28,9 @@ public class EventfulCloud extends DroidGap
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+    	// To avoid error code 3 on photo upload
+    	System.setProperty("http.keepAlive", "false"); 
+    	
         super.onCreate(savedInstanceState);
         // Set by <content src="index.html" /> in config.xml
         super.loadUrl(Config.getStartUrl());

@@ -7,6 +7,13 @@
     
 	include_once('global.php');
 	
+	function chunkTime( $chunk ){
+		$time1 = new Datetime($chunk['start']);
+		$time2 = new Datetime();
+		$interval =  $time2->getTimestamp() - $time1->getTimestamp();
+		return $interval;
+	}
+	
 	function insertMedia($tempFile, $eid, $uid, $meta = '')
 	{
 		global $db;
@@ -17,7 +24,23 @@
 		// Add media record to DB
 		$mid = -1;
 		{
-			$chunk = array_slice( $db->Select( 'chunks', array('eid' => $eid), 'cid' ), -1, 1, true );
+			// Check last chunk time, create new if needed
+			$chunkThreshold = 30; // seconds
+			$chunks = $db->Select( 'chunks', array('eid' => $eid), '*', strsql('index'). ' DESC ');
+			
+			// Treat all results as an array
+			if(array_key_exists('cid',$chunks)) $chunks[0] = $chunks;
+			
+			$chunk = $chunks[0];
+			
+			if( chunkTime($chunk) > $chunkThreshold )
+			{
+				// Increase chunk index
+				$newCIDX = $chunk['index'] + 1;
+				
+				// Create new chunk
+				$chunk['cid'] = $db->InsertReturnId( array('eid' => $eid, 'index' => $newCIDX), 'chunks' );
+			}
 			
 			$vars = array('uid'=> $uid, 'uid' => $uid, 'cid' => $chunk['cid'], 'type' => $ext);
 			$vars['meta'] = "";
@@ -52,8 +75,7 @@
 		$db->Update('media', $vars, array("mid" => $mid));
 		
 		// Return file name
-		echo getMediaFilename( $mid );
-		die();
+		return getMediaFilename( $mid );
 	}
 	
 	function deleteMedia( $mid )

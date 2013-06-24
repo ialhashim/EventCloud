@@ -2,7 +2,8 @@
 var eid;
 var userid;
 var username;
-var eventname = '';
+var eventname;
+var eventStart;
 
 var itemCount = 4;
 
@@ -14,7 +15,10 @@ $(document).ready(function() {
 	// Get event name
 	$.post(eventsManager, { request: "name", eid: eid }, function(data){ 
 		eventname = data.name; 
+		eventStart = data.start;
 		$("h2#greeting").replaceWith( "<h2 id='greeting'> " + toTitleCase(username) + " @ " + eventname + " </h2>" );
+		
+		setInterval(eventClock, 1000);
 	});
 	
 	// Disable scrolling
@@ -245,6 +249,15 @@ function initialSlides() {
 		  resizeSwiper();
 		});
 	});
+}
+
+function eventClock()
+{
+	var from = new Date( eventStart ); 
+	var to = new Date();
+	var millisecond = (new Date()) - from; 
+
+	$('#timer').text( msToTime(millisecond) );
 }
 
 

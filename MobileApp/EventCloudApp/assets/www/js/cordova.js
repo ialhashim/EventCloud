@@ -909,7 +909,7 @@ androidExec.nativeToJsModes = nativeToJsModes;
 
 androidExec.setJsToNativeBridgeMode = function(mode) {
     if (mode == jsToNativeModes.JS_OBJECT && !window._cordovaNative) {
-        //console.log('Falling back on PROMPT mode since _cordovaNative is missing. Expected for Android 3.2 and lower only.');
+        console.log('Falling back on PROMPT mode since _cordovaNative is missing. Expected for Android 3.2 and lower only.');
         mode = jsToNativeModes.PROMPT;
     }
     nativeApiProvider.setPreferPrompt(mode == jsToNativeModes.PROMPT);
@@ -6715,14 +6715,14 @@ window.cordova = require('cordova');
     function logUnfiredChannels(arr) {
         for (var i = 0; i < arr.length; ++i) {
             if (arr[i].state != 2) {
-                //console.log('Channel not fired: ' + arr[i].type);
+                console.log('Channel not fired: ' + arr[i].type);
             }
         }
     }
 
     window.setTimeout(function() {
         if (channel.onDeviceReady.state != 2) {
-            //console.log('deviceready has not fired after 5 seconds.');
+            console.log('deviceready has not fired after 5 seconds.');
             logUnfiredChannels(platformInitChannelsArray);
             logUnfiredChannels(channel.deviceReadyChannelsArray);
         }
@@ -6936,10 +6936,13 @@ require('cordova/channel').onNativeReady.fire();
         injectPluginScript();
     };
     try { // we commented we were going to try, so let us actually try and catch
-        //xhr.open('GET', plugins_json, true); // Async
-        //xhr.send();
+        xhr.open('GET', plugins_json, true); // Async
+		
+		if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
+			xhr.send();
+		}
     } catch(err){
-        //injectPluginScript();
+        injectPluginScript();
     }
 }(window));
 

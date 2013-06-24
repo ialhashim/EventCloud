@@ -1,5 +1,8 @@
 <?php
 
+// Assume server is in VANCOUVER
+date_default_timezone_set('America/Vancouver');
+			
 $MYSQL_NAME = "event_cloud";
 $MYSQL_USER = "root";
 $MYSQL_PASS = "chixchix";
@@ -87,8 +90,6 @@ function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
 
 function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnailFile) { 
 
-	echo "<pre>";
-		
 	$uid = newGuid();
 	$ext = 'mp4';
 	
@@ -96,24 +97,14 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 	
 	$newNameFull = $toThumbnailFile;
 	
-	if($ext == 'gif')
-	{
-		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -t 00:00:0{$seconds} -vf scale=$resolution:-1 {$newNamePath}tmp/{$uid}%02d.png";
-		$convert_cmd = "convert -delay 4 -loop 0 {$newNamePath}tmp/{$uid}*.png $newNameFull";
-		$convert_cmd_pause = "convert $newNameFull ( -clone 0 -set delay 100 ) -layers OptimizePlus -layers OptimizeTransparency +map $newNameFull";
-	
-		system($ffmpeg_cmd);
-		system($convert_cmd);
-		system($convert_cmd_pause);
-		
-		array_map('unlink', glob( $toThumbnailFile."tmp/{$uid}*.png" ) );
-	}
-	
 	if($ext == 'mp4')
 	{
+		$base = basename($newNameFull);
+		$path = dirname($newNameFull);
+		
 		// Create poster image
-		$posterFile = str_replace("mp4", "png", $newName);
-		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -r 1/1 -vf scale=".round_down_pow2($resolution).":-1 -f mjpeg {$newNamePath}poster/$posterFile";
+		$posterFile = str_replace("mp4", "png", $base);
+		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -r 1/1 -vf scale=".round_down_pow2($resolution).":-1 -f mjpeg {$path}/poster/$posterFile";
 		system($ffmpeg_cmd);
 		
 		// Create short clip
@@ -122,10 +113,7 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 	}
 
 	// set proper permissions on the new file
-	echo "File:".$newNameFull;
 	chmod($newNameFull, 0644);	
-	
-	echo "</pre>";
 }
 
 function makePublicFolder($folderpath){

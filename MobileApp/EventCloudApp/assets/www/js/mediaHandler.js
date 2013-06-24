@@ -41,7 +41,12 @@ function uploadFile(){
 	        beforeSend: function(){  },
 	        success: function(){ console.log('File upload OK'); },
 	        error: function(){ up_fail( {code:'error code', source:'', target:''} ); },
-	        complete: function(e, xhr, settings){ postUpload(e.responseText); },
+	        complete: function(e, xhr, settings)
+	        {
+	       		postUpload(e.responseText); 
+	       		$tempForm = $("#tempForm");
+	       		$tempForm.remove();
+	        },
 	        // Form data
 	        data: formData,
 	        //Options to tell JQuery not to process data or worry about content-type
