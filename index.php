@@ -53,7 +53,7 @@
 	
 	<div>
 		<a href="MobileApp/EventCloudApp/assets/www">Go to App page</a> <br/>
-		<a href="/EventCloudApp.apk">EventCloud APK</a>
+		<a href="/EventfulCloud.apk">EventCloud APK</a>
 	</div>
 	
 	<div id="showGoogleMaps">
