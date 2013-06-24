@@ -16,7 +16,7 @@
 
 html {
 	color: white;
-	background-color: #444 !important;
+	background-color: #303030 !important;
 	background-size: 16px 16px;
 }
 
@@ -47,7 +47,7 @@ html, body {
 	opacity: 0;
 	
 	background-image: url('../img/cloudsDark.png');
-	-webkit-animation: slide 90s linear infinite;
+	-webkit-animation: slide 60s linear infinite;
 }
 
 #mainScreen {

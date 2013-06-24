@@ -37,7 +37,7 @@ public class EventfulCloud extends DroidGap
         //super.loadUrl("file:///android_asset/www/index.html")
         
         // Fix flashing white screen between pages
-        appView.setBackgroundColor( Color.parseColor("#444444") );
+        appView.setBackgroundColor( Color.parseColor("#303030") );
     }
 }
 
