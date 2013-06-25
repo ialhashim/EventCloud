@@ -57,30 +57,32 @@ function uploadFile(){
 	});
 }
 
-/// Video
-//
+// Video
 function captureVideo() {
-	// Launch device video recording application, 
-	// allowing user to capture up to 2 video clips
-	navigator.device.capture.captureVideo(captureVideoSuccess, captureVideoError);
+	navigator.device.capture.captureVideo(captureMediaSuccess, captureMediaError);
 }
 
-function captureVideoSuccess(mediaFiles) {
-	var i, len;
-	for (i = 0, len = mediaFiles.length; i < len; i += 1) {
-		uploadVideoFile(mediaFiles[i]);
-	}
+// Photo
+function capturePhoto() {
+	navigator.device.capture.captureImage(captureMediaSuccess, captureMediaError);
 }
 
-function captureVideoError(error) {
+function captureMediaError(error) {
 	if (error != CAPTURE_NO_MEDIA_FILES) {
 		var msg = 'An error occurred during capture: ' + error.code;
 		navigator.notification.alert(msg, null, 'Uh oh!');
 	}
 }
 
+function captureMediaSuccess(mediaFiles) {
+	var i, len;
+	for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+		uploadMediaFile(mediaFiles[i]);
+	}
+}
+
 // Upload files to server
-function uploadVideoFile(mediaFile) {
+function uploadMediaFile(mediaFile) {
 	var ft = new FileTransfer(),
     	path = mediaFile.fullPath,
     	name = mediaFile.name;
@@ -97,39 +99,6 @@ function uploadVideoFile(mediaFile) {
 	}
 	
     ft.upload(path, uploadURL, up_win, up_fail, options, true);
-}
-
-/// Photo
-//
-function capturePhoto() {
-	navigator.camera.getPicture(uploadPhotoFile, capturePhotoError, {
-		quality : 50,
-		destinationType : navigator.camera.DestinationType.FILE_URI
-	});
-}
-
-function capturePhotoError(message) {
-	var msg = 'An error occurred during capture: ' + error.code;
-	navigator.notification.alert(msg, null, 'Uh oh!');
-}
-
-function uploadPhotoFile(imageURI) {
-    var options = new FileUploadOptions();
-    options.fileKey="file";
-    options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);
-    options.mimeType="image/jpeg";
-
-	// Submission parameters
-	{
-		var params = {};
-		params.eid = eid;
-		params.uid = userid;
-		
-		options.params = params;
-	}
-
-    var ft = new FileTransfer();
-    ft.upload(imageURI, uploadURL, up_win, up_fail, options, true);
 }
 
 function up_win(r) {
