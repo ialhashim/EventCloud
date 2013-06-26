@@ -3,7 +3,6 @@ var eid;
 var userid;
 var username;
 var eventname;
-var eventStart;
 
 var itemCount = 4;
 
@@ -15,10 +14,9 @@ $(document).ready(function() {
 	// Get event name
 	$.post(eventsManager, { request: "name", eid: eid }, function(data){ 
 		eventname = data.name; 
-		eventStart = data.start;
 		$("h2#greeting").replaceWith( "<h2 id='greeting'> " + toTitleCase(username) + " @ " + eventname + " </h2>" );
 		
-		setInterval(eventClock, 1000);
+		setInterval(eventClock, 1000, [data.start]);
 	});
 	
 	// Disable scrolling
@@ -83,51 +81,48 @@ var $refSpinner;
 	};
 })(jQuery);
 
+var currentStart = 0;
+var slidesCount = 3;
+var numActiveSlides = 12;
+var mediaUID = 1;
+var packetUID = 1;
+var slideWidth;
+var slideHeight;
 
 function getInitialMedia(count, start, callBack){
-
 	var requestData = {
 		count : count,
 		start : start,
 		eid: eid
 	};
-
 	var request = $.ajax({
 		url : galleryURL,
 		type : "POST",
 		data : requestData,
-		success: function( d ){
-			callBack(d);
-		}
+		success: function( d ){	callBack(d); }
 	}); 
 }
 
-var currentStart = 0;
-var slidesCount = 3;
-var numActiveSlides = 12;
-var mainSwiper;
-var mediaUID = 1;
-var packetUID = 1;
-
-function resizeSwiper(){
+function resizeSwiper( className, numSlides, myswiper ){
 	var width = $('body').width();
 	var height = $('body').height();
 	
+	slideWidth = (width) / numSlides;
+	slideHeight = height * 0.5;
+	
 	// Sizes
-	$('#swiper-main-container').css('width', width);
-	$('#swiper-main-container').css('height', height);     
+	$('.' + className).css('width', width);
+	$('.' + className).css('height', slideWidth);     
 	
-	var slideWidth = (width) / slidesCount;
-	var slideHeight = height * 0.5;
-	
-	$('.swiper-slide').css('width', slideWidth);
-	$('.swiper-slide').css('height', slideHeight);
+	//$('.' + className + ' > .swiper-slide').css('width', slideWidth);
+	//$('.' + className + ' > .swiper-slide').css('height', slideHeight);
 	
 	// Placements
-	$('#swiper-main-container').css('top', ( ($('body').height() * 0.5) - (slideHeight * 0.5) ));
+	$('.' + className).css('top', ( (height * 0.5) - (slideHeight * 0.5) ));
 	
-	if(!mainSwiper == undefined)
-		mainSwiper.reInit();
+	// Refresh
+	if(!myswiper == undefined)
+		myswiper.reInit();
 }
 
 function getMoreMedia( start, count ){
@@ -177,87 +172,118 @@ function getMoreMedia( start, count ){
 	return $media.clone();
 }
 
+function makeSliderV( swiperClassID, options, initialSlides ){
+	var swiperContainer = $("<div/>");
+	swiperContainer.addClass( swiperClassID );
+	swiperContainer.addClass( 'swiper-container' );
+	swiperContainer.css('width', '100%');
+	swiperContainer.css('height', slideHeight);
+
+	swiperContainer = swiperContainer.append( "<div class='swiper-wrapper' style='height:200px;width:200px'> </div>" );
+	
+	options = {
+		mode: 'vertical',
+		slidesPerView: 1
+	}
+	
+	for(var i = 0; i < 10; i++){
+		el = $("<div/>");
+		el.addClass( 'swiper-slide' );
+		el.addClass( 'vslide' );
+		el.html( '<div class="thumbnail"><img class="thumbnail-item" src="http://96.49.252.141/uploads/1/0000000002.png"></div>' );
+		el.appendTo( swiperContainer.children('.swiper-wrapper') );
+	}
+	
+	var slide = $("<div/>");
+	slide.addClass( 'swiper-slide' );
+	swiperContainer.appendTo( slide );
+	
+	return { container: slide, swiper: swiperContainer.swiper( options ) };
+}
+
+function makeSliderH( swiperClassID, options, initialSlides ){
+	var swiperContainer = $("<div/>");
+	swiperContainer.addClass( swiperClassID );
+	swiperContainer.addClass( 'swiper-container' );
+	swiperContainer = swiperContainer.append( "<div class='pagination-main'> </div> <div class='swiper-wrapper'> </div>" );
+			
+	// Load initial set of slides if any
+	$.each( initialSlides, function( i, el ) {
+    	$(el).appendTo( swiperContainer.children('.swiper-wrapper') ).wrap('<div class="swiper-slide" />');
+	});
+	
+	return { container: swiperContainer, swiper: swiperContainer.swiper( options ) };
+}
+
 function initialSlides() {
 	
 	var count = slidesCount;
 	
 	getInitialMedia(numActiveSlides, 0, function(d){
-			
-		// Load initial set of slides
-		$initData = $(d);
-		$.each( $initData, function( i, el ) {
-	    	var slideHeight = $(el).height();
-	    	$(el).appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" style="height:' + slideHeight + 'px" />');
-		});
-		
-		// Generate left over slides
-		//leftOver = numActiveSlides - $initData.length;
-		//for (var i = 0; i < leftOver; i++){ 
-			//$emptyItem = $refSpinner.clone();
-		//	$($refSpinner.html()).appendTo( '.swiper-wrapper' ).wrap('<div class="swiper-slide" />');
-		//}
-		
-	    mainSwiper = $('.swiper-container').swiper({
-			//Your options here:
+
+		var photoStream = makeSliderH( 'photoStream', {
 			slidesPerView : slidesCount,
-			preventClassNoSwiping: true,
 			pagination : '.pagination-main',
 			mode:'horizontal',
 			initialSlide : 0,
-			onSlideChangeEnd: function(){
-				//console.log('Last Direction: ' + mainSwiper.lastDirection);
+			onSlideChangeEnd: function( swiper ){
+				//console.log('Last Direction: ' + swiper.lastDirection);
 				var count = slidesCount;
 						
-				if(mainSwiper.lastDirection === 'next')
+				if(swiper.lastDirection === 'next')
 				{
 					// Start dynamic loading when we are at the middle
-					if(mainSwiper.activeIndex >= 0.5 * numActiveSlides)
+					if(swiper.activeIndex >= 0.5 * numActiveSlides)
 					{
-						var start = mainSwiper.virtualIndex + numActiveSlides;
+						var start = swiper.virtualIndex + numActiveSlides;
 						var $media = $( getMoreMedia( start, count ) );
-						mainSwiper.virtualIndex += $media.children().length;
-						mainSwiper.removeStartAddEnd( $media );	
-					}
-								
+						swiper.virtualIndex += $media.children().length;
+						swiper.removeStartAddEnd( $media );	
+					}			
 				}
 				
-				if(mainSwiper.lastDirection === 'prev')
+				if(swiper.lastDirection === 'prev')
 				{
-					if(mainSwiper.activeIndex <= 0.5 * numActiveSlides)
+					if(swiper.activeIndex <= 0.5 * numActiveSlides)
 					{
-						var start = mainSwiper.virtualIndex - count;
+						var start = swiper.virtualIndex - count;
 						var $media = $( getMoreMedia( start, count ) );
 						var c = $media.children().length;
 						
-						if(mainSwiper.virtualIndex - c >= 0)
+						if(swiper.virtualIndex - c >= 0)
 						{
-							mainSwiper.virtualIndex -= c;
-							mainSwiper.removeEndAddStart( $media );	
+							swiper.virtualIndex -= c;
+							swiper.removeEndAddStart( $media );	
 						}
 					}
 				}
+			},
+			onSwiperCreate: function( swiper ){
+				
+				// Add main photo stream
+				$("#gallery").append( swiper.container );
+				swiper.reInit();
+				
+			    // Automatically resize
+			    resizeSwiper('photoStream', slidesCount, swiper);
+			    $(window).resize(function() {
+				  resizeSwiper('photoStream', slidesCount, swiper);
+				});
+		
+				// Test vertical stream
+				vslider = makeSliderV('test');
+				console.log( vslider.container[0] );
+				$vslide = $("<div>").addClass('swiper-slide').append( vslider.container[0] );
+				vslider.swiper.reInit();
+				
+				swiper.prependSlide( vslider.container[0] );
+				//$("#gallery").append( vslider.container );
+				
+				$(window).resize(function() {  $(".test").height( slideWidth + 'px');	});
+				$(".test").height( slideWidth + 'px');
 			}
-		});
+		}, $(d));
 		
-		$(document).on('mousemove mousewheel',function(e) {
-			$("#vidx").text( 'v = ' + mainSwiper.virtualIndex + ", active idx = " + mainSwiper.activeIndex);
-		});
-		
-	    // Automatically resize
-	    resizeSwiper();
-	    $(window).resize(function() {
-		  resizeSwiper();
-		});
-	});
+	}); // end of getInitialMedia
 }
-
-function eventClock()
-{
-	var from = new Date( eventStart ); 
-	var to = new Date();
-	var millisecond = (new Date()) - from; 
-
-	$('#timer').text( msToTime(millisecond) );
-}
-
 

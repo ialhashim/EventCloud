@@ -63,5 +63,7 @@
 		<a onclick=" coords = (document.coord.coords.value + '').replace(' ', ','); window.location.href = 'https://maps.google.ca/maps?q=' + coords; " href="#">Map it</a>
 	</div>
 	
+	<a href="rtsp://96.49.252.141:8554/test.sdp">Stream</a>
+	
     </body>
 </html>

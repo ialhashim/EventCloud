@@ -1837,6 +1837,12 @@ var Swiper = function (selector, params) {
             paginationHTML += '<'+params.paginationElement+' class="'+params.paginationElementClass+'"></'+params.paginationElement+'>'
         }
         _this.paginationContainer = params.pagination.nodeType ? params.pagination : $$(params.pagination)[0];
+        
+        // Ibraheem
+        if(_this.paginationContainer == undefined){
+        	_this.paginationContainer = _this.container.firstElementChild;
+        }
+        
         _this.paginationContainer.innerHTML = paginationHTML;
         _this.paginationButtons = []
         if (document.querySelectorAll)
@@ -2131,6 +2137,9 @@ var Swiper = function (selector, params) {
         if (params.autoplay) {
             _this.startAutoplay();
         }
+        
+        if (params.onSwiperCreate)
+        	params.onSwiperCreate(_this);
         
     }
     makeSwiper();

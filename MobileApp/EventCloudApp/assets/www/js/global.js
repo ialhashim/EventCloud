@@ -55,26 +55,6 @@ function toTitleCase(str) {
 	});
 }
 
-/* Time functions */
-function msToTime(s, isIncludeMS) {
-
-	function addZ(n) {
-		return (n < 10 ? '0' : '') + n;
-	}
-
-	var ms = s % 1000;
-	s = (s - ms) / 1000;
-	var secs = s % 60;
-	s = (s - secs) / 60;
-	var mins = s % 60;
-	var hrs = (s - mins) / 60;
-
-	var tail = '.' + ms;
-	if (!isIncludeMS) tail = '';
-
-	return addZ(hrs) + ':' + addZ(mins) + ':' + addZ(secs) + tail;
-}
-
 /// Form actions
 function actionSubmitForm($sender, $form, callBack) {
 
@@ -152,6 +132,34 @@ function getEventStart(eid) {
 		}
 	});
 	return eventStart;
+}
+
+/* Time functions */
+function msToTime(s, isIncludeMS) {
+
+	function addZ(n) {
+		return (n < 10 ? '0' : '') + n;
+	}
+
+	var ms = s % 1000;
+	s = (s - ms) / 1000;
+	var secs = s % 60;
+	s = (s - secs) / 60;
+	var mins = s % 60;
+	var hrs = (s - mins) / 60;
+
+	var tail = '.' + ms;
+	if (!isIncludeMS) tail = '';
+
+	return addZ(hrs) + ':' + addZ(mins) + ':' + addZ(secs) + tail;
+}
+
+function eventClock( eventStart ){
+	var from = new Date( eventStart ); 
+	var to = new Date();
+	var millisecond = (new Date()) - from; 
+
+	$('#timer').text( msToTime(millisecond) );
 }
 
 /* Need these? */
