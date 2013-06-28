@@ -46,6 +46,7 @@
 			$vars['meta'] = "";
 			$vars['lat'] = 0;
 			$vars['long'] = 0;
+			//$vars['timestamp'] = date("Y-m-d H:i:s", filemtime($tempFile));
 			
 			$mid = $db->InsertReturnId($vars, 'media');
 		}
@@ -153,6 +154,36 @@
 		return $mid;
     }
     
+    function getAllChunks( $eid ){
+    	global $db;
+    	$chunks = $db->Select( 'chunks', array( "eid" => $eid ), '*', strsql('index'). ' ASC ');
+		if(array_key_exists('cid',$chunks)) $chunks[0] = $chunks; // Treat all results as an array
+		return $chunks;
+    }
+    
+    function getChunkByIndex( $cidx, $eid ){
+		$chunks = getAllChunks( $eid );
+		return $chunks[$cidx];
+    }
+	
+	function getLatestChunk( $eid ){
+		$chunks = getAllChunks( $eid );
+		return end($chunks);
+	}
+	
+	function getMediaForChunk( $cid, $count = -1 ){
+		global $db;
+		
+		// Get all media of chunk 'id', sorted by their time stamp
+		$media = $db->Select( 'media', array( "cid" => $cid ), '*', strsql('timestamp') );
+		
+		if($count > 0){
+			$media = array_slice( $media, 0, $count );
+		}
+		
+		return $media;
+	}
+	
     // Update requests
     if(!empty($_POST['request']) && $_POST['request'] == "updateCoord")
     {
@@ -160,11 +191,35 @@
 		die();
     }
     
-    // By default, upload media sent with this script's request
+    // By default, upload media sent with this script
     if(!empty($_FILES["file"]) && empty($_POST['manual']))
 	{
     	echo saveUploadedMedia();
 		die();
 	}
+	
+	$count = -1; if(!empty($_POST['count'])) $count = $_POST['count'];
+	
+	// Get specific chunk by its index
+	if(!empty($_POST['request']) && $_POST['request'] == "getChunk")
+    {
+    	$result = array();
+		$result[] = getChunkByIndex( $_POST['cidx'], $eid );
+		$result[] = getMediaForChunk( $result[0]['cid'], $count );
+		echo json_encode( $result );
+		die();
+	}
+	
+	// Get latest chunk
+	if(!empty($_POST['request']) && $_POST['request'] == "getLatestChunk")
+    {
+    	$result = array();
+		$latestChunk = getLatestChunk( $eid );
+		$result[] = $latestChunk;
+		$result[] = getMediaForChunk( $latestChunk['cid'], $count );
+		echo json_encode( $result );
+		die();
+	}
+	
 ?>
 	

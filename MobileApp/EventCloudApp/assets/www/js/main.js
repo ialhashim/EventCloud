@@ -86,8 +86,10 @@ var slidesCount = 3;
 var numActiveSlides = 12;
 var mediaUID = 1;
 var packetUID = 1;
+var binUID = 1;
 var slideWidth;
 var slideHeight;
+var photoStream;
 
 function getInitialMedia(count, start, callBack){
 	var requestData = {
@@ -123,6 +125,8 @@ function resizeSwiper( className, numSlides, myswiper ){
 	// Refresh
 	if(!myswiper == undefined)
 		myswiper.reInit();
+		
+	$(".swiper-vertical").height( slideWidth + 'px' );
 }
 
 function getMoreMedia( start, count ){
@@ -172,56 +176,13 @@ function getMoreMedia( start, count ){
 	return $media.clone();
 }
 
-function makeSliderV( swiperClassID, options, initialSlides ){
-	var swiperContainer = $("<div/>");
-	swiperContainer.addClass( swiperClassID );
-	swiperContainer.addClass( 'swiper-container' );
-	swiperContainer.css('width', '100%');
-	swiperContainer.css('height', slideHeight);
-
-	swiperContainer = swiperContainer.append( "<div class='swiper-wrapper' style='height:200px;width:200px'> </div>" );
-	
-	options = {
-		mode: 'vertical',
-		slidesPerView: 1
-	}
-	
-	for(var i = 0; i < 10; i++){
-		el = $("<div/>");
-		el.addClass( 'swiper-slide' );
-		el.addClass( 'vslide' );
-		el.html( '<div class="thumbnail"><img class="thumbnail-item" src="http://96.49.252.141/uploads/1/0000000002.png"></div>' );
-		el.appendTo( swiperContainer.children('.swiper-wrapper') );
-	}
-	
-	var slide = $("<div/>");
-	slide.addClass( 'swiper-slide' );
-	swiperContainer.appendTo( slide );
-	
-	return { container: slide, swiper: swiperContainer.swiper( options ) };
-}
-
-function makeSliderH( swiperClassID, options, initialSlides ){
-	var swiperContainer = $("<div/>");
-	swiperContainer.addClass( swiperClassID );
-	swiperContainer.addClass( 'swiper-container' );
-	swiperContainer = swiperContainer.append( "<div class='pagination-main'> </div> <div class='swiper-wrapper'> </div>" );
-			
-	// Load initial set of slides if any
-	$.each( initialSlides, function( i, el ) {
-    	$(el).appendTo( swiperContainer.children('.swiper-wrapper') ).wrap('<div class="swiper-slide" />');
-	});
-	
-	return { container: swiperContainer, swiper: swiperContainer.swiper( options ) };
-}
-
 function initialSlides() {
 	
 	var count = slidesCount;
 	
 	getInitialMedia(numActiveSlides, 0, function(d){
 
-		var photoStream = makeSliderH( 'photoStream', {
+		photoStream = makeSliderH( 'photoStream', {
 			slidesPerView : slidesCount,
 			pagination : '.pagination-main',
 			mode:'horizontal',
@@ -266,24 +227,107 @@ function initialSlides() {
 				
 			    // Automatically resize
 			    resizeSwiper('photoStream', slidesCount, swiper);
-			    $(window).resize(function() {
-				  resizeSwiper('photoStream', slidesCount, swiper);
-				});
-		
-				// Test vertical stream
-				vslider = makeSliderV('test');
-				console.log( vslider.container[0] );
-				$vslide = $("<div>").addClass('swiper-slide').append( vslider.container[0] );
-				vslider.swiper.reInit();
-				
-				swiper.prependSlide( vslider.container[0] );
-				//$("#gallery").append( vslider.container );
-				
-				$(window).resize(function() {  $(".test").height( slideWidth + 'px');	});
-				$(".test").height( slideWidth + 'px');
+			    $(window).resize(function() { resizeSwiper('photoStream', slidesCount, swiper);	});
 			}
-		}, $(d));
+		}, $(d)); // End of photo stream creation
+		
+		getMediaForChunk(-1, 1, -1);
 		
 	}); // end of getInitialMedia
 }
+
+function makeSliderH( swiperClassID, options, initialSlides ){
+	var swiperContainer = $("<div/>");
+	swiperContainer.addClass( swiperClassID );
+	swiperContainer.addClass( 'swiper-container' );
+	swiperContainer = swiperContainer.append( "<div class='pagination-main'> </div> <div class='swiper-wrapper'> </div>" );
+			
+	// Load initial set of slides if any
+	$.each( initialSlides, function( i, el ) {
+    	$(el).appendTo( swiperContainer.children('.swiper-wrapper') ).wrap('<div class="swiper-slide" />');
+	});
+	
+	return { container: swiperContainer, swiper: swiperContainer.swiper( options ) };
+}
+
+function makeSliderV( swiperClassID, options, slides ){
+	var swiperContainer = $("<div/>");
+	swiperContainer.addClass( swiperClassID );
+	swiperContainer.addClass( 'swiper-container' );
+	swiperContainer.addClass( 'swiper-vertical' );
+	swiperContainer.css('width', '100%');
+	swiperContainer.css('height', slideHeight);
+
+	swiperContainer = swiperContainer.append( "<div class='swiper-wrapper' style='height:200px;width:200px'> </div>" );
+	
+	options = {
+		mode: 'vertical',
+		slidesPerView: 1
+	}
+	
+	$.each( slides, function( k, v ) {
+		el = $("<div/>");
+		el.addClass( 'swiper-slide' ).addClass( 'vslide' );
+		el.html( getThumbnail(v) );
+		el.appendTo( swiperContainer.children('.swiper-wrapper') );
+	});
+	
+	var main_slide = $("<div/>").addClass( 'swiper-slide' ).append( swiperContainer[0] );
+	swiperContainer.appendTo( main_slide );
+	
+	var swiper = swiperContainer.swiper( options );
+	swiper.reInit();
+	
+	return { container: main_slide, swiper: swiper };
+}
+
+var chunkThreshold = 30; // seconds
+var binCount = 3;
+
+function getThumbnail( media ){
+	var mediaURI = website + 'uploads/' + eid + '/' + getMediaBasename( media.mid, media.type );
+	if(media.type != "mp4"){
+		return "<div class='thumbnail'><img class='thumbnail-item' src='" + mediaURI + "'/></div>" ;
+	}else{
+		var videoItem = "<div class='thumbnail'>";
+		videoItem += "<video class='thumbnail-item NoSwiping' poster='$posterFullPath' muted>";
+		videoItem += "<source src='" + mediaURI + "' type='video/mp4'>";
+		videoItem += '</video> <br />';
+		videoItem += "</div>";
+		return videoItem;
+	}
+}	
+
+function getMediaForChunk(count, eid, cidx){
+	
+	var r = {eid: eid, cidx: cidx};
+	r.request = ( cidx > 0 ) ? r.request = 'getChunk' : 'getLatestChunk';
+	
+	$.post(mediaURL, r, function(data) {
+		$chunk_media = JSON.parse( data );
+		
+		$chunk = $chunk_media[0];
+		$media = $chunk_media[1];
+		chunkTime = new Date( $chunk.start );
+		
+		// Bin media into [X] slots
+		var $bins = new Object();
+		
+		for(var i = 0; i < $media.length; i++){
+			mediaTime = new Date( $media[i].timestamp );
+			diffSeconds = Math.max(0, (mediaTime - chunkTime) / 1000);
+			b = parseInt( (diffSeconds / chunkThreshold) * binCount );
+			if(!$bins[b]) $bins[b] = new Array();
+			$bins[b].push( $media[i] );
+		}
+		
+		// Add to photo stream
+		$.each($bins, function( k, v )
+		{
+			vslider = makeSliderV( 'vswiper-' + (binUID++), {}, v );
+			photoStream.swiper.prependSlide( vslider.container[0] );
+		});
+	});
+}
+
 

@@ -18,10 +18,11 @@ $server_address = 'http://96.49.252.141';
 
 // Global variables sent to PHP scripts - its research code :P
 if(isset($_POST["request"]))	$request 	= $_POST["request"]; else 	$request 	= "";
+if(isset($_POST["username"]))	$username	= $_POST["username"]; else 	$username	= "";
 if(isset($_POST["eid"]))		$eid 		= $_POST["eid"]; 	else 	$eid 		= -1;
 if(isset($_POST["uid"]))		$uid 		= $_POST["uid"]; 	else 	$uid 		= -1;
 if(isset($_POST["mid"]))		$mid 		= $_POST["mid"]; 	else 	$mid 		= -1;
-if(isset($_POST["username"]))	$username	= $_POST["username"]; else 	$username	= "";
+if(isset($_POST["cid"]))		$cid 		= $_POST["cid"]; 	else 	$cid 		= -1;
 
 function startsWith($haystack, $needle){
     return !strncmp($haystack, $needle, strlen($needle));
