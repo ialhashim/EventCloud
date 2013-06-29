@@ -310,7 +310,7 @@ function initialSlides() {
 				//console.log('Last Direction: ' + swiper.lastDirection);
 				var count = slidesCount;
 						
-				if(swiper.lastDirection === 'next')
+				/*if(swiper.lastDirection === 'next')
 				{
 					// Start dynamic loading when we are at the middle
 					if(swiper.activeIndex >= 0.5 * numActiveSlides)
@@ -336,7 +336,7 @@ function initialSlides() {
 							swiper.removeEndAddStart( $media );	
 						}
 					}
-				}
+				}*/
 			},
 			onSwiperCreate: function( swiper ){
 				
