@@ -17,10 +17,14 @@ $upload_url = "/uploads/";
 $server_address = 'http://96.49.252.141';
 
 // Development paths
-$host= gethostname();
-$ip = gethostbyname($host);
-$server_address = 'http://' . $ip;
-
+{
+	$host= gethostname();
+	$ip = gethostbyname($host);
+	$server_address = 'http://' . $ip;
+	
+	$h = parse_url( $_SERVER['HTTP_REFERER'] );
+	$server_address = $h[ "scheme" ] . "://" . $h['host'];
+}
 
 
 // Global variables sent to PHP scripts - its research code :P
