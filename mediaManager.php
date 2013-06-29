@@ -157,7 +157,7 @@
     function getAllChunks( $eid ){
     	global $db;
     	$chunks = $db->Select( 'chunks', array( "eid" => $eid ), '*', strsql('index'). ' ASC ');
-		if(array_key_exists('cid',$chunks)) $chunks[0] = $chunks; // Treat all results as an array
+		if(is_array($chunks) && array_key_exists('cid',$chunks)) $chunks[0] = $chunks; // Treat all results as an array
 		return $chunks;
     }
     
@@ -168,7 +168,10 @@
 	
 	function getLatestChunk( $eid ){
 		$chunks = getAllChunks( $eid );
-		return end($chunks);
+		if(is_array($chunks))
+			return end($chunks);
+		else 
+			return "";
 	}
 	
 	function getMediaForChunk( $cid, $count = -1 ){
@@ -205,9 +208,13 @@
     {
     	$result = array();
 		$result[] = getChunkByIndex( $_POST['cidx'], $eid );
-		$result[] = getMediaForChunk( $result[0]['cid'], $count );
-		echo json_encode( $result );
-		die();
+		
+		if(is_array($latestChunk))
+		{
+			$result[] = getMediaForChunk( $result[0]['cid'], $count );
+			echo json_encode( $result );
+			die();
+		}
 	}
 	
 	// Get latest chunk
@@ -215,10 +222,14 @@
     {
     	$result = array();
 		$latestChunk = getLatestChunk( $eid );
-		$result[] = $latestChunk;
-		$result[] = getMediaForChunk( $latestChunk['cid'], $count );
-		echo json_encode( $result );
-		die();
+		
+		if(is_array($latestChunk))
+		{
+			$result[] = $latestChunk;
+			$result[] = getMediaForChunk( $latestChunk['cid'], $count );
+			echo json_encode( $result );
+			die();
+		}
 	}
 	
 ?>

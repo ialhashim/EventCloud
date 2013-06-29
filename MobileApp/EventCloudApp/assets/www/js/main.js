@@ -304,6 +304,8 @@ function getMediaForChunk(count, eid, cidx){
 	r.request = ( cidx > 0 ) ? r.request = 'getChunk' : 'getLatestChunk';
 	
 	$.post(mediaURL, r, function(data) {
+		if( fulltrim(data).length == 0 ) return;
+		
 		$chunk_media = JSON.parse( data );
 		
 		$chunk = $chunk_media[0];
@@ -322,10 +324,11 @@ function getMediaForChunk(count, eid, cidx){
 		}
 		
 		// Add to photo stream
-		$.each($bins, function( k, v )
-		{
+		$.each($bins, function( k, v ){
 			vslider = makeSliderV( 'vswiper-' + (binUID++), {}, v );
 			photoStream.swiper.prependSlide( vslider.container[0] );
+			
+			forceResizeWindow();
 		});
 	});
 }

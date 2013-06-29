@@ -1,8 +1,9 @@
 /* Global paths to server scripts */
-var website = "http://54.214.248.120/development/workspace/EventCloud/";
+var website = "http://54.214.248.120/";
 
 /* When using local host */
 var website = 'http://96.49.252.141/';
+var website = location.protocol + "//" + location.host + "/";
 
 var uploadURL = website + "mediaManager.php";
 var mediaURL = website + "mediaManager.php";
@@ -55,6 +56,8 @@ function toTitleCase(str) {
 		return match.toUpperCase();
 	});
 }
+
+function fulltrim(str){return str.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');};
 
 /// Form actions
 function actionSubmitForm($sender, $form, callBack) {
@@ -172,6 +175,12 @@ if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
 
 function onDeviceReady() {
 
+}
+
+function forceResizeWindow(){
+	var evt = document.createEvent('UIEvents');
+    evt.initUIEvent('resize', true, false,window,0);
+    window.dispatchEvent(evt);
 }
 
 /*! sprintf.js | Copyright (c) 2007-2013 Alexandru Marasteanu <hello at alexei dot ro> | 3 clause BSD license */

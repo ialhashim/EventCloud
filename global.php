@@ -16,6 +16,13 @@ $upload_dir = dirname(__FILE__). "/uploads/";
 $upload_url = "/uploads/";
 $server_address = 'http://96.49.252.141';
 
+// Development paths
+$host= gethostname();
+$ip = gethostbyname($host);
+$server_address = 'http://' . $ip;
+
+
+
 // Global variables sent to PHP scripts - its research code :P
 if(isset($_POST["request"]))	$request 	= $_POST["request"]; else 	$request 	= "";
 if(isset($_POST["username"]))	$username	= $_POST["username"]; else 	$username	= "";
