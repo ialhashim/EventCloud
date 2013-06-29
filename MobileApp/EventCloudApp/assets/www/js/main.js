@@ -6,6 +6,9 @@ var eventname;
 
 var itemCount = 4;
 
+var $mediaViewer;
+var $mediaViewerItem;
+
 $(document).ready(function() { 
 	$("#mainScreen").fadeTo(0,0);
 	
@@ -32,9 +35,53 @@ $(document).ready(function() {
 	$refSpinner = $('<div class="spinner-container"></div>').append( $s );
 	
 	initialSlides();
+
+	/// Media Viewer:
+	$mediaViewer = $("#media-viewer");
+	$mediaViewerItem = $("#media-viewer-item");
+	$mediaViewer.fadeOut(0);
+		
+	// Show media view when media clicked
+	$('.photoStream').on("dblclick doubletap", ".interactive", function(e){
+		$media = $(this);
+		
+		// Scale and position media viewer
+		$mediaViewer.css('width', $media.width());
+		$mediaViewer.css('height', $media.height());
+		$mediaViewer.css('top', $media.offset().top);
+		$mediaViewer.css('left', $media.offset().left);
+		
+		// Save initial style so we can return to
+		$mediaViewer.data('startStyle', $mediaViewer.copyCSS('width height top left') );
+		
+		// Media item itself
+		$mediaViewerItem.css('width', $media.width());
+		$mediaViewerItem.css('height', $media.height());
+		
+		console.log( $mediaViewer.data('startStyle') );
+		
+		// Set media item to selected one
+		$img = $mediaViewerItem.children('figure').find(">:first-child");
+		$img.replaceWith( $media.outerHTML() );
+		
+		// Maximize to full screen
+		$mediaViewer.fadeIn( function(){
+			$mediaViewer.animate( { width: '100%', height: '100%', top:0, left:0}, 'slow');
+		});
+		
+		$mediaViewer.on("dblclick doubletap", hideMediViewer );
+		
+		e.preventDefault();
+	});
 	
 	$('.debug').hide();
 });
+
+function hideMediViewer(){
+	initStyle = $mediaViewer.data('startStyle');
+	$mediaViewer.animate( initStyle );
+	$mediaViewer.fadeOut();
+}
 
 /// Spinner stuff
 var $refSpinner;
@@ -195,7 +242,7 @@ function makeSliderH( swiperClassID, options, initialSlides ){
 	return { container: swiperContainer, swiper: swiperContainer.swiper( options ) };
 }
 
-function makeSliderV( swiperClassID, options, slides ){
+function makeSliderV( swiperClassID, options, slides, specialClass ){
 	var swiperContainer = $("<div/>");
 	swiperContainer.addClass( swiperClassID );
 	swiperContainer.addClass( 'swiper-container' );
@@ -213,7 +260,7 @@ function makeSliderV( swiperClassID, options, slides ){
 	$.each( slides, function( k, v ) {
 		el = $("<div/>");
 		el.addClass( 'swiper-slide' ).addClass( 'vslide' );
-		el.html( getThumbnail(v) );
+		el.html( getThumbnail(v,specialClass) );
 		el.appendTo( swiperContainer.children('.swiper-wrapper') );
 	});
 	
@@ -225,20 +272,6 @@ function makeSliderV( swiperClassID, options, slides ){
 	
 	return { container: main_slide, swiper: swiper };
 }
-
-function getThumbnail( media ){
-	var mediaURI = website + 'uploads/' + eid + '/' + getMediaBasename( media.mid, media.type );
-	if(media.type != "mp4"){
-		return "<div class='thumbnail'><img class='thumbnail-item' src='" + mediaURI + "'/></div>" ;
-	}else{
-		var videoItem = "<div class='thumbnail'>";
-		videoItem += "<video class='thumbnail-item NoSwiping' poster='$posterFullPath' muted>";
-		videoItem += "<source src='" + mediaURI + "' type='video/mp4'>";
-		videoItem += '</video> <br />';
-		videoItem += "</div>";
-		return videoItem;
-	}
-}	
 
 var chunkThreshold = 30; // seconds
 var binCount = 3;
@@ -360,7 +393,7 @@ function initialSlides() {
 					swiper.removeLastSlide();
 					
 					$("#mainScreen").fadeTo('fast', 1, function(){
-						updater = setInterval(updateLatest, 5000);
+						updater = setInterval(updateLatest, 1000);
 					});
 				}, true, true, ALL_MEDIA);
 			}
@@ -377,8 +410,8 @@ function updateLatest(){
 		if(curChunk == lastChunk) return;
 		else lastChunk = curChunk;
 		
-		$.each($bins, function( k, v ){
-			vslider = makeSliderV( 'vswiper-' + (binUID++), {}, v );
+		$.each($bins, function( k, mediaBin ){
+			vslider = makeSliderV( 'vswiper-' + (binUID++), {}, mediaBin, 'interactive' );
 			photoStream.swiper.appendSlide( vslider.container[0] );
 			forceResizeWindow();
 			
@@ -387,3 +420,21 @@ function updateLatest(){
 		
 	}, false, false, ALL_MEDIA);
 }
+
+function getThumbnail( media, specialClass ){
+	if(specialClass == undefined) specialClass = '';
+	
+	var mediaURI = website + 'uploads/' + eid + '/' + getMediaBasename( media.mid, media.type );
+	if(media.type != "mp4"){
+		return "<div class='thumbnail'><img class='thumbnail-item " + specialClass + "' src='" + mediaURI + "'/></div>" ;
+	}else{
+		var videoItem = "<div class='thumbnail'>";
+		videoItem += "<video class='thumbnail-item NoSwiping " + specialClass + "' poster='$posterFullPath' muted>";
+		videoItem += "<source src='" + mediaURI + "' type='video/mp4'>";
+		videoItem += '</video> <br />';
+		videoItem += "</div>";
+		return videoItem;
+	}
+}	
+
+

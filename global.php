@@ -1,5 +1,12 @@
 <?php
 
+//$upload_dir = "/var/www/html/uploads/";
+$upload_dir = dirname(__FILE__). "/uploads/";
+$upload_url = "/uploads/";
+$server_address = 'http://96.49.252.141'; 	// home
+$server_address = 'http://54.214.248.120'; 	// Amazon
+
+
 // Assume server is in VANCOUVER
 date_default_timezone_set('America/Vancouver');
 			
@@ -10,13 +17,6 @@ $MYSQL_PASS = "chixchix";
 // Global DB object
 include_once('mysql.php');
 $db = new MySQL($MYSQL_NAME, $MYSQL_USER, $MYSQL_PASS);
-
-//$upload_dir = "/var/www/html/uploads/";
-$upload_dir = dirname(__FILE__). "/uploads/";
-$upload_url = "/uploads/";
-$server_address = 'http://96.49.252.141'; 	// home
-$server_address = 'http://54.214.248.120'; 	// Amazon
-
 
 // Global variables sent to PHP scripts - its research code :P
 if(isset($_POST["request"]))	$request 	= $_POST["request"]; else 	$request 	= "";

@@ -303,3 +303,28 @@ h1 {
 	margin: auto;
 	width: 50px;
 }
+
+#media-viewer{
+	/* HW acceleration */
+   -webkit-transform: translate3d(0, 0, 0);
+   -moz-transform: translate3d(0, 0, 0);
+   -ms-transform: translate3d(0, 0, 0);
+   transform: translate3d(0, 0, 0);
+	
+	background: rgba(0,0,0,0.9);
+	/* box-shadow: inset 0 0 10px #0f0; /* debug */ 
+	width:100%;
+	height:100%;
+	position: absolute;
+	z-index: 9999;
+}
+
+#media-viewer figure{
+	padding: 0;
+	margin: 0;
+}
+
+#media-viewer-item{
+	width: 80%;
+	margin: 0 auto;
+}

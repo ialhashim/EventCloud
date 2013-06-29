@@ -64,7 +64,27 @@ function captureVideo() {
 
 // Photo
 function capturePhoto() {
-	navigator.device.capture.captureImage(captureMediaSuccess, captureMediaError);
+	// This is better way to keep all EXIF
+	//navigator.device.capture.captureImage(captureMediaSuccess, captureMediaError);
+	
+	// This is for development and be able to send smaller files
+	{
+		var options = {  quality: 10 };
+		navigator.camera.getPicture(function(imageURI){
+			var options = new FileUploadOptions();
+		    options.fileKey="file";
+		    options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);
+		    options.mimeType="image/jpeg";
+			{
+				var params = {};
+				params.eid = eid;
+				params.uid = userid;
+				options.params = params;
+			}
+		    var ft = new FileTransfer();
+		    ft.upload(imageURI, uploadURL, up_win, up_fail, options, true);
+		}, function(){}, { quality: 50, destinationType: Camera.DestinationType.FILE_URI }); 	
+	}
 }
 
 function captureMediaError(error) {
