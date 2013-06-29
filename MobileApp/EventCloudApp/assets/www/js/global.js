@@ -3,7 +3,7 @@ var website = "http://54.214.248.120/";
 
 /* When using local host */
 var website = 'http://96.49.252.141/'; // home
-var website = 'http://54.214.248.120'; // Amazon
+var website = 'http://54.214.248.120/'; // Amazon
 
 var uploadURL = website + "mediaManager.php";
 var mediaURL = website + "mediaManager.php";
