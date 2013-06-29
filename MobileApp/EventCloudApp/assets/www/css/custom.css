@@ -59,7 +59,7 @@ html, body {
 }
 
 #mainScreen2{
-	box-shadow: inset 0 0 80px 80px #303030;
+	box-shadow: inset 0 0 40px 40px #303030;
 	
 	position: absolute;
 	height: 100%;
