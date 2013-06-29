@@ -14,17 +14,8 @@ $db = new MySQL($MYSQL_NAME, $MYSQL_USER, $MYSQL_PASS);
 //$upload_dir = "/var/www/html/uploads/";
 $upload_dir = dirname(__FILE__). "/uploads/";
 $upload_url = "/uploads/";
-$server_address = 'http://96.49.252.141';
-
-// Development paths
-{
-	$host= gethostname();
-	$ip = gethostbyname($host);
-	$server_address = 'http://' . $ip;
-	
-	$h = parse_url( $_SERVER['HTTP_REFERER'] );
-	$server_address = $h[ "scheme" ] . "://" . $h['host'];
-}
+$server_address = 'http://96.49.252.141'; 	// home
+$server_address = 'http://54.214.248.120'; 	// Amazon
 
 
 // Global variables sent to PHP scripts - its research code :P
@@ -84,7 +75,8 @@ function readableTime($time){
 function createThumbnailImage($fromImageFile, $resolution, $toImageFile) { 
 	$thumb = new Imagick($fromImageFile);
 	$thumb->setCompressionQuality(100); 
-	$thumb->resizeImage($resolution, $resolution, Imagick::FILTER_CATROM, 1, true);
+	//$thumb->scaleImage($resolution, $resolution, true);
+	$thumb->cropThumbnailImage($resolution,$resolution);
 	
 	$ext = right($fromImageFile, 4);
 	

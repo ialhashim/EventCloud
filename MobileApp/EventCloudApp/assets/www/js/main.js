@@ -7,6 +7,8 @@ var eventname;
 var itemCount = 4;
 
 $(document).ready(function() { 
+	$("#mainScreen").fadeTo(0,0);
+	
 	userid = getParameterByName('uid');
 	username = getUserName( userid );
 	eid = getParameterByName('eid');
@@ -16,12 +18,12 @@ $(document).ready(function() {
 		eventname = data.name; 
 		$("h2#greeting").replaceWith( "<h2 id='greeting'> " + toTitleCase(username) + " @ " + eventname + " </h2>" );
 		
-		setInterval(eventClock, 1000, [data.start]);
+		setInterval(eventClock, 1000, [data.start.replace(/-/g, '/')]);
 	});
 	
 	// Disable scrolling
 	$(document.body).on('touchmove',function(e){
-	    if(!$('#swiper-main-container').has($(e.target)).length)
+	    //if(!$('#swiper-main-container').has($(e.target)).length)
 	        e.preventDefault();
 	});
 	
@@ -30,6 +32,8 @@ $(document).ready(function() {
 	$refSpinner = $('<div class="spinner-container"></div>').append( $s );
 	
 	initialSlides();
+	
+	$('.debug').hide();
 });
 
 /// Spinner stuff
@@ -90,6 +94,7 @@ var binUID = 1;
 var slideWidth;
 var slideHeight;
 var photoStream;
+var updater;
 
 function getInitialMedia(count, start, callBack){
 	var requestData = {
@@ -176,66 +181,6 @@ function getMoreMedia( start, count ){
 	return $media.clone();
 }
 
-function initialSlides() {
-	
-	var count = slidesCount;
-	
-	getInitialMedia(numActiveSlides, 0, function(d){
-
-		photoStream = makeSliderH( 'photoStream', {
-			slidesPerView : slidesCount,
-			pagination : '.pagination-main',
-			mode:'horizontal',
-			initialSlide : 0,
-			onSlideChangeEnd: function( swiper ){
-				//console.log('Last Direction: ' + swiper.lastDirection);
-				var count = slidesCount;
-						
-				if(swiper.lastDirection === 'next')
-				{
-					// Start dynamic loading when we are at the middle
-					if(swiper.activeIndex >= 0.5 * numActiveSlides)
-					{
-						var start = swiper.virtualIndex + numActiveSlides;
-						var $media = $( getMoreMedia( start, count ) );
-						swiper.virtualIndex += $media.children().length;
-						swiper.removeStartAddEnd( $media );	
-					}			
-				}
-				
-				if(swiper.lastDirection === 'prev')
-				{
-					if(swiper.activeIndex <= 0.5 * numActiveSlides)
-					{
-						var start = swiper.virtualIndex - count;
-						var $media = $( getMoreMedia( start, count ) );
-						var c = $media.children().length;
-						
-						if(swiper.virtualIndex - c >= 0)
-						{
-							swiper.virtualIndex -= c;
-							swiper.removeEndAddStart( $media );	
-						}
-					}
-				}
-			},
-			onSwiperCreate: function( swiper ){
-				
-				// Add main photo stream
-				$("#gallery").append( swiper.container );
-				swiper.reInit();
-				
-			    // Automatically resize
-			    resizeSwiper('photoStream', slidesCount, swiper);
-			    $(window).resize(function() { resizeSwiper('photoStream', slidesCount, swiper);	});
-			}
-		}, $(d)); // End of photo stream creation
-		
-		getMediaForChunk(-1, 1, -1);
-		
-	}); // end of getInitialMedia
-}
-
 function makeSliderH( swiperClassID, options, initialSlides ){
 	var swiperContainer = $("<div/>");
 	swiperContainer.addClass( swiperClassID );
@@ -281,9 +226,6 @@ function makeSliderV( swiperClassID, options, slides ){
 	return { container: main_slide, swiper: swiper };
 }
 
-var chunkThreshold = 30; // seconds
-var binCount = 3;
-
 function getThumbnail( media ){
 	var mediaURI = website + 'uploads/' + eid + '/' + getMediaBasename( media.mid, media.type );
 	if(media.type != "mp4"){
@@ -298,10 +240,17 @@ function getThumbnail( media ){
 	}
 }	
 
-function getMediaForChunk(count, eid, cidx){
+var chunkThreshold = 30; // seconds
+var binCount = 3;
+
+/* ENUMS */
+var ALL_MEDIA = -1;
+var LATEST_CHUNK = -1;
+
+function getMediaForChunk(eid, cidx, callback, isFlat, isReversed, count){
 	
 	var r = {eid: eid, cidx: cidx};
-	r.request = ( cidx > 0 ) ? r.request = 'getChunk' : 'getLatestChunk';
+	r.request = ( cidx != LATEST_CHUNK ) ? r.request = 'getChunk' : 'getLatestChunk';
 	
 	$.post(mediaURL, r, function(data) {
 		if( fulltrim(data).length == 0 ) return;
@@ -315,22 +264,126 @@ function getMediaForChunk(count, eid, cidx){
 		// Bin media into [X] slots
 		var $bins = new Object();
 		
-		for(var i = 0; i < $media.length; i++){
-			mediaTime = new Date( $media[i].timestamp );
-			diffSeconds = Math.max(0, (mediaTime - chunkTime) / 1000);
-			b = parseInt( (diffSeconds / chunkThreshold) * binCount );
-			if(!$bins[b]) $bins[b] = new Array();
-			$bins[b].push( $media[i] );
+		if ($media instanceof Array) {
+			for(var i = 0; i < $media.length; i++){
+				mediaTime = new Date( $media[i].timestamp );
+				diffSeconds = Math.max(0, (mediaTime - chunkTime) / 1000);
+				b = parseInt( (diffSeconds / chunkThreshold) * binCount );
+				if(!$bins[b]) $bins[b] = new Array();
+				$bins[b].push( $media[i] );
+			}
+		} else {
+			// For single items..
+			$bins[0] = new Array();
+			$bins[0].push( $media );
 		}
 		
-		// Add to photo stream
-		$.each($bins, function( k, v ){
-			vslider = makeSliderV( 'vswiper-' + (binUID++), {}, v );
-			photoStream.swiper.prependSlide( vslider.container[0] );
-			
-			forceResizeWindow();
-		});
+		if(isFlat){
+			$flat = new Object();
+			var i = 0;
+			$.each($bins, function( _k, _v ){ $.each(_v, function( k, v ){	$flat[i++] = [ v ];	});	});
+			$bins = $flat;
+		}
+		
+		if(isReversed){
+			$reversed = new Object();
+			$.each($bins, function( i, v ){ 
+				var numItems = Object.size( $bins ) - 1;
+				$reversed[numItems - i] = v; 
+			});
+			$bins = $reversed;
+		}
+		
+		callback( $bins );
 	});
 }
 
+function initialSlides() {
+	
+	photoStream = makeSliderH( 'photoStream', {
+			slidesPerView : slidesCount,
+			pagination : '.pagination-main',
+			mode:'horizontal',
+			initialSlide : 0,
+			speed : 600,
+			onSlideChangeEnd: function( swiper ){
+				//console.log('Last Direction: ' + swiper.lastDirection);
+				var count = slidesCount;
+						
+				if(swiper.lastDirection === 'next')
+				{
+					// Start dynamic loading when we are at the middle
+					if(swiper.activeIndex >= 0.5 * numActiveSlides)
+					{
+						var start = swiper.virtualIndex + numActiveSlides;
+						var $media = $( getMoreMedia( start, count ) );
+						swiper.virtualIndex += $media.children().length;
+						swiper.removeStartAddEnd( $media );	
+					}			
+				}
+				
+				if(swiper.lastDirection === 'prev')
+				{
+					if(swiper.activeIndex <= 0.5 * numActiveSlides)
+					{
+						var start = swiper.virtualIndex - count;
+						var $media = $( getMoreMedia( start, count ) );
+						var c = $media.children().length;
+						
+						if(swiper.virtualIndex - c >= 0)
+						{
+							swiper.virtualIndex -= c;
+							swiper.removeEndAddStart( $media );	
+						}
+					}
+				}
+			},
+			onSwiperCreate: function( swiper ){
+				
+				// Add main photo stream
+				$("#gallery").append( swiper.container );
+				swiper.reInit();
+				
+			    // Automatically resize
+			    resizeSwiper('photoStream', slidesCount, swiper);
+			    $(window).resize(function() { resizeSwiper('photoStream', slidesCount, swiper);	});
+			    
+			    // Always get first chunk
+				getMediaForChunk(eid, 0, function($bins){
+					$.each($bins, function( k, v ){
+						vslider = makeSliderV( 'vswiper-' + (binUID++), {}, v );
+						swiper.prependSlide( vslider.container[0] );
+						forceResizeWindow();
+					});	
+					
+					// Remove dummy slide
+					swiper.removeLastSlide();
+					
+					$("#mainScreen").fadeTo('fast', 1, function(){
+						updater = setInterval(updateLatest, 5000);
+					});
+				}, true, true, ALL_MEDIA);
+			}
+	}, $("<div id = 'dummy'> </div>")); // End of photo stream creation
+}
 
+var lastChunk = 1;
+function updateLatest(){
+	getMediaForChunk(eid, LATEST_CHUNK, function($bins){
+		
+		// Skip if same as existing chunk
+		curChunk = $bins[0][0]['cid'];
+		
+		if(curChunk == lastChunk) return;
+		else lastChunk = curChunk;
+		
+		$.each($bins, function( k, v ){
+			vslider = makeSliderV( 'vswiper-' + (binUID++), {}, v );
+			photoStream.swiper.appendSlide( vslider.container[0] );
+			forceResizeWindow();
+			
+			photoStream.swiper.swipeTo( photoStream.swiper.getLastSlide().index() );
+		});
+		
+	}, false, false, ALL_MEDIA);
+}

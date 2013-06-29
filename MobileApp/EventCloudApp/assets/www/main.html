@@ -3,6 +3,9 @@
 <head>
 <title>Event view | EventCloud</title>
 
+<meta name="HandheldFriendly" content="true" />
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
 <link rel="stylesheet" href="css/reset-min.css">
 <link rel="stylesheet" href="css/buttons.css">
 <link rel="stylesheet" href="css/custom.css">
@@ -39,8 +42,10 @@
 				</span>
 			</a> 
 			
-			<div id="vidx" style="position:absolute; top:2em; left:2em; z-index: 99999; color: red" >vidx = 0</div>
-			<div id="timer" style="position:absolute; top:3em; left:2em; z-index: 99999; color: red" >00:00:00</div>
+			<div class='debug'>
+				<div id="vidx" style="position:absolute; top:2em; left:2em; z-index: 99999; color: red" >vidx = 0</div>
+				<div id="timer" style="position:absolute; top:3em; left:2em; z-index: 99999; color: red" >00:00:00</div>
+			</div>
 		</div>
 		
 		<div id="wrapper">

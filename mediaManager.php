@@ -7,6 +7,8 @@
     
 	include_once('global.php');
 	
+	$chunkThreshold = 30; // seconds
+			
 	function chunkTime( $chunk ){
 		$time1 = new Datetime($chunk['start']);
 		$time2 = new Datetime();
@@ -18,6 +20,7 @@
 	{
 		global $db;
 		global $upload_dir;
+		global $chunkThreshold;
 		
 		$ext = right($tempFile, 3);
 		
@@ -25,7 +28,6 @@
 		$mid = -1;
 		{
 			// Check last chunk time, create new if needed
-			$chunkThreshold = 30; // seconds
 			$chunks = $db->Select( 'chunks', array('eid' => $eid), '*', strsql('index'). ' DESC ');
 			
 			// Treat all results as an array
@@ -167,9 +169,19 @@
     }
 	
 	function getLatestChunk( $eid ){
+		global $chunkThreshold;
+		
 		$chunks = getAllChunks( $eid );
 		if(is_array($chunks))
-			return end($chunks);
+		{
+			$l = count($chunks) - 1;
+			
+			// Only give ready chunks
+			if(chunkTime($chunks[$l]) < $chunkThreshold)
+				$l = max(0, $l - 1);
+			
+			return $chunks[$l];
+		}
 		else 
 			return "";
 	}
@@ -209,7 +221,7 @@
     	$result = array();
 		$result[] = getChunkByIndex( $_POST['cidx'], $eid );
 		
-		if(is_array($latestChunk))
+		if(is_array($result[0]))
 		{
 			$result[] = getMediaForChunk( $result[0]['cid'], $count );
 			echo json_encode( $result );
