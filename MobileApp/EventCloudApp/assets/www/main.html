@@ -28,6 +28,21 @@
 <body>
 
 	<div id="media-viewer"> <div id="media-viewer-item"> <figure> <img /> <figcaption> <h3>Image here</h3> </figcaption>  </figure>  </div> </div>
+	<div id="media-capture"> 
+		<div id="media-feed"> 
+			<h3> Smile! </h3>
+			<div id="captureDeviceContainer">
+				<a id="cancelButton" href="#" onclick="cancelCapture(); return false;"> x </a>
+				<div id="rec-icon">  <i class="icon-circle"> </i> </div>
+				<div id="captureIcon">  </div>
+				<video autoplay id="captureDevice"> </video>
+				<canvas width=640 height=480> </canvas>
+			</div>
+			<div id="media-feed-controls"> 
+				<a id="snapMedia" class="button"> </a> 
+			</div> 
+		</div> 
+	</div>
 	
 	<div id="mainScreen">
 		<div id="mainScreen2"> </div>
@@ -35,10 +50,10 @@
 		<div style="text-align:center"> <h2 id="greeting">Signing in..</h2> </div>
 					
 		<div id="hud">
-			<a id="camera" class="special-button button back blue" onclick="capturePhoto();"> <i class="icon-camera"> </i></a> 
-			<a id="video" class="special-button button back green" onclick="captureVideo();"> <i class="icon-facetime-video"> </i></a> 
-			<a id="upload" class="special-button button back orange" onclick="uploadFile()"> <i class="icon-upload"> </i></a> 
-			<a id="history" class="special-button button back" onclick="getLocation();"> <i	class="icon-backward"> </i></a> 
+			<a id="camera" class="special-button button back blue" onclick="capturePhoto(); return false;"> <i class="icon-camera"> </i></a> 
+			<a id="video" class="special-button button back green" onclick="captureVideo(); return false;"> <i class="icon-facetime-video"> </i></a> 
+			<a id="upload" class="special-button button back orange" onclick="uploadFile(); return false;"> <i class="icon-upload"> </i></a> 
+			<a id="history" class="special-button button back" onclick="getLocation(); return false;"> <i	class="icon-backward"> </i></a> 
 			<a id="volume" class="special-button button back" style="height:1em" href=""> 
 				<span class="icon-stack" style="display:block;font-size: 0.9em; margin-top: -0.5em;" > 
 					<i class="icon-volume-up icon-stack"> </i>

@@ -57,17 +57,158 @@ function uploadFile(){
 	});
 }
 
+var localMediaStream = null;
+var context = null;
+    	
+function captureMediaFromBrowser( captureIcon, buttonIcon, callback ){
+	$mediaCapture = $("#media-capture");
+		
+	// Large placeholder
+	$("#captureIcon").html( captureIcon );
+	
+	// Capture button as camera
+	{
+		$snapMedia = $("#snapMedia"); $snapMedia.empty();
+		$snapMedia.append( buttonIcon );
+		$snapMedia.off('click').on('click', function(e){ 
+			e.preventDefault(); 
+			callback(); 
+			return false; 
+		} );
+		if(buttonIcon.indexOf("facetime") !== -1) 
+			$snapMedia.attr('class', 'green button'); 
+		else 
+			$snapMedia.attr('class', 'blue button'); 
+		$snapMedia.focus();
+	}
+	
+	// Hide video record red circle
+	$("#rec-icon").hide();
+	
+	// Show capture window
+	$mediaCapture.fadeIn( function(){
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    	navigator.getUserMedia({video:true}, function (stream) {
+        	$("#captureDevice").attr( 'src', window.URL.createObjectURL(stream) );
+        	localMediaStream = stream;
+    	}, function(){ console.log('fail'); } );
+	} );
+}
+
+function cancelCapture(){
+	$mediaCapture = $("#media-capture").fadeOut(function(){
+		$("#captureDevice").attr( 'src', '');
+		if(localMediaStream != null) localMediaStream.stop(); // Stop camera
+		if(context != null) context.clearRect (0,0,640,480); // Clear canvas
+	});
+}
+
 // Video
 function captureVideo() {
+	
+	/// 0) Desktop-like capture
+	if( !isInsidePhoneGap )
+	{
+		captureMediaFromBrowser( '&#xf03d;', ' <i class="icon-facetime-video"> </i> ', function(){
+			// Draw image to a canvas
+			var canvas = document.querySelector('canvas');
+			context = canvas.getContext("2d");
+			var media = document.querySelector('#captureDevice');
+			
+			var fps = 15;
+			var interval = 5; // seconds
+			var videoFrames = new Array();
+			
+			// Blink red circle while recording
+			$recIcon = $("#rec-icon");
+			hidden = true;
+			var blinkRecord = window.setInterval(function(){
+				if(hidden){
+					$recIcon.show();
+					hidden = false;
+				}
+				else{
+					$recIcon.hide();
+					hidden = true;
+				}
+			}, 500);
+			
+			var videoCapture = window.setInterval(function(){
+				context.drawImage(media, 0, 0, 640, 480);
+				var data = canvas.toDataURL('image/jpeg', 0.4);
+				var output = data.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+				
+				videoFrames.push( output );
+				
+				// End of video length
+				if(videoFrames.length > fps * interval){
+					window.clearInterval( videoCapture );
+					window.clearInterval( blinkRecord );
+					$recIcon.hide();
+					
+					// Setup upload data
+					var params = {
+						request: 'uploadCapturedVideo',
+						eid: eid,
+						uid: userid,
+						fps: fps,
+						data: JSON.stringify(videoFrames)
+					};
+					
+					// Upload and process response
+					$.post(uploadURL, params, function(d){	
+						postUpload(d); 	
+						cancelCapture();
+					});
+				}
+			}, 1000 / fps );
+		} );
+		return;
+	}
+	
 	navigator.device.capture.captureVideo(captureMediaSuccess, captureMediaError);
 }
 
 // Photo
 function capturePhoto() {
-	// This is better way to keep all EXIF
-	//navigator.device.capture.captureImage(captureMediaSuccess, captureMediaError);
 	
-	// This is for development and be able to send smaller files
+	// We have three capture options:
+	
+	/// 0) Desktop-like capture
+	if( !isInsidePhoneGap )
+	{
+		captureMediaFromBrowser( '&#xf030;', ' <i class="icon-camera"> </i> ', function(){
+			// Draw image to a canvas
+			var canvas = document.querySelector('canvas');
+			context = canvas.getContext("2d");
+			var media = document.querySelector('#captureDevice');
+			context.drawImage(media, 0, 0, 640, 480);
+			var data = canvas.toDataURL('image/jpeg', 0.8);
+			var output = data.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+
+			// Setup upload data
+			var params = {
+				request: 'uploadCaptured',
+				eid: eid,
+				uid: userid,
+				data: output
+			};
+			
+			// Upload and process response
+			$.post(uploadURL, params, function(d){	
+				postUpload(d); 	
+				cancelCapture();
+			});
+		} );
+		return;
+	}
+	
+	/// 1) This is a better way to keep all EXIF
+	{
+		//navigator.device.capture.captureImage(captureMediaSuccess, captureMediaError);
+	}
+	
+	/// 2) This is for development and be able to send smaller files
 	{
 		var options = {  quality: 10 };
 		navigator.camera.getPicture(function(imageURI){
@@ -149,7 +290,6 @@ function postUpload( mid )
     	
     	$.post(uploadURL, params, function(d){
     		console.log( d );
-    		
     		// Show in gallery	
     		
     	});

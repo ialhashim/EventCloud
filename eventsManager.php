@@ -133,7 +133,7 @@
 				}
 
 				// Add an initial chunk[0]
-				$db->Insert(array('eid' => $eid, 'index' => 0), 'chunks');
+				$db->Insert(array('eid' => $eid, 'index' => 0, 'length' => $chunkThreshold), 'chunks');
 				
 				for($i = 0; $i < 3; $i++)
 				{

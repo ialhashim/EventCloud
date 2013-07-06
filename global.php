@@ -1,11 +1,17 @@
 <?php
 
-//$upload_dir = "/var/www/html/uploads/";
+/// Global parameters
+
+// Server location
+$server_address = 'https://96.49.252.141'; 	// home
+//$server_address = 'http://54.214.248.120'; 	// Amazon
+
+// Media location
 $upload_dir = dirname(__FILE__). "/uploads/";
 $upload_url = "/uploads/";
-$server_address = 'http://96.49.252.141'; 	// home
-$server_address = 'http://54.214.248.120'; 	// Amazon
 
+// Event parameters
+$chunkThreshold = 4; // seconds
 
 // Assume server is in VANCOUVER
 date_default_timezone_set('America/Vancouver');

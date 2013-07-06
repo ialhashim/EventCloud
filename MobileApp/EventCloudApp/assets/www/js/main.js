@@ -36,6 +36,10 @@ $(document).ready(function() {
 	
 	initialSlides();
 
+	/// Media Capture:
+	$mediaCapture = $("#media-capture");
+	$mediaCapture.fadeOut(0);
+
 	/// Media Viewer:
 	$mediaViewer = $("#media-viewer");
 	$mediaViewerItem = $("#media-viewer-item");
@@ -179,6 +183,7 @@ function resizeSwiper( className, numSlides, myswiper ){
 		myswiper.reInit();
 		
 	$(".swiper-vertical").height( slideWidth + 'px' );
+	$(".block").height( slideWidth + 'px' );
 }
 
 function getMoreMedia( start, count ){
@@ -273,12 +278,11 @@ function makeSliderV( swiperClassID, options, slides, specialClass ){
 	return { container: main_slide, swiper: swiper };
 }
 
-var chunkThreshold = 30; // seconds
-var binCount = 3;
-
 /* ENUMS */
 var ALL_MEDIA = -1;
 var LATEST_CHUNK = -1;
+
+var binCount = 3;
 
 function getMediaForChunk(eid, cidx, callback, isFlat, isReversed, count){
 	
@@ -292,7 +296,9 @@ function getMediaForChunk(eid, cidx, callback, isFlat, isReversed, count){
 		
 		$chunk = $chunk_media[0];
 		$media = $chunk_media[1];
+		
 		chunkTime = new Date( $chunk.start );
+		chunkLength = $chunk.length; // seconds
 		
 		// Bin media into [X] slots
 		var $bins = new Object();
@@ -301,7 +307,7 @@ function getMediaForChunk(eid, cidx, callback, isFlat, isReversed, count){
 			for(var i = 0; i < $media.length; i++){
 				mediaTime = new Date( $media[i].timestamp );
 				diffSeconds = Math.max(0, (mediaTime - chunkTime) / 1000);
-				b = parseInt( (diffSeconds / chunkThreshold) * binCount );
+				b = parseInt( (diffSeconds / chunkLength) * binCount );
 				if(!$bins[b]) $bins[b] = new Array();
 				$bins[b].push( $media[i] );
 			}
@@ -418,6 +424,9 @@ function updateLatest(){
 			photoStream.swiper.swipeTo( photoStream.swiper.getLastSlide().index() );
 		});
 		
+		// Resize for videos
+		forceResizeWindow();
+		
 	}, false, false, ALL_MEDIA);
 }
 
@@ -428,10 +437,13 @@ function getThumbnail( media, specialClass ){
 	if(media.type != "mp4"){
 		return "<div class='thumbnail'><img class='thumbnail-item " + specialClass + "' src='" + mediaURI + "'/></div>" ;
 	}else{
+		var posterURI = website + 'uploads/' + eid + '/poster/' + getMediaBasename( media.mid, 'png' );
 		var videoItem = "<div class='thumbnail'>";
-		videoItem += "<video class='thumbnail-item NoSwiping " + specialClass + "' poster='$posterFullPath' muted>";
+		videoItem += "<div class='block'>";
+		videoItem += "<video controls class='centered videoMedia thumbnail-item NoSwiping " + specialClass + "' poster='" + posterURI + "' muted>";
 		videoItem += "<source src='" + mediaURI + "' type='video/mp4'>";
-		videoItem += '</video> <br />';
+		videoItem += '</video>';
+		videoItem += '</div>';
 		videoItem += "</div>";
 		return videoItem;
 	}

@@ -6,9 +6,7 @@
     $verbose = true;
     
 	include_once('global.php');
-	
-	$chunkThreshold = 30; // seconds
-			
+		
 	function chunkTime( $chunk ){
 		$time1 = new Datetime($chunk['start']);
 		$time2 = new Datetime();
@@ -41,7 +39,7 @@
 				$newCIDX = $chunk['index'] + 1;
 				
 				// Create new chunk
-				$chunk['cid'] = $db->InsertReturnId( array('eid' => $eid, 'index' => $newCIDX), 'chunks' );
+				$chunk['cid'] = $db->InsertReturnId( array('eid' => $eid, 'index' => $newCIDX, 'length' => $chunkThreshold), 'chunks' );
 			}
 			
 			$vars = array('uid'=> $uid, 'uid' => $uid, 'cid' => $chunk['cid'], 'type' => $ext);
@@ -141,7 +139,12 @@
 			    unlink($finalFileName); //remove the file
 			
             // preserve file from temporary directory
-            $success = move_uploaded_file($myFile["tmp_name"], $finalFileName);
+            if(!isset($myFile['special']))
+            	$success = move_uploaded_file($myFile["tmp_name"], $finalFileName);
+			else{
+				$success = copy($myFile["tmp_name"], $finalFileName);
+				unlink( $myFile["tmp_name"] );
+			}
             
             if (!$success) 
                 $log .= "<p class='message-box error'>Unable to save file : " . $myFile["name"]  . "</p>";    
@@ -159,7 +162,8 @@
     function getAllChunks( $eid ){
     	global $db;
     	$chunks = $db->Select( 'chunks', array( "eid" => $eid ), '*', strsql('index'). ' ASC ');
-		if(is_array($chunks) && array_key_exists('cid',$chunks)) $chunks[0] = $chunks; // Treat all results as an array
+		if(is_array($chunks) && array_key_exists('cid',$chunks)) 
+			$chunks = array(0 => $chunks); // Treat all results as an array
 		return $chunks;
     }
     
@@ -205,6 +209,62 @@
 		echo updateMediaLocation( $_POST['mid'], $_POST['latitude'], $_POST['longitude'] );
 		die();
     }
+	
+	// Upload images via browser capture
+	if(!empty($_POST['request']) && $_POST['request'] == "uploadCaptured")
+    {
+    	$tempFolder = $upload_dir.$eid.'/tmp/';
+		
+    	$decocedData = base64_decode( $_POST['data'] );
+    	
+		$tempUID = uniqid(rand(), true);
+		$tempFile = $tempFolder . $tempUID . '.jpg';
+		
+		file_put_contents( $tempFile, $decocedData );
+		$_FILES["file"] = array('name' => $tempFile, 'error' => UPLOAD_ERR_OK, 'tmp_name' => $tempFile, 'special' => true);
+		
+		echo saveUploadedMedia();
+    	die();
+	}
+	
+	// Upload videos via browser capture
+	if(!empty($_POST['request']) && $_POST['request'] == "uploadCapturedVideo")
+    {
+    	$fps = $_POST['fps'];
+    	
+    	$tempFolder = $upload_dir.$eid.'/tmp/';
+		$tempUID = uniqid(rand(), true);
+		$tempFile = $tempFolder . $tempUID. '-';
+		$seqFormat = '%04d';
+	
+    	// Extract data into frames
+    	$tmpFiles = array();
+		$jsonVideoFrames = json_decode( $_POST['data'] );
+		for ($i = 0; $i < count($jsonVideoFrames); $i++)
+		{
+			$frame = base64_decode( $jsonVideoFrames[$i] );
+			$decocedFrames[] = $frame;
+			
+			$curFile = $tempFile . sprintf($seqFormat, $i) . '.jpg';
+			file_put_contents( $curFile, $frame );
+			$tmpFiles[] = $curFile;
+		}
+		
+		// Create video from images
+		$ffmpeg_cmd = "ffmpeg -i ". $tempFile . $seqFormat . '.jpg' . " -r " . $fps . " " . $tempFile . ".mp4";
+		@system($ffmpeg_cmd);
+		
+		// Fake upload
+		$tempFile .= '.mp4';
+		$_FILES["file"] = array('name' => $tempFile, 'error' => UPLOAD_ERR_OK, 'tmp_name' => $tempFile, 'special' => true);
+		
+		// Delete temporary frame files
+		foreach ($tmpFiles as $file)  unlink($file);
+		
+		// Save media
+		echo saveUploadedMedia();
+		die();
+	}
     
     // By default, upload media sent with this script
     if(!empty($_FILES["file"]) && empty($_POST['manual']))

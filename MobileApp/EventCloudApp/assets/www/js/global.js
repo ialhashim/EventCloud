@@ -1,9 +1,6 @@
-/* Global paths to server scripts */
-var website = "http://54.214.248.120/";
-
 /* When using local host */
-var website = 'http://96.49.252.141/'; // home
-var website = 'http://54.214.248.120/'; // Amazon
+var website = 'https://96.49.252.141/'; // home
+//var website = 'http://54.214.248.120/'; // Amazon
 
 var uploadURL = website + "mediaManager.php";
 var mediaURL = website + "mediaManager.php";
@@ -54,7 +51,6 @@ jQuery.fn.copyCSS = function(style, toNode) {
 	});
 	return ( has_toNode ? self : styleObj );
 }
-
 
 /* Get number of stuff in an object */
 Object.size = function(obj) {

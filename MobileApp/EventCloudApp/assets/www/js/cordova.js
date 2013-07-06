@@ -18,6 +18,8 @@
  specific language governing permissions and limitations
  under the License.
 */
+var isInsidePhoneGap = true;
+
 ;(function() {
 var CORDOVA_JS_BUILD_LABEL = '2.9.0rc1-0-g002f33d';
 // file: lib/scripts/require.js
@@ -6938,8 +6940,18 @@ require('cordova/channel').onNativeReady.fire();
     try { // we commented we were going to try, so let us actually try and catch
         xhr.open('GET', plugins_json, true); // Async
 		
-		if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
+		function UrlExists(url)
+		{
+		    var http = new XMLHttpRequest();
+		    http.open('HEAD', url, false);
+		    http.send();
+		    return http.status!=404;
+		}
+		
+		if ( UrlExists(plugins_json) ) {
 			xhr.send();
+		}else{
+			isInsidePhoneGap = false;
 		}
     } catch(err){
         injectPluginScript();
