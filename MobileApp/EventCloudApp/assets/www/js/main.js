@@ -91,6 +91,10 @@ function showMediaViewer(){
 	$mediaCaption.removeClass('clicked');
 	$mediaCaption.removeClass('not');
 	
+	$('#media-viewer-loading').css('top',0);
+	$('#media-viewer-loading').css('left',0);
+	$('#media-viewer-loading').fadeOut(0);
+	
 	// Dynamic caption
 	{
 		$caption = $('<div id="captionContainer"/>');
@@ -110,7 +114,19 @@ function showMediaViewer(){
 		
 		// Add MapView and 3DView links
 		{
+			$toolbar = $('<div class="toolbar"/>');
+			$toolbarContainer = $('<div class="toolbarContainer"/>');
 			
+			// Map-view
+			mapview_href = 'mapview.html?eid=' + eid + '&mid=' + mediaID + '&uid=' + userid;
+			$toolbarContainer.append( '<a class="outlinkFade button icon green" href="' + mapview_href +'"> <i class="icon-globe"></i> </a>' );
+			
+			// 3DView
+			threedview_href = '3dview.html?eid=' + eid + '&mid=' + mediaID + '&uid=' + userid;
+			$toolbarContainer.append( '<a class="outlinkFade button icon blue" href="' + threedview_href +'"> <i class="icon-eye-open"></i> </a>' );
+			
+			$toolbar.append( $toolbarContainer );
+			$mediaCaption.prepend( $toolbar );
 		}
 		
 		$mediaCaption.append( $caption );
@@ -120,39 +136,76 @@ function showMediaViewer(){
 	
 	// Maximize to full screen
 	$mediaViewer.fadeIn(0, function(){
+		$('#media-viewer-loading').fadeIn('slow');
+		
 		$mediaViewer.animate( { width: '101%', height: '100%', top:0, left:0}, 'slow');
 		$mediaViewer.promise().done(function() {
 			
 			var mediaURI = website + 'uploads/' + eid + '/full/' + getMediaBasename( mediaID, mediaType );
-	
+			var maxWidth = '100%';
+			
 			// For images
 			if(mediaType != 'mp4')
-				$('#mediaViewport').prepend("<img id='highRes' class='thumbnail-item' style='opacity:0;position:absolute' src='" + mediaURI + "' />");
+			{
+				// Full resolution: slow on mobile devices..
+				//$('#mediaViewport').prepend("<img id='highRes' class='thumbnail-item' style='opacity:0;position:absolute' src='" + mediaURI + "' />");
+				
+				// PHP resized:
+				var img = "<img id='highRes' class='thumbnail-item' style='opacity:0;position:absolute' src='' />";
+				$('#mediaViewport').prepend(img);
+				$.post( mediaURL, {request: 'getRepImage', mid: mediaID, eid: eid}, function(d){
+					var repImage = JSON.parse( d );
+					$('#highRes').attr('src','data:image/jpeg;base64,' + repImage.data);
+					
+					fullResolution( maxWidth );
+				});
+			}
 			
 			// For videos
 			if(mediaType == 'mp4')
 			{
-				var vid = "<video controls id='highRes' class='thumbnail-item' style='display:none;position:absolute'>";
-				vid += "<source src='" + mediaURI + "' type='video/mp4'/>";
-				vid += "</video>";
+				var posterURI = website + 'uploads/' + eid + '/poster/' + getMediaBasename( mediaID, 'png' );
 				
-				$('#mediaViewport').prepend( vid );
-			}
-			
-			$highRes = $('#highRes');
-			
-			$mediaViewerItem.animate( {width: '100%', height: '100%'}, function(){
-				$highRes.css( 'opacity', 1 );
-				$mediaCaption.show();
-				
-				$highRes.on('click', function(){
-					$('.lowRes').hide();
+				if( !isInsidePhoneGap )
+				{
+					var vid = "<video controls id='highRes' class='thumbnail-item' poster='" + posterURI + "' style='opacity:0;position:absolute'>";
+					vid += "<source src='" + mediaURI + "' type='video/mp4'/>";
+					vid += "</video>";
 					
-					$('#highRes').toggleClass('clicked');
-					$('#mediaCaption').toggleClass('clicked');
-				});
-			} );
-			
+					$('#mediaViewport').prepend( vid );
+					
+					maxWidth = '70%';
+					
+					fullResolution( maxWidth );
+				}
+				else
+				{
+					$('#media-viewer-loading').fadeOut(function(){
+						$('#mediaCaption').css('top',0);
+						$('#mediaCaption').css('position','absolute');
+						$('#mediaCaption').show();
+						
+						$lowRes = $('.lowRes video');
+						$lowRes.children('source').attr('src', mediaURI);
+						$lowRes.removeAttr('muted');
+						$lowRes.removeClass('lowRes');
+						$lowRes.attr('id','highRes');
+						
+						var old = $( $lowRes.parent().html() );
+						$lowRes.parent().empty();
+						
+						$mediaViewerItem.animate( {width: '100%', height: '100%'}, function(){
+							$('.lowRes').append( old );
+							setTimeout(function(){	$('.lowRes').children('video').trigger("play");	}, 500);	
+							
+							$('.lowRes').parent().on('click', function(){
+								$('#mediaCaption').toggleClass('clicked');
+								$('#highRes').toggleClass('clicked');
+							});
+						});
+					});
+				}
+			}
 		});
 	});
 	
@@ -164,17 +217,56 @@ function showMediaViewer(){
 	}
 }
 
+function fullResolution( maxWidth ){
+	$highRes = $('#highRes');
+	$mediaCaption = $("#mediaCaption");
+	
+	$mediaViewerItem.animate( {width: maxWidth, height: '100%'}, function(){
+		$mediaCaption.hide();
+		$('#media-viewer-loading').fadeOut();
+		
+		setTimeout(function(){ 
+			$('.lowRes').hide(); 
+			$mediaCaption.show(); 
+			
+			if($highRes.is("video")){
+				setTimeout(function(){	
+						$highRes.trigger("play");	
+				}, 500);	
+			}
+			
+			$highRes.on('click', function(){
+				$('.lowRes').hide();
+				$mediaCaption.show();
+				
+				if(!$highRes.is("video")) $('#highRes').toggleClass('clicked');
+				$('#mediaCaption').toggleClass('clicked');
+			});
+		}, 1000);
+		
+		$highRes.css( 'opacity', 1 );
+	} );
+}
+
 function hideMediaViewer(){
 	$('#mediaCaption').addClass('not');
 	$('#highRes').addClass('not');
 	
+	$highRes = $('#highRes');
+	
 	// Give some time for caption to disappear
 	setTimeout(function(){
+		$('.lowRes').show();
+		$highRes.css( 'opacity', 0 );
+		
 		$('#mediaCaption').hide();
-		initStyle = $mediaViewer.data('startStyle');
-		$mediaViewer.animate( initStyle, function(){
-			$mediaViewer.fadeOut('slow');
-		});
+		
+		setTimeout(function(){
+			initStyle = $mediaViewer.data('startStyle');
+			$mediaViewer.animate( initStyle, function(){
+				$mediaViewer.fadeOut('slow');
+			});
+		}, 100);
 	}, 150);
 
 	// Events bug fix
@@ -478,8 +570,8 @@ function getThumbnail( media, specialClass ){
 	}else{
 		var posterURI = website + 'uploads/' + eid + '/poster/' + getMediaBasename( media.mid, 'png' );
 		var videoItem = "<div class='thumbnail' " + mediaAttrib + " >";
-		videoItem += "<div class='block " + specialClass + "'>";
-		videoItem += "<video controls class='centered videoMedia thumbnail-item NoSwiping " + specialClass + "' poster='" + posterURI + "' muted>";
+		videoItem += "<div class='block thumbnail-item " + specialClass + "'>";
+		videoItem += "<video controls class='centered videoMedia NoSwiping' poster='" + posterURI + "' muted>";
 		videoItem += "<source src='" + mediaURI + "' type='video/mp4'>";
 		videoItem += '</video>';
 		videoItem += '</div>';

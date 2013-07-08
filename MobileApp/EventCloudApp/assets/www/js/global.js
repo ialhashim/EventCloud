@@ -7,6 +7,7 @@ var mediaURL = website + "mediaManager.php";
 var galleryURL = website + "gallery.php";
 var eventsManager = website + "eventsManager.php";
 var usersManager = website + "usersManager.php";
+var mapView = website + "mapView.php";
 
 /* Default page display */
 var fadeSpeed = 500;
@@ -26,6 +27,16 @@ $(document).ready(function() {
 			window.location = event.currentTarget.href;
 		});
 
+		return false;
+	});
+	
+	$(document).on("click", ".outlinkFade", function(event) {
+		event.preventDefault();
+		$('body').fadeOut(function(){
+			$('a').fadeOut(fadeSpeed, function() {
+				window.location = event.currentTarget.href;
+			});
+		});
 		return false;
 	});
 });

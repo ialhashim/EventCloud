@@ -285,6 +285,20 @@
 		die();
 	}
 	
+	// Get media representation
+	if(!empty($_POST['request']) && $_POST['request'] == "getRepImage")
+    {
+    	global $upload_dir; 
+		$media = $db->Select('media' , array("mid" => $mid) );
+		$basename = getMediaBasename( $mid, $media['type'] );
+    	$fullImage = $upload_dir.$eid."/full/".$basename;
+    	$mid = new Imagick( $fullImage );
+		$mid->setImageFormat("jpeg");
+		$mid->scaleImage(1920,0);
+    	echo json_encode( array('fullImage' => $fullImage, 'data' => base64_encode($mid->getImageBlob())) );
+    	die();
+	}
+	
     // By default, upload media sent with this script
     if(!empty($_FILES["file"]) && empty($_POST['manual']))
 	{
