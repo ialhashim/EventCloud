@@ -32,6 +32,12 @@ if(isset($_POST["uid"]))		$uid 		= $_POST["uid"]; 	else 	$uid 		= -1;
 if(isset($_POST["mid"]))		$mid 		= $_POST["mid"]; 	else 	$mid 		= -1;
 if(isset($_POST["cid"]))		$cid 		= $_POST["cid"]; 	else 	$cid 		= -1;
 
+function echov($var){
+	echo "<pre>";
+	echo var_export($var);
+	echo "</pre>";
+}
+
 function startsWith($haystack, $needle){
     return !strncmp($haystack, $needle, strlen($needle));
 }
@@ -98,6 +104,18 @@ function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
 	chmod($newNameFull, 0644);			
 } 
 
+function getVideoDimensions($video) {
+	$width = 0;
+	$height = 0;
+	$command = "ffmpeg -i " . $video . ' -vstats 2>&1';
+	$output = shell_exec ( $command );
+	if ( preg_match('/Video:.*?0x.*?([0-9]+)x([[0-9]+)/', $output , $regs) ) {
+		$width = $regs[1];
+		$height = $regs[2];
+	} 
+	return array ('width' => $width, 'height' => $height );
+}
+
 function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnailFile) { 
 
 	$uid = newGuid();
@@ -112,13 +130,34 @@ function createThumbnailVideo($fromVideoFile, $resolution, $seconds, $toThumbnai
 		$base = basename($newNameFull);
 		$path = dirname($newNameFull);
 		
+		$filters = '"';
+		
+		// Cropping
+		if(false)
+		{
+			$s = getVideoDimensions($fromVideoFile);
+			$h = min( $s['width'], $s['height'] );
+			$t = ($s['height'] - $h) * 0.5;
+			$l = ($s['width'] - $h) * 0.5;
+			$filters .= "crop=$h:$h:$t:$l,";
+		}
+		
+		// Scaling
+		$filters .= "scale=". round_down_pow2($resolution).":-1";
+		
+		// End of filters
+		$filters .= '"';
+		
 		// Create poster image
 		$posterFile = str_replace("mp4", "png", $base);
-		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -r 1/1 -vf scale=".round_down_pow2($resolution).":-1 -f mjpeg {$path}/poster/$posterFile";
+		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -r 1/1 -vf $filters -f mjpeg {$path}/poster/$posterFile";
 		system($ffmpeg_cmd);
 		
 		// Create short clip
-		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -t 00:00:05 -vol 0 -vf scale=".round_down_pow2($resolution).":-1 $newNameFull";
+		$ffmpeg_cmd = "ffmpeg -i $fromVideoFile -t 00:00:03 -vol 0 -vf $filters  $newNameFull";
+		
+		echov($ffmpeg_cmd);
+		
 		system($ffmpeg_cmd);
 	}
 

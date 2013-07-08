@@ -49,6 +49,11 @@
 			//$vars['timestamp'] = date("Y-m-d H:i:s", filemtime($tempFile));
 			
 			$mid = $db->InsertReturnId($vars, 'media');
+			
+			// Default media caption
+			$event = $db->Select( 'events', array("eid" => $eid) );
+			$caption = $event['name'] . ' / '. $mid;
+			$db->Update('media', array('caption' => $caption), array("mid" => $mid));
 		}
 		
 		// Create previews
@@ -265,7 +270,21 @@
 		echo saveUploadedMedia();
 		die();
 	}
-    
+
+	// Get media information
+	if(!empty($_POST['request']) && $_POST['request'] == "getInfo")
+    {
+    	global $db;
+		
+		$media = $db->Select('media' , array("mid" => $mid) );
+		$media['author'] = $db->Select( 'users', array( "uid" => $media['uid'] ) );
+		$chunk = $db->Select('chunks', array("cid"=>$media['cid']) );
+		$media['event'] = $db->Select('events', array("eid"=>$chunk['eid']));
+		
+    	echo json_encode( $media );
+		die();
+	}
+	
     // By default, upload media sent with this script
     if(!empty($_FILES["file"]) && empty($_POST['manual']))
 	{

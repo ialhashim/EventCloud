@@ -68,7 +68,9 @@ function captureMediaFromBrowser( captureIcon, buttonIcon, callback ){
 	
 	// Capture button as camera
 	{
-		$snapMedia = $("#snapMedia"); $snapMedia.empty();
+		$snapMedia = $("#snapMedia"); 
+		$snapMedia.show();
+		$snapMedia.empty();
 		$snapMedia.append( buttonIcon );
 		$snapMedia.off('click').on('click', function(e){ 
 			e.preventDefault(); 
@@ -84,6 +86,14 @@ function captureMediaFromBrowser( captureIcon, buttonIcon, callback ){
 	
 	// Hide video record red circle
 	$("#rec-icon").hide();
+	
+	// Resize for smaller screens
+	if($(document).height() < 500)
+	{
+		$("#captureDeviceContainer").width(100);
+		$("#captureDeviceContainer").height(100);
+		$("#captureDeviceContainer").css('margin', '0px');
+	}
 	
 	// Show capture window
 	$mediaCapture.fadeIn( function(){
@@ -132,6 +142,8 @@ function captureVideo() {
 					hidden = true;
 				}
 			}, 500);
+			
+			$("#snapMedia").hide(); // Hide capture button
 			
 			var videoCapture = window.setInterval(function(){
 				context.drawImage(media, 0, 0, 640, 480);
@@ -193,6 +205,8 @@ function capturePhoto() {
 				uid: userid,
 				data: output
 			};
+			
+			$("#snapMedia").hide(); // Hide capture button
 			
 			// Upload and process response
 			$.post(uploadURL, params, function(d){	

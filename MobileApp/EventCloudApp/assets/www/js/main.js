@@ -10,6 +10,8 @@ var $mediaViewer;
 var $mediaViewerItem;
 
 $(document).ready(function() { 
+	$("#debug").hide();
+	
 	$("#mainScreen").fadeTo(0,0);
 	
 	userid = getParameterByName('uid');
@@ -45,46 +47,141 @@ $(document).ready(function() {
 	$mediaViewerItem = $("#media-viewer-item");
 	$mediaViewer.fadeOut(0);
 		
-	// Show media view when media clicked
-	$('.photoStream').on("dblclick doubletap", ".interactive", function(e){
-		$media = $(this);
-		
-		// Scale and position media viewer
-		$mediaViewer.css('width', $media.width());
-		$mediaViewer.css('height', $media.height());
-		$mediaViewer.css('top', $media.offset().top);
-		$mediaViewer.css('left', $media.offset().left);
-		
-		// Save initial style so we can return to
-		$mediaViewer.data('startStyle', $mediaViewer.copyCSS('width height top left') );
-		
-		// Media item itself
-		$mediaViewerItem.css('width', $media.width());
-		$mediaViewerItem.css('height', $media.height());
-		
-		console.log( $mediaViewer.data('startStyle') );
-		
-		// Set media item to selected one
-		$img = $mediaViewerItem.children('figure').find(">:first-child");
-		$img.replaceWith( $media.outerHTML() );
-		
-		// Maximize to full screen
-		$mediaViewer.fadeIn( function(){
-			$mediaViewer.animate( { width: '100%', height: '100%', top:0, left:0}, 'slow');
-		});
-		
-		$mediaViewer.on("dblclick doubletap", hideMediViewer );
-		
-		e.preventDefault();
-	});
+	// Show media viewer on double click
+	$(document).on("dblclick doubletap", ".interactive", showMediaViewer);
 	
-	$('.debug').hide();
+	// Escape to close any sub-window
+	$(document).keyup(function(e) {
+	  if (e.keyCode == 27) { cancelCapture(); hideMediaViewer(); }   // ESC
+	});
 });
 
-function hideMediViewer(){
-	initStyle = $mediaViewer.data('startStyle');
-	$mediaViewer.animate( initStyle );
-	$mediaViewer.fadeOut();
+function showMediaViewer(){
+	$media = $(this);
+	$parent = $(this).parent();
+	
+	$('#highRes').remove();
+	
+	// Scale and position media viewer
+	$mediaViewer.css('width', $media.width());
+	$mediaViewer.css('height', $media.height());
+	$mediaViewer.css('top', $media.offset().top);
+	$mediaViewer.css('left', $media.offset().left);
+	
+	// Save initial style so we can return to
+	$mediaViewer.data('startStyle', $mediaViewer.copyCSS('width height top left') );
+	
+	// Media item itself
+	$mediaViewerItem.css('width', $media.width());
+	$mediaViewerItem.css('height', $media.height());
+	
+	// Set media item to selected one
+	$img = $mediaViewerItem.children('figure').find(">:first-child");
+	$img.replaceWith( $media.parent().html().replace('interactive','lowRes') );
+	$img.css('z-index', -999);
+	
+	// Get media data
+	if($parent.attr('type') == undefined) $parent = $parent.parent(); // for video
+	var mediaType = $parent.attr('type');
+	var mediaCaption = $parent.attr('caption');
+	var mediaID = $parent.attr('mid');
+	
+	$mediaCaption = $("#mediaCaption");
+	$mediaCaption.hide(); $mediaCaption.empty();
+	$mediaCaption.removeClass('clicked');
+	$mediaCaption.removeClass('not');
+	
+	// Dynamic caption
+	{
+		$caption = $('<div id="captionContainer"/>');
+		$caption.append( $('<h2>').text( mediaCaption ) );
+		$caption.append( $('<div class="captionSpinner"/>') );
+		
+		// Get media information
+		$.post(mediaURL, {request:'getInfo', mid: mediaID}, function(data){
+			var mediaInfo = JSON.parse( data );
+			
+			var info = $("<div/>");
+			info.append( $("<h3/>").text( mediaInfo.author.name ) );
+			info.append( $("<h4/>").text( mediaInfo.timestamp ) );
+			 
+			$('#captionContainer').children('.captionSpinner').replaceWith( info.html() );		
+		});
+		
+		// Add MapView and 3DView links
+		{
+			
+		}
+		
+		$mediaCaption.append( $caption );
+		
+		$('.captionSpinner').spin('small');
+	}
+	
+	// Maximize to full screen
+	$mediaViewer.fadeIn(0, function(){
+		$mediaViewer.animate( { width: '101%', height: '100%', top:0, left:0}, 'slow');
+		$mediaViewer.promise().done(function() {
+			
+			var mediaURI = website + 'uploads/' + eid + '/full/' + getMediaBasename( mediaID, mediaType );
+	
+			// For images
+			if(mediaType != 'mp4')
+				$('#mediaViewport').prepend("<img id='highRes' class='thumbnail-item' style='opacity:0;position:absolute' src='" + mediaURI + "' />");
+			
+			// For videos
+			if(mediaType == 'mp4')
+			{
+				var vid = "<video controls id='highRes' class='thumbnail-item' style='display:none;position:absolute'>";
+				vid += "<source src='" + mediaURI + "' type='video/mp4'/>";
+				vid += "</video>";
+				
+				$('#mediaViewport').prepend( vid );
+			}
+			
+			$highRes = $('#highRes');
+			
+			$mediaViewerItem.animate( {width: '100%', height: '100%'}, function(){
+				$highRes.css( 'opacity', 1 );
+				$mediaCaption.show();
+				
+				$highRes.on('click', function(){
+					$('.lowRes').hide();
+					
+					$('#highRes').toggleClass('clicked');
+					$('#mediaCaption').toggleClass('clicked');
+				});
+			} );
+			
+		});
+	});
+	
+	// Events bug fix
+	{
+		$(document).off("dblclick doubletap", ".interactive", showMediaViewer);
+		// Hide media viewer on double click
+		$mediaViewer.on("dblclick doubletap", hideMediaViewer );
+	}
+}
+
+function hideMediaViewer(){
+	$('#mediaCaption').addClass('not');
+	$('#highRes').addClass('not');
+	
+	// Give some time for caption to disappear
+	setTimeout(function(){
+		$('#mediaCaption').hide();
+		initStyle = $mediaViewer.data('startStyle');
+		$mediaViewer.animate( initStyle, function(){
+			$mediaViewer.fadeOut('slow');
+		});
+	}, 150);
+
+	// Events bug fix
+	{
+		$mediaViewer.off("dblclick doubletap", hideMediaViewer );
+		$(document).on("dblclick doubletap", ".interactive", showMediaViewer);
+	}
 }
 
 /// Spinner stuff
@@ -147,23 +244,9 @@ var slideHeight;
 var photoStream;
 var updater;
 
-function getInitialMedia(count, start, callBack){
-	var requestData = {
-		count : count,
-		start : start,
-		eid: eid
-	};
-	var request = $.ajax({
-		url : galleryURL,
-		type : "POST",
-		data : requestData,
-		success: function( d ){	callBack(d); }
-	}); 
-}
-
 function resizeSwiper( className, numSlides, myswiper ){
 	var width = $('body').width();
-	var height = $('body').height();
+	var height = $('#mainScreen').height();
 	
 	slideWidth = (width) / numSlides;
 	slideHeight = height * 0.5;
@@ -184,53 +267,6 @@ function resizeSwiper( className, numSlides, myswiper ){
 		
 	$(".swiper-vertical").height( slideWidth + 'px' );
 	$(".block").height( slideWidth + 'px' );
-}
-
-function getMoreMedia( start, count ){
-	var packetid = "packet-" + (packetUID++);
-	var $media = $('<div>', {class:  packetid});
-	
-	// bounds check
-	if(start < 0) return $media;
-	
-	var requestData = {
-		start : start,
-		count : count,
-		eid: eid
-	};
-	
-	for(var i = 0; i < count; i++){
-		var myuid = "uid-" + (mediaUID++);
-		$media.append( $refSpinner.clone().addClass( myuid ) );
-	}
-	
-	$.ajax({
-  		type: 'POST',
-  		url: galleryURL,
-  		data: requestData,
-  		success: function(d) {
-  			$data = $(d);
-  			
-  			N = $media.children().length;
-  			
-			for(var i = 0; i < N; i++)
-			{
-				var oldMediaItem = $media.children()[i];
-
-				var filterClass = $(oldMediaItem).attr('class');
-				myuid = filterClass ? filterClass.split(' ').pop() : 'undefined';
-
-				if(i < $data.length){
-					$('.' + myuid).replaceWith( $data[i] );	
-				}else{
-					$('.' + myuid).css('display', 'none');
-				}
-			}
-		},
-  		async:true
-	});
-	
-	return $media.clone();
 }
 
 function makeSliderH( swiperClassID, options, initialSlides ){
@@ -434,12 +470,15 @@ function getThumbnail( media, specialClass ){
 	if(specialClass == undefined) specialClass = '';
 	
 	var mediaURI = website + 'uploads/' + eid + '/' + getMediaBasename( media.mid, media.type );
+	
+	var mediaAttrib = " mid=" + media.mid + " type='" + media.type + "'" + " caption='" + media.caption + "'";
+	
 	if(media.type != "mp4"){
-		return "<div class='thumbnail'><img class='thumbnail-item " + specialClass + "' src='" + mediaURI + "'/></div>" ;
+		return "<div class='thumbnail' " + mediaAttrib + "><img " + mediaAttrib + " class='thumbnail-item " + specialClass + "' src='" + mediaURI + "'/></div>" ;
 	}else{
 		var posterURI = website + 'uploads/' + eid + '/poster/' + getMediaBasename( media.mid, 'png' );
-		var videoItem = "<div class='thumbnail'>";
-		videoItem += "<div class='block'>";
+		var videoItem = "<div class='thumbnail' " + mediaAttrib + " >";
+		videoItem += "<div class='block " + specialClass + "'>";
 		videoItem += "<video controls class='centered videoMedia thumbnail-item NoSwiping " + specialClass + "' poster='" + posterURI + "' muted>";
 		videoItem += "<source src='" + mediaURI + "' type='video/mp4'>";
 		videoItem += '</video>';

@@ -4,7 +4,7 @@
 <title>Event view | EventCloud</title>
 
 <meta name="HandheldFriendly" content="true" />
-<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 <link rel="stylesheet" href="css/reset-min.css">
 <link rel="stylesheet" href="css/buttons.css">
@@ -27,7 +27,15 @@
 
 <body>
 
-	<div id="media-viewer"> <div id="media-viewer-item"> <figure> <img /> <figcaption> <h3>Image here</h3> </figcaption>  </figure>  </div> </div>
+	<div id='debug'> </div>
+	
+	<div id="media-viewer"> 
+		<div id="media-viewer-item"> 
+		<figure id="mediaViewport" style='position: relative'> <img /> 
+			<figcaption id="mediaCaption"> <h3>Image here</h3> </figcaption>  
+		</figure> 
+		</div> 
+	</div>
 	<div id="media-capture"> 
 		<div id="media-feed"> 
 			<h3> Smile! </h3>
@@ -60,11 +68,6 @@
 					<i class="icon-ban-circle text-error" style="color: #9d261d;font-size:200%"> </i>
 				</span>
 			</a> 
-			
-			<div class='debug'>
-				<div id="vidx" style="position:absolute; top:2em; left:2em; z-index: 99999; color: red" >vidx = 0</div>
-				<div id="timer" style="position:absolute; top:3em; left:2em; z-index: 99999; color: red" >00:00:00</div>
-			</div>
 		</div>
 		
 		<div id="wrapper">

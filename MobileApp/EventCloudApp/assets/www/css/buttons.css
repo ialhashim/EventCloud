@@ -213,9 +213,6 @@ button.button:hover {
 							rgba(0,0,0,0.4) 0 .1em 1px, /* border */
 							rgba(0,0,0,0.2) 0 .2em 6px; /* drop shadow */
 
-	-webkit-transform: 	translateY(.2em);
-	-moz-transform: 	translateY(.2em);
-	transform: 			translateY(.2em);
 }
 
 .button:focus {
@@ -251,8 +248,8 @@ button.button:hover {
 /* -------------- Fonts -------------- */
 
 .serif { 
-	font-family: 'Lobster', serif;
-	font-weight: 			normal;
+	font-family: serif;
+	font-weight: normal;
 }
 
 

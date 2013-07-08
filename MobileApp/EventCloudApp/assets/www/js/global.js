@@ -30,6 +30,21 @@ $(document).ready(function() {
 	});
 });
 
+function htmlEncode(value){
+  //create a in-memory div, set it's inner text(which jQuery automatically encodes)
+  //then grab the encoded contents back out.  The div never exists on the page.
+  return $('<div/>').text(value).html();
+}
+
+function htmlDecode(value){
+  return $('<div/>').html(value).text();
+}
+
+function debug( $item ){
+	if($item == "") $item = "[empty string]";
+	$item = '<pre>' + htmlEncode($item) + '</pre>';
+	$('#debug').append( $item );
+}
 
 /* jQuery: small extensions */
 jQuery.fn.outerHTML = function(s) {
