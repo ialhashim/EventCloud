@@ -200,10 +200,7 @@
 		
 		// Get all media of chunk 'id', sorted by their time stamp
 		$media = $db->Select( 'media', array( "cid" => $cid ), '*', strsql('timestamp') );
-		
-		if($count > 0){
-			$media = array_slice( $media, 0, $count );
-		}
+		if($count > 0) $media = array_slice( $media, 0, $count );
 		
 		return $media;
 	}
@@ -288,7 +285,9 @@
 	// Get media representation
 	if(!empty($_POST['request']) && $_POST['request'] == "getRepImage")
     {
-    	global $upload_dir; 
+  		global $db;
+    	global $upload_dir;     	
+    	
 		$media = $db->Select('media' , array("mid" => $mid) );
 		$basename = getMediaBasename( $mid, $media['type'] );
     	$fullImage = $upload_dir.$eid."/full/".$basename;
@@ -337,5 +336,15 @@
 		}
 	}
 	
+	// Get chunk of given 'mid'
+	if(!empty($_POST['request']) && $_POST['request'] == "getChunkByMid")
+    {
+    	global $db;
+    	global $upload_dir;     	
+		$media = $db->Select('media' , array("mid" => $mid) );
+		$result[] = getMediaForChunk( $media['cid'], $count );
+		echo json_encode( $result );
+		die();
+	}
 ?>
 	

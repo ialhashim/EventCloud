@@ -1,5 +1,4 @@
 /* Global variables */
-
 eid = getParameterByName('eid');
 mid = getParameterByName('mid');
 userid = getParameterByName('uid');

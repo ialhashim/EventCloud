@@ -11,7 +11,7 @@ $upload_dir = dirname(__FILE__). "/uploads/";
 $upload_url = "/uploads/";
 
 // Event parameters
-$chunkThreshold = 4; // seconds
+$chunkThreshold = 10; // seconds
 
 // Assume server is in VANCOUVER
 date_default_timezone_set('America/Vancouver');
