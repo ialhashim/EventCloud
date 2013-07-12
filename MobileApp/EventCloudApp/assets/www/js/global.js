@@ -227,6 +227,30 @@ function forceResizeWindow(){
     window.dispatchEvent(evt);
 }
 
+// Haversine Algorithm
+function distGPS(lat1, long1, lat2, long2, isMeter) {
+    var _eQuatorialEarthRadius = 6378.1370;
+    var _d2r = (Math.PI / 180.0);
+
+    function HaversineInM(lat1, long1, lat2, long2) {
+        return 1000.0 * HaversineInKM(lat1, long1, lat2, long2);
+    }
+
+    function HaversineInKM(lat1, long1, lat2, long2) {
+        var dlong = (long2 - long1) * _d2r;
+        var dlat = (lat2 - lat1) * _d2r;
+        var a = Math.pow(Math.sin(dlat / 2.0), 2.0) + Math.cos(lat1 * _d2r) * Math.cos(lat2 * _d2r)
+                * Math.pow(Math.sin(dlong / 2.0), 2.0);
+        var c = 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
+        var d = _eQuatorialEarthRadius * c;
+
+        return d;
+    }
+
+	if(isMeter) return HaversineInM(lat1, long1, lat2, long2)
+	else return HaversineInKM(lat1, long1, lat2, long2);
+}
+
 /* Mobile: orientation */
 var previousOrientation = window.orientation;
 var checkOrientation = function(){
@@ -240,7 +264,7 @@ var checkOrientation = function(){
 window.addEventListener("orientationchange", checkOrientation, false);
 
 // (optional) Android doesn't always fire orientationChange on 180 degree turns
-setInterval(checkOrientation, 10000);
+setInterval(checkOrientation, 5000);
 
 /* Need these? */
 if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {

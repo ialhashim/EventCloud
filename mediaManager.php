@@ -342,8 +342,7 @@
     	global $db;
     	global $upload_dir;     	
 		$media = $db->Select('media' , array("mid" => $mid) );
-		$result[] = getMediaForChunk( $media['cid'], $count );
-		echo json_encode( $result );
+		echo json_encode( getMediaForChunk( $media['cid'], $count ) );
 		die();
 	}
 ?>

@@ -69,17 +69,20 @@ html, body {
 h1{
 	font-size: 1em;
 	text-align: center;
-	margin: 0.5em;
+	padding: 0.5em;
+	margin: 0;
 }
 
-#mapContainer{
+#map{
 	overflow: hidden;
 	position: relative;
 }
 
 #mapContainer{
-	width: 100%;
-	
+	position:absolute;
+}
+
+#mapContent{
 	opacity: 0;
 	transition-property: all;
 	transition-timing-function: ease-in-out;
@@ -92,15 +95,21 @@ img.mainMap{
 }
 
 #overlay{
-	position: relative;
+	position: absolute;
 }
 
 .dot{
 	font-size: 0.8em;
-	color: rgb(254,123,111);
-	-webkit-text-stroke: 0.2em rgb(156,60,54);
+	color: #444;
+	-webkit-text-stroke: 0.2em black;
 	text-shadow:  4px 4px 15px #000;
 	
 	position: absolute;
 	z-index: 99;
 }
+.red{ -webkit-text-stroke: 0.2em rgb(156,60,54); color: rgb(254,123,111); }
+.green{ -webkit-text-stroke: 0.2em rgb(60,156,54); color: rgb(123,254,111); }
+.blue{ -webkit-text-stroke: 0.2em rgb(54,60,156); color: rgb(123,111,254); }
+
+.pagename{ color:#AAA; }
+#eventNameCaption{ color: black; font-size:larger }

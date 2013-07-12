@@ -111,24 +111,15 @@ function createCornerAxis( size, sceneSize ){
 	var cylinderX = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, size), new THREE.MeshBasicMaterial( { color: 0xff0000 } ));
 	var cylinderY = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, size), new THREE.MeshBasicMaterial( { color: 0x00ff00 } ));
 	var cylinderZ = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, size), new THREE.MeshBasicMaterial( { color: 0x0000ff } ));
-	
 	cylinderX.rotation.z = Math.PI / 2.0;
 	cylinderZ.rotation.x = Math.PI / 2.0;
-	
 	size *= 0.5
-	
 	cylinderX.position.set(  size,    0,    0 );
 	cylinderY.position.set(  	0, size,    0 );
 	cylinderZ.position.set(  	0,    0, size );
-	
 	var anchor = new THREE.Vector3( -sceneSize, -sceneSize, 0 );
-	cylinderX.position.add( anchor );
-	cylinderY.position.add( anchor );
-	cylinderZ.position.add( anchor );
-	
-	scene.add( cylinderX );
-	scene.add( cylinderY );
-	scene.add( cylinderZ );
+	cylinderX.position.add( anchor );cylinderY.position.add( anchor );cylinderZ.position.add( anchor );
+	scene.add( cylinderX );scene.add( cylinderY );scene.add( cylinderZ );
 }
 
 function onWindowResize() {
@@ -183,8 +174,7 @@ function initialMedia(){
 	//createBillboard( 'crate.gif' );
 	
 	$.post(mediaURL, { request:'getChunkByMid', mid: mid}, function(data){
-		var dataArray = JSON.parse( data );
-		var chunk = dataArray[0];
+		var chunk = JSON.parse( data );
 		
 		var theta = (Math.PI * 2) / chunk.length;
 		var r = 200;
