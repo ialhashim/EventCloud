@@ -4,7 +4,7 @@
 
 // Server location
 $server_address = 'https://96.49.252.141'; 	// home
-$server_address = 'http://54.214.248.120'; 	// Amazon
+$server_address = 'https://54.214.248.120'; 	// Amazon
 
 // Media location
 $upload_dir = dirname(__FILE__). "/uploads/";
