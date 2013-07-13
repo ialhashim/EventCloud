@@ -176,10 +176,10 @@ function initialMedia(){
 	$.post(mediaURL, { request:'getChunkByMid', mid: mid}, function(data){
 		var chunk = JSON.parse( data );
 		
-		var theta = (Math.PI * 2) / chunk.length;
+		var theta = (Math.PI * 2) / Object.keys(chunk).length;
 		var r = 200;
-		
-		for(var i = 0; i < chunk.length; i++){
+
+		for (var i in chunk) {
 			var media = chunk[i];
 			var isFull = '/';
 	    	var mediaURI = website + 'uploads/' + eid + isFull + getMediaBasename( media.mid, media.type );

@@ -20,7 +20,7 @@
 		global $upload_dir;
 		global $chunkThreshold;
 		
-		$ext = right($tempFile, 3);
+		$ext = strtolower(right($tempFile, 3));
 		
 		// Add media record to DB
 		$mid = -1;
@@ -47,6 +47,12 @@
 			$vars['lat'] = 0;
 			$vars['long'] = 0;
 			//$vars['timestamp'] = date("Y-m-d H:i:s", filemtime($tempFile));
+			
+			if(!empty($_POST['creationdate'])){
+				$d = date_create_from_format("D M j G:i:s T Y", $_POST['creationdate']);
+				//$vars['timestamp'] = $d->format('Y-m-d H:i:s');
+			}
+				
 			
 			$mid = $db->InsertReturnId($vars, 'media');
 			
@@ -298,6 +304,11 @@
     	die();
 	}
 	
+	// Uploadify hack
+	if(!empty($_FILES) && !empty($_FILES['Filedata'])){
+		$_FILES["file"] = $_FILES['Filedata'];
+	}
+	
     // By default, upload media sent with this script
     if(!empty($_FILES["file"]) && empty($_POST['manual']))
 	{
@@ -342,7 +353,13 @@
     	global $db;
     	global $upload_dir;     	
 		$media = $db->Select('media' , array("mid" => $mid) );
-		echo json_encode( getMediaForChunk( $media['cid'], $count ) );
+		
+		$chunkMedia = getMediaForChunk( $media['cid'], $count );
+		
+		// Treat all results as an array
+		if(array_key_exists('mid',$chunkMedia)) { $chunkMedia = array(0 => $chunkMedia); };
+		
+		echo json_encode( $chunkMedia );
 		die();
 	}
 ?>

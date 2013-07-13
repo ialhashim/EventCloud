@@ -1,6 +1,6 @@
 /* When using local host */
 var website = 'https://96.49.252.141/'; // home
-//var website = 'http://54.214.248.120/'; // Amazon
+var website = 'http://54.214.248.120/'; // Amazon
 
 var uploadURL = website + "mediaManager.php";
 var mediaURL = website + "mediaManager.php";
@@ -10,7 +10,7 @@ var usersManager = website + "usersManager.php";
 var mapView = website + "mapView.php";
 
 /* Default page display */
-var fadeSpeed = 500;
+var fadeSpeed = 250;
 $(document).ready(function() {
 	$('#mainScreen').css('transition-duration', fadeSpeed + 'ms');
 	$('#mainScreen').css({
@@ -40,6 +40,9 @@ $(document).ready(function() {
 		return false;
 	});
 });
+
+// Find out if we support flash
+var flashEnabled = !!(navigator.mimeTypes["application/x-shockwave-flash"] || window.ActiveXObject && new ActiveXObject('ShockwaveFlash.ShockwaveFlash'));
 
 function htmlEncode(value){
   //create a in-memory div, set it's inner text(which jQuery automatically encodes)

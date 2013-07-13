@@ -7,7 +7,7 @@
     
 	include_once('global.php');
 	
-	function GoogleStaticMap( $width, $height, $lat, $long, $zoom = 16 )
+	function GoogleStaticMap( $width, $height, $lat, $long, $zoom = 17 )
 	{
 		$latlng = $lat . "," . $long;
 		
@@ -18,6 +18,7 @@
 			'maptype' => 'roadmap',
 			'sensor'  => 'false',
 			'format'  => 'png',
+			'scale'   => '2',
 			'visual_refresh' => 'true'
 		);      
 		$requestURL = "http://maps.googleapis.com/maps/api/staticmap?".http_build_query($parts);
@@ -45,7 +46,7 @@
 	$result['event'] = $event;
 	$result['user'] = $user;
 	$result['media'] = $media;
-	$result['mapImage'] = GoogleStaticMap( $vars['width'], $vars['height'], $event['lat'], $event['long'] );
+	$result['mapImage'] = GoogleStaticMap( $vars['width'], $vars['height'], $event['lat'], $event['long'], $vars['zoom'] );
 	
 	echo json_encode( $result );
 	die();

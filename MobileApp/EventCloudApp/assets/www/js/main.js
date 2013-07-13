@@ -13,6 +13,7 @@ $(document).ready(function() {
 	$("#debug").hide();
 	
 	$("#mainScreen").fadeTo(0,0);
+	$("#special-upload-form").hide();
 	
 	userid = getParameterByName('uid');
 	username = getUserName( userid );
@@ -40,20 +41,43 @@ $(document).ready(function() {
 
 	/// Media Capture:
 	$mediaCapture = $("#media-capture");
-	$mediaCapture.fadeOut(0);
+	$mediaCapture.hide();
 
 	/// Media Viewer:
 	$mediaViewer = $("#media-viewer");
 	$mediaViewerItem = $("#media-viewer-item");
-	$mediaViewer.fadeOut(0);
+	$mediaViewer.hide();
 		
 	// Show media viewer on double click
 	$(document).on("dblclick doubletap", ".interactive", showMediaViewer);
 	
-	// Escape to close any sub-window
+	
 	$(document).keyup(function(e) {
-	  if (e.keyCode == 27) { cancelCapture(); hideMediaViewer(); }   // ESC
+		// Escape to close any sub-window
+		if (e.keyCode == 27) { cancelCapture(); hideMediaViewer(); $("#special-upload-form").fadeOut(); }   // ESC
+		
+		// Special upload
+		if( flashEnabled && e.keyCode == 85 ){
+			$('#file_upload').uploadify({
+				'swf'      : 'uploadify.swf',
+				'uploader' : mediaURL,
+				'onUploadStart'	: function (file) {  
+						$("#file_upload").uploadify("settings", "formData", {
+							"creationdate": file.creationdate, 
+							"modificationdate": file.modificationdate,
+							"eid": eid,
+				    		"uid": userid 
+						});
+					},
+				'onUploadSuccess' : function(file, data, response) {
+					postUpload( data ); 
+				}
+			});
+			
+			$("#special-upload-form").fadeIn();
+		}
 	});
+
 });
 
 function showMediaViewer(){
@@ -119,11 +143,11 @@ function showMediaViewer(){
 			
 			// Map-view
 			mapview_href = 'mapview.html?eid=' + eid + '&mid=' + mediaID + '&uid=' + userid;
-			$toolbarContainer.append( '<a class="outlinkFade button icon green" href="' + mapview_href +'"> <i class="icon-globe"></i> </a>' );
+			$toolbarContainer.append( '<a class="button icon green" href="' + mapview_href +'"> <i class="icon-globe"></i> </a>' );
 			
 			// 3DView
 			threedview_href = '3dview.html?eid=' + eid + '&mid=' + mediaID + '&uid=' + userid;
-			$toolbarContainer.append( '<a class="outlinkFade button icon blue" href="' + threedview_href +'"> <i class="icon-eye-open"></i> </a>' );
+			$toolbarContainer.append( '<a class="button icon blue" href="' + threedview_href +'"> <i class="icon-eye-open"></i> </a>' );
 			
 			$toolbar.append( $toolbarContainer );
 			$mediaCaption.prepend( $toolbar );
@@ -528,6 +552,8 @@ function initialSlides() {
 					
 					$("#mainScreen").fadeTo('fast', 1, function(){
 						updater = setInterval(updateLatest, 1000);
+						
+						$(document).keyup(function(e) {	if (e.keyCode == 83) { clearInterval( updater ); } });
 					});
 				}, true, true, ALL_MEDIA);
 			}
@@ -579,5 +605,3 @@ function getThumbnail( media, specialClass ){
 		return videoItem;
 	}
 }	
-
-
