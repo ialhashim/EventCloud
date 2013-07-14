@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 28, 2013 at 11:20 PM
+-- Generation Time: Jul 13, 2013 at 11:54 PM
 -- Server version: 5.5.27
 -- PHP Version: 5.4.7
 
@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `chunks` (
   `eid` int(11) NOT NULL,
   `index` int(11) NOT NULL,
   `start` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `length` int(11) NOT NULL,
   PRIMARY KEY (`cid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -67,6 +68,7 @@ CREATE TABLE IF NOT EXISTS `media` (
   `lat` decimal(18,14) NOT NULL,
   `long` decimal(18,14) NOT NULL,
   `type` text COLLATE utf8_unicode_ci NOT NULL,
+  `caption` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`mid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -80,14 +82,16 @@ CREATE TABLE IF NOT EXISTS `users` (
   `uid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`uid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`uid`, `name`) VALUES
-(1, 'User');
+(1, 'User'),
+(2, 'hh'),
+(3, 'æŽå®åŽ');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
