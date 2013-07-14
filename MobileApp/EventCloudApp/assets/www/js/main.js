@@ -417,7 +417,7 @@ function makeSliderV( swiperClassID, options, slides, specialClass ){
 	$.each( slides, function( k, v ) {
 		el = $("<div/>");
 		el.addClass( 'swiper-slide' ).addClass( 'vslide' );
-		el.html( getThumbnail(v,specialClass) );
+		el.html( getThumbnail(v, specialClass) );
 		el.appendTo( swiperContainer.children('.swiper-wrapper') );
 	});
 	
@@ -585,7 +585,10 @@ function updateLatest(){
 }
 
 function getThumbnail( media, specialClass ){
+
 	if(specialClass == undefined) specialClass = '';
+	
+	console.log(specialClass);
 	
 	var mediaURI = getMediaURI(media.mid, media.type, eid, '/');
 	var posterURI = getMediaURI(media.mid, 'png', eid, '/poster/');

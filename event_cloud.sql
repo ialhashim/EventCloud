@@ -7,8 +7,14 @@
 -- Server version: 5.5.27
 -- PHP Version: 5.4.7
 
+-- DROP DATABASE event_cloud;
+CREATE DATABASE event_cloud
+  DEFAULT CHARACTER SET utf8
+  DEFAULT COLLATE utf8_general_ci;
+USE event_cloud;
+
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+SET time_zone = 'US/Pacific';
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -83,15 +89,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   `name` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`uid`, `name`) VALUES
-(1, 'User'),
-(2, 'hh'),
-(3, 'æŽå®åŽ');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -69,10 +69,11 @@ function createGrid(size, step){
 	var material = new THREE.LineBasicMaterial( { color: 0x333333, opacity: 0.5 } );
 	var line = new THREE.Line( geometry, material );
 	line.type = THREE.LinePieces;
+	line._meshtype = 'grid';
 	return line;
 }
 
-function createBillboard( imgURL, position, scaling ){
+function createBillboard( mid, imgURL, position, scaling ){
     var texture = new THREE.Texture();
     var loader = new THREE.ImageLoader();
     
@@ -89,6 +90,9 @@ function createBillboard( imgURL, position, scaling ){
 		var h = texture.image.height * scaling;
 		
 		var plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), material) ;
+		plane.mid = mid;
+		plane._meshtype = 'billboard';
+		
 		plane.rotation.x = Math.PI / 2.0;
 		
 		var anchor = new THREE.Vector3( 0, 0, h * 0.5 );
@@ -100,7 +104,7 @@ function createBillboard( imgURL, position, scaling ){
 		
 		// Add its shadow
 		var shadowPos = new THREE.Vector3( plane.position.x, plane.position.y, -1 );
-		addShadow( shadowPos );
+		addShadow( shadowPos, plane );
 	});
 	
 	loader.load( imgURL );
@@ -119,6 +123,7 @@ function createCornerAxis( size, sceneSize ){
 	cylinderZ.position.set(  	0,    0, size );
 	var anchor = new THREE.Vector3( -sceneSize, -sceneSize, 0 );
 	cylinderX.position.add( anchor );cylinderY.position.add( anchor );cylinderZ.position.add( anchor );
+	cylinderX._meshtype='axis';cylinderY._meshtype='axis';cylinderZ._meshtype='axis';
 	scene.add( cylinderX );scene.add( cylinderY );scene.add( cylinderZ );
 }
 
@@ -144,10 +149,10 @@ function render(){
 	renderer.render( scene, camera );
 }
 
-function addShadow( position ){
+function addShadow( position, parent ){
 	var canvas = document.createElement( 'canvas' );
-	canvas.width = 128;
-	canvas.height = 128;
+	canvas.width = 64;
+	canvas.height = 64;
 
 	var context = canvas.getContext( '2d' );
 	var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
@@ -160,10 +165,15 @@ function addShadow( position ){
 	var shadowTexture = new THREE.Texture( canvas );
 	shadowTexture.needsUpdate = true;
 
+	var width = parent.material.map.image.width * 0.75;
+	var length = width * 0.3;
+
 	var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture, transparent: true } );
-	var shadowGeo = new THREE.PlaneGeometry( 300, 100, 1, 1 );
+	var shadowGeo = new THREE.PlaneGeometry( width, length, 1, 1 );
 
 	mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+	mesh.parentMID = parent.mid;
+	mesh._meshtype = 'shadow';
 	
 	mesh.position.add( position );
 	objectStack.push( mesh );
@@ -181,12 +191,18 @@ function initialMedia(){
 
 		for (var i in chunk) {
 			var media = chunk[i];
-			var isFull = '/';
-	    	var mediaURI = getMediaURI(media.mid, media.type, eid, isFull);
+			var folder = '/';
+			
+			if(media.type == 'mp4'){
+				folder = '/poster/';
+				media.type = 'png';
+			}
+			
+	    	var mediaURI = getMediaURI(media.mid, media.type, eid, folder);
 	    	
 	    	var roundTrip = mediaURL + "?request=bypass&url=" + mediaURI;
 	    	var position = new THREE.Vector3( r * Math.cos(theta * i), r * Math.sin(theta * i), 0 );
-	    	createBillboard( roundTrip, position );
+	    	createBillboard( media.mid, roundTrip, position );
 		};
 	});
 }

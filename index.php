@@ -65,5 +65,7 @@
 	
 	<a href="rtsp://96.49.252.141:8554/test.sdp">Stream</a>
 	
+	<div> IP <?php echo echov( $server_address ) ?> </div>
+	
     </body>
 </html>

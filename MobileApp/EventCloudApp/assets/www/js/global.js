@@ -110,6 +110,12 @@ function decode_utf8(s) {
 	return htmlentities(escape(s));
 }
 
+function lastToken(str, delimiter) {
+	delimiter = delimiter ? delimiter : '/';
+	var xs = str.split( delimiter );
+	return xs.length > 1 ? xs.pop() : null;
+}
+
 /* Change to title case */
 function toTitleCase(str) {
 	return str.replace(/(?:^|\s)\w/g, function(match) {

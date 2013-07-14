@@ -36,6 +36,10 @@
 			
 			if( chunkTime($chunk) > $chunkThreshold )
 			{
+				echo 'chunk time '. chunkTime($chunk); 
+				echo '  interval ' . $chunkThreshold;
+		
+				
 				// Increase chunk index
 				$newCIDX = $chunk['index'] + 1;
 				

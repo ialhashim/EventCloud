@@ -3,8 +3,7 @@
 /// Global parameters
 
 // Server location
-$server_address = 'https://96.49.252.141'; 	// home
-//$server_address = 'https://54.214.248.120'; 	// Amazon
+$server_address = 'https://' . $_SERVER['REMOTE_ADDR'];
 
 // Media location
 $upload_dir = dirname(__FILE__). "/uploads/";
@@ -13,9 +12,9 @@ $upload_url = "/uploads/";
 // Event parameters
 $chunkThreshold = 10; // seconds
 
-// Assume server is in VANCOUVER
-date_default_timezone_set('America/Vancouver');
+date_default_timezone_set('UTC');
 			
+$MYSQL_HOST = "eventfulcloud.clfp4bwzq9e9.us-west-2.rds.amazonaws.com";
 $MYSQL_NAME = "event_cloud";
 $MYSQL_USER = "root";
 $MYSQL_PASS = "chixchix";
@@ -24,10 +23,11 @@ $MYSQL_PASS = "chixchix";
 include_once('mysql.php');
 
 function connectDB(){
+	global $MYSQL_HOST;
 	global $MYSQL_NAME;
 	global $MYSQL_USER;
 	global $MYSQL_PASS;
-	$db = new MySQL($MYSQL_NAME, $MYSQL_USER, $MYSQL_PASS);
+	$db = new MySQL($MYSQL_NAME, $MYSQL_USER, $MYSQL_PASS, $MYSQL_HOST);
 	return $db;
 }
 
