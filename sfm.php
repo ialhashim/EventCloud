@@ -9,7 +9,8 @@
     
     $bundler = '/etc/bundler/RunBundler.sh '; // path to bundler script
 	
-    $event = $db->Select( 'events', array("eid" => $eid) );
+	//$db = connectDB();
+    //$event = $db->Select( 'events', array("eid" => $eid) );
 
     $mediaFolder = $upload_dir.$eid.'/full';
     $bundleFolder = $upload_dir.$eid.'/bundle';

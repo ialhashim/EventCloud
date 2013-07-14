@@ -8,14 +8,17 @@
 	
 	// Return result based on request type
 	if($request == "all"){
+		$db = connectDB();
 		$result = $db->ExecuteSQL("SELECT * FROM events");
 	}
 	
 	if($request == "name"){
+		$db = connectDB();
 		$result = $db->Select( 'events', array("eid" => $eid) );
 	}
 	
 	if($request == "clearAll"){
+		$db = connectDB();
 		$result = $db->ExecuteSQL( "TRUNCATE TABLE events" );
 		$result = $db->ExecuteSQL( "TRUNCATE TABLE chunks" );
 		$result = $db->ExecuteSQL( "TRUNCATE TABLE media" );
@@ -23,9 +26,13 @@
 		// Delete all media files and folders
 		deleteDir( $upload_dir );
 		makePublicFolder( $upload_dir );
+		
+		// Delete files in the cloud
+		clearBucket();
 	}
 	
 	if($request == "create"){
+		$db = connectDB();
 		$name = $_POST["eventname"];
 		$chunks = intval($_POST["numchunks"]);
 		$maptype = $_POST["maptype"];
@@ -73,6 +80,7 @@
 					curl_close($ch);
 					
 			    	file_put_contents($eventPoster, $file);
+					moveFileToCloud( $eventPoster, $eid );
 				}
 			}
 			

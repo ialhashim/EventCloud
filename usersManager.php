@@ -8,19 +8,19 @@
 	include_once('global.php');
 	
 	function insertUser($username){
-		global $db;
+		$db = connectDB();
 		$db->Insert(array('uid'=> getUID($username), 'name' => $username), 'users', true);
 		return intval( getUID($username) );
 	}
 	
 	function getUID( $username ){
-		global $db;
+		$db = connectDB();
 		$result = $db->Select( 'users', array("name" => $username) );
 		return $result['uid'];
 	}
 	
 	function getUsername( $uid ){
-		global $db;
+		$db = connectDB();
 		$result = $db->Select( 'users', array("uid" => $uid) );
 		return $result['name'];
 	}

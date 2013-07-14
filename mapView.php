@@ -36,6 +36,7 @@
 	
 	$result = array();
 
+	$db = connectDB();
 	$event = $db->Select('events', array("eid"=>$eid));
 	$user = $db->Select('users', array("uid"=>$uid));
 	$media = $db->Select('media', array("mid"=>$mid));

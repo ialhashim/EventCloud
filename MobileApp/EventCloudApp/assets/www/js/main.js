@@ -165,7 +165,7 @@ function showMediaViewer(){
 		$mediaViewer.animate( { width: '101%', height: '100%', top:0, left:0}, 'slow');
 		$mediaViewer.promise().done(function() {
 			
-			var mediaURI = website + 'uploads/' + eid + '/full/' + getMediaBasename( mediaID, mediaType );
+			var mediaURI = getMediaURI(mediaID, mediaType, eid, '/full/');
 			var maxWidth = '100%';
 			
 			// For images
@@ -188,7 +188,7 @@ function showMediaViewer(){
 			// For videos
 			if(mediaType == 'mp4')
 			{
-				var posterURI = website + 'uploads/' + eid + '/poster/' + getMediaBasename( mediaID, 'png' );
+				var posterURI = getMediaURI(mediaID, 'png', eid, '/poster/');
 				
 				if( !isInsidePhoneGap )
 				{
@@ -587,14 +587,14 @@ function updateLatest(){
 function getThumbnail( media, specialClass ){
 	if(specialClass == undefined) specialClass = '';
 	
-	var mediaURI = website + 'uploads/' + eid + '/' + getMediaBasename( media.mid, media.type );
-	
+	var mediaURI = getMediaURI(media.mid, media.type, eid, '/');
+	var posterURI = getMediaURI(media.mid, 'png', eid, '/poster/');
+
 	var mediaAttrib = " mid=" + media.mid + " type='" + media.type + "'" + " caption='" + media.caption + "'";
 	
 	if(media.type != "mp4"){
 		return "<div class='thumbnail' " + mediaAttrib + "><img " + mediaAttrib + " class='thumbnail-item " + specialClass + "' src='" + mediaURI + "'/></div>" ;
 	}else{
-		var posterURI = website + 'uploads/' + eid + '/poster/' + getMediaBasename( media.mid, 'png' );
 		var videoItem = "<div class='thumbnail' " + mediaAttrib + " >";
 		videoItem += "<div class='block thumbnail-item " + specialClass + "'>";
 		videoItem += "<video controls class='centered videoMedia NoSwiping' poster='" + posterURI + "' muted>";

@@ -6,6 +6,7 @@
     $verbose = true;
     
 	include_once('global.php');
+	include_once('s3.php');
 		
 	function chunkTime( $chunk ){
 		$time1 = new Datetime($chunk['start']);
@@ -16,7 +17,7 @@
 	
 	function insertMedia($tempFile, $eid, $uid, $meta = '')
 	{
-		global $db;
+		$db = connectDB();
 		global $upload_dir;
 		global $chunkThreshold;
 		
@@ -52,7 +53,6 @@
 				$d = date_create_from_format("D M j G:i:s T Y", $_POST['creationdate']);
 				//$vars['timestamp'] = $d->format('Y-m-d H:i:s');
 			}
-				
 			
 			$mid = $db->InsertReturnId($vars, 'media');
 			
@@ -68,17 +68,22 @@
 
 		if($ext == 'jpg' || $ext == 'png')	createThumbnailImage($tempFile, 500, $thumbFilename);
 		if($ext == 'mp4')					createThumbnailVideo($tempFile, 500, 5, $thumbFilename);
+		
+		moveFileToCloud($thumbFilename, $eid);
+		if($ext == 'mp4') moveFileToCloud($upload_dir.$eid."/poster/".getMediaBasename($mid, 'png'), $eid . '/poster');
 				
 		// Move full version from a temporary location
 		$fullFileName = $upload_dir.$eid."/full/".$basename;
 		moveFile( $tempFile, $fullFileName );
+		
+		moveFileToCloud( $fullFileName, $eid."/full" );
 		
 		return $mid;
 	}
 	
 	function updateMediaLocation( $mid, $lat, $long )
 	{
-		global $db;
+		$db = connectDB();
 		
 		$vars = array();
 		$vars['lat'] = $lat;
@@ -103,7 +108,7 @@
 	
 	function getMediaFilename( $mid )
 	{
-		global $db;
+		$db = connectDB();
 		global $upload_dir;
 		
 		$media = $db->Select('media' , array("mid" => $mid) );
@@ -171,7 +176,7 @@
     }
     
     function getAllChunks( $eid ){
-    	global $db;
+    	$db = connectDB();
     	$chunks = $db->Select( 'chunks', array( "eid" => $eid ), '*', strsql('index'). ' ASC ');
 		if(is_array($chunks) && array_key_exists('cid',$chunks)) 
 			$chunks = array(0 => $chunks); // Treat all results as an array
@@ -202,7 +207,7 @@
 	}
 	
 	function getMediaForChunk( $cid, $count = -1 ){
-		global $db;
+		$db = connectDB();
 		
 		// Get all media of chunk 'id', sorted by their time stamp
 		$media = $db->Select( 'media', array( "cid" => $cid ), '*', strsql('timestamp') );
@@ -277,7 +282,7 @@
 	// Get media information
 	if(!empty($_POST['request']) && $_POST['request'] == "getInfo")
     {
-    	global $db;
+    	$db = connectDB();
 		
 		$media = $db->Select('media' , array("mid" => $mid) );
 		$media['author'] = $db->Select( 'users', array( "uid" => $media['uid'] ) );
@@ -288,22 +293,58 @@
 		die();
 	}
 	
+	function get_data_url($url) {
+		$ch = curl_init();
+		$timeout = 5;
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		$data = curl_exec($ch);
+		curl_close($ch);
+		return $data;
+	}
+	
 	// Get media representation
 	if(!empty($_POST['request']) && $_POST['request'] == "getRepImage")
     {
-  		global $db;
+  		$db = connectDB();
     	global $upload_dir;     	
     	
 		$media = $db->Select('media' , array("mid" => $mid) );
+		
 		$basename = getMediaBasename( $mid, $media['type'] );
-    	$fullImage = $upload_dir.$eid."/full/".$basename;
-    	$mid = new Imagick( $fullImage );
-		$mid->setImageFormat("jpeg");
-		$mid->scaleImage(1920,0);
-    	echo json_encode( array('fullImage' => $fullImage, 'data' => base64_encode($mid->getImageBlob())) );
+    	//$fullImage = $upload_dir.$eid."/full/".$basename;
+    	
+    	$tmpFile = $upload_dir.$eid."/tmp/".$basename;
+
+		$url = getFile( $basename, $eid.'/full' );
+		$data = get_data_url( $url );
+		
+		file_put_contents($tmpFile, $data);
+		$img = new Imagick($tmpFile);
+		unlink($tmpFile);
+
+		$img->setImageFormat("jpeg");
+		$img->scaleImage(1920,0);
+    	echo json_encode( array('data' => base64_encode($img->getImageBlob())) );
     	die();
 	}
-	
+
+	if(!empty($_GET['request']) && $_GET['request'] == "bypass")
+    {
+    	$url = $_GET['url'];
+		get_data_url($url);
+		
+		header('Access-Control-Allow-Credentials: true');
+		header('Access-Control-Allow-Methods: GET');
+		header('Access-Control-Allow-Origin: *');
+		header('Content-type: image/jpg');
+		echo get_data_url($url);
+		die();
+	}
+
 	// Uploadify hack
 	if(!empty($_FILES) && !empty($_FILES['Filedata'])){
 		$_FILES["file"] = $_FILES['Filedata'];
@@ -350,7 +391,7 @@
 	// Get chunk of given 'mid'
 	if(!empty($_POST['request']) && $_POST['request'] == "getChunkByMid")
     {
-    	global $db;
+    	$db = connectDB();
     	global $upload_dir;     	
 		$media = $db->Select('media' , array("mid" => $mid) );
 		

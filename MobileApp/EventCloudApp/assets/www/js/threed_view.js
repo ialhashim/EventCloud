@@ -182,10 +182,11 @@ function initialMedia(){
 		for (var i in chunk) {
 			var media = chunk[i];
 			var isFull = '/';
-	    	var mediaURI = website + 'uploads/' + eid + isFull + getMediaBasename( media.mid, media.type );
+	    	var mediaURI = getMediaURI(media.mid, media.type, eid, isFull);
 	    	
+	    	var roundTrip = mediaURL + "?request=bypass&url=" + mediaURI;
 	    	var position = new THREE.Vector3( r * Math.cos(theta * i), r * Math.sin(theta * i), 0 );
-	    	createBillboard( mediaURI, position );
+	    	createBillboard( roundTrip, position );
 		};
 	});
 }

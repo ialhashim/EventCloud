@@ -9,6 +9,14 @@ var eventsManager = website + "eventsManager.php";
 var usersManager = website + "usersManager.php";
 var mapView = website + "mapView.php";
 
+var amazon_s3 = 'https://s3.amazonaws.com/';
+var bucket = 'eventfulcloud-uploads/';
+
+function getMediaURI( mid, type, eid, folder ){
+	folder = folder ? folder : '';
+	return amazon_s3 + bucket + eid + folder + getMediaBasename( mid, type );
+}
+
 /* Default page display */
 var fadeSpeed = 250;
 $(document).ready(function() {

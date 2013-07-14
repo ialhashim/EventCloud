@@ -22,7 +22,14 @@ $MYSQL_PASS = "chixchix";
 
 // Global DB object
 include_once('mysql.php');
-$db = new MySQL($MYSQL_NAME, $MYSQL_USER, $MYSQL_PASS);
+
+function connectDB(){
+	global $MYSQL_NAME;
+	global $MYSQL_USER;
+	global $MYSQL_PASS;
+	$db = new MySQL($MYSQL_NAME, $MYSQL_USER, $MYSQL_PASS);
+	return $db;
+}
 
 // Global variables sent to PHP scripts - its research code :P
 if(isset($_POST["request"]))	$request 	= $_POST["request"]; else 	$request 	= "";
