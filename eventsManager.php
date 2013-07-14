@@ -146,5 +146,5 @@
 		$result = intval($eid);
 	}
 	
-    if(count($result))  echo json_encode($result);
+	echo json_encode($result);
 ?>

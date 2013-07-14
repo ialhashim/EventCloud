@@ -4,7 +4,7 @@
 
 // Server location
 $server_address = 'https://96.49.252.141'; 	// home
-//$server_address = 'https://54.214.248.120'; 	// Amazon
+$server_address = 'https://54.214.248.120'; 	// Amazon
 
 // Media location
 $upload_dir = dirname(__FILE__). "/uploads/";
@@ -32,8 +32,8 @@ if(isset($_POST["uid"]))		$uid 		= $_POST["uid"]; 	else 	$uid 		= -1;
 if(isset($_POST["mid"]))		$mid 		= $_POST["mid"]; 	else 	$mid 		= -1;
 if(isset($_POST["cid"]))		$cid 		= $_POST["cid"]; 	else 	$cid 		= -1;
 
-// Using GET
-if(isset($_GET["eid"]))    	    $eid 		= $_GET["eid"]; 	else 	$eid 		= -1;
+// Using GET for easy debugging
+if(isset($_GET["eid"]))    	    $eid 		= $_GET["eid"];
 
 function echov($var){
 	echo "<pre>";
