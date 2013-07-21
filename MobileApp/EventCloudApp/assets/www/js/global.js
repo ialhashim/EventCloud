@@ -1,6 +1,9 @@
-/* When using local host */
-var website = 'https://96.49.252.141/'; // home
-var website = 'https://54.214.248.120/'; // Amazon
+var website = window.location.origin + "/";
+
+if( isInsidePhoneGap ){
+	var website = 'https://96.49.252.141/'; // home
+	//var websites = 'https://54.214.248.120/'; // Amazon	
+}
 
 var uploadURL = website + "mediaManager.php";
 var mediaURL = website + "mediaManager.php";

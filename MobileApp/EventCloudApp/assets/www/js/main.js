@@ -365,7 +365,7 @@ function resizeSwiper( className, numSlides, myswiper ){
 	var height = $('#mainScreen').height();
 	
 	slideWidth = (width) / numSlides;
-	slideHeight = height * 0.5;
+	slideHeight = slideWidth;
 	
 	// Sizes
 	$('.' + className).css('width', width);
@@ -542,8 +542,7 @@ function initialSlides() {
 			    // Always get first chunk
 				getMediaForChunk(eid, 0, function($bins){
 					$.each($bins, function( k, v ){
-						vslider = makeSliderV( 'vswiper-' + (binUID++), {}, v );
-						swiper.prependSlide( vslider.container[0] );
+						swiper.prependSlide( getThumbnail(v[0], '') );
 						forceResizeWindow();
 					});	
 					
@@ -585,10 +584,7 @@ function updateLatest(){
 }
 
 function getThumbnail( media, specialClass ){
-
 	if(specialClass == undefined) specialClass = '';
-	
-	console.log(specialClass);
 	
 	var mediaURI = getMediaURI(media.mid, media.type, eid, '/');
 	var posterURI = getMediaURI(media.mid, 'png', eid, '/poster/');

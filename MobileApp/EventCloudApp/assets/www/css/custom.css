@@ -109,12 +109,12 @@ html, body {
 }
 
 #camera {
-	left: 75%;
+	right: 0.25em;
 	bottom: -0.3em;
 }
 
 #video {
-	left: 50%;
+	right: 4em;
 	bottom: -0.3em;
 }
 
