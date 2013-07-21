@@ -94,24 +94,12 @@ function readableTime($time){
 	return date("F d Y H:i:s", $time);
 }
 
-function createThumbnailImage($fromImageFile, $resolution, $toImageFile) { 
-	$thumb = new Imagick($fromImageFile);
-	$thumb->setCompressionQuality(100); 
-	//$thumb->scaleImage($resolution, $resolution, true);
-	$thumb->cropThumbnailImage($resolution,$resolution);
-	
-	$ext = right($fromImageFile, 4);
-	
-	$newNameFull = $toImageFile;
-
-	$thumb->setImageCompression(imagick::COMPRESSION_JPEG); 
-	$thumb->setImageCompressionQuality(100); 
-	$thumb->stripImage(); 
-	$thumb->writeImage($newNameFull);
-	$thumb->destroy();
+function createThumbnailImage($fromImageFile, $resolution, $toImageFile) {
+	$cmd = "convert $fromImageFile -resize \"{$resolution}x{$resolution}^\" -gravity center -crop {$resolution}x{$resolution}+0+0 $toImageFile"; 
+	system($cmd);
 	
 	// set proper permissions on the new file
-	chmod($newNameFull, 0644);			
+	chmod($toImageFile, 0644);			
 } 
 
 function getVideoDimensions($video) {

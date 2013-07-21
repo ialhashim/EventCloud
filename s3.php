@@ -15,6 +15,7 @@
 	));
 		
 	$bucket = 'eventfulcloud-uploads';
+	$bucketOutput = 'eventfulcloud-3d';
 
 	function putFile( $filename, $folder = ''){
 		global $s3;
@@ -49,6 +50,8 @@
 	function clearBucket(){
 		global $s3;
 		global $bucket;
+		global $bucketOutput;
 		$s3->clearBucket($bucket);
+		$s3->clearBucket($bucketOutput);
 	}
 ?>

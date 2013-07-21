@@ -1,6 +1,6 @@
 /* When using local host */
 var website = 'https://96.49.252.141/'; // home
-//var website = 'https://54.214.248.120/'; // Amazon
+var website = 'https://54.214.248.120/'; // Amazon
 
 var uploadURL = website + "mediaManager.php";
 var mediaURL = website + "mediaManager.php";
@@ -11,6 +11,7 @@ var mapView = website + "mapView.php";
 
 var amazon_s3 = 'https://s3.amazonaws.com/';
 var bucket = 'eventfulcloud-uploads/';
+var bucketOutput = 'eventfulcloud-3d/';
 
 function getMediaURI( mid, type, eid, folder ){
 	folder = folder ? folder : '';
