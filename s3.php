@@ -4,7 +4,7 @@
     error_reporting(E_ALL);
     $verbose = true;
     
-	require 'external/aws.phar';
+	require_once 'external/aws.phar';
 	use Aws\S3\S3Client;
 	use Aws\S3\Enum\CannedAcl;
 
