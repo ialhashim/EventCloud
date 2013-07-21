@@ -141,7 +141,8 @@
 				}
 
 				// Add an initial chunk[0]
-				$db->Insert(array('eid' => $eid, 'index' => 0, 'length' => $chunkThreshold), 'chunks');
+				$start = date("Y-m-d H:i:s", time());
+				$db->Insert(array('eid' => $eid, 'index' => 0, 'length' => $chunkThreshold, 'start'=> $start), 'chunks');
 				
 				for($i = 0; $i < 3; $i++)
 				{

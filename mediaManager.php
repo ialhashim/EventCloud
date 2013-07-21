@@ -12,12 +12,6 @@
 		$time1 = new Datetime($chunk['start']);
 		$time2 = time();
 		$interval =  $time2 - $time1->getTimestamp();
-		
-		echo "Interval = " . $interval;
-		echov($chunk);
-		echov($time2);
-		echov($time1->getTimestamp());
-		
 		return $interval;
 	}
 	
@@ -46,14 +40,15 @@
 				$newCIDX = $chunk['index'] + 1;
 				
 				// Create new chunk
-				$chunk['cid'] = $db->InsertReturnId( array('eid' => $eid, 'index' => $newCIDX, 'length' => $chunkThreshold), 'chunks' );
+				$start = date("Y-m-d H:i:s", time());
+				$chunk['cid'] = $db->InsertReturnId( array('eid' => $eid, 'index' => $newCIDX, 'length' => $chunkThreshold, 'start'=> $start), 'chunks' );
 			}
 			
 			$vars = array('uid'=> $uid, 'uid' => $uid, 'cid' => $chunk['cid'], 'type' => $ext);
 			$vars['meta'] = "";
 			$vars['lat'] = 0;
 			$vars['long'] = 0;
-			//$vars['timestamp'] = date("Y-m-d H:i:s", filemtime($tempFile));
+			$vars['timestamp'] = date("Y-m-d H:i:s", time());
 			
 			if(!empty($_POST['creationdate'])){
 				$d = date_create_from_format("D M j G:i:s T Y", $_POST['creationdate']);
