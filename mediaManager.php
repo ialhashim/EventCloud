@@ -10,8 +10,14 @@
 		
 	function chunkTime( $chunk ){
 		$time1 = new Datetime($chunk['start']);
-		$time2 = new Datetime();
-		$interval =  $time2->getTimestamp() - $time1->getTimestamp();
+		$time2 = time();
+		$interval =  $time2 - $time1->getTimestamp();
+		
+		echo "Interval = " . $interval;
+		echov($chunk);
+		echov($time2);
+		echov($time1->getTimestamp());
+		
 		return $interval;
 	}
 	
