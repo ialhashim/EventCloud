@@ -27,6 +27,11 @@
 			'Body'   => fopen($filename, 'r'),
 			'ACL'    => CannedAcl::PUBLIC_READ
 		));
+		
+		$s3->waitUntilObjectExists(array(
+			'Bucket' => $bucket,
+			'Key'    => $folder . '/' . basename($filename)
+		));
 	}
 	
 	function moveFileToCloud( $filename, $folder = ''){
