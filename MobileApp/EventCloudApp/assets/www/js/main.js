@@ -604,3 +604,9 @@ function getThumbnail( media, specialClass ){
 		return videoItem;
 	}
 }	
+
+function manualRecon(){
+	$.get(sfmURL, function(data){
+		console.log( data );
+	});
+}

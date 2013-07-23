@@ -37,6 +37,13 @@
     <access origin="http://96.49.252.141*" /> <!-- earth -->
     <access origin="http://54.214.248.120*" /> <!-- Amazon EC2 -->
 
+    <access origin="https://localhost*"/>
+    <access origin="https://127.0.0.1*"/> <!-- allow local pages -->
+    <access origin="https://192.168.0.10*" />
+    <access origin="https://96.49.252.141*" /> <!-- earth -->
+    <access origin="https://54.214.248.120*" /> <!-- Amazon EC2 -->
+
+
     <!-- <content src="http://mysite.com/myapp.html" /> for external pages -->
     <content src="index.html" />
 

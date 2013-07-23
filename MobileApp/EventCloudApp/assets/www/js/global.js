@@ -1,8 +1,9 @@
 var website = window.location.origin + "/";
 
 if( isInsidePhoneGap ){
-	var website = 'https://96.49.252.141/'; // home
-	//var websites = 'https://54.214.248.120/'; // Amazon	
+	//website = 'https://96.49.252.141/'; // home
+	website = 'https://54.214.248.120/'; // Amazon	
+	console.log( "Setting server side to: " + website );
 }
 
 var uploadURL = website + "mediaManager.php";
@@ -11,6 +12,7 @@ var galleryURL = website + "gallery.php";
 var eventsManager = website + "eventsManager.php";
 var usersManager = website + "usersManager.php";
 var mapView = website + "mapView.php";
+var sfmURL = website + "sfm.php";
 
 var amazon_s3 = 'https://s3.amazonaws.com/';
 var bucket = 'eventfulcloud-uploads/';
