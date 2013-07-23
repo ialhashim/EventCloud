@@ -11,5 +11,5 @@
 	$resolution = 300;
 	$reconCmd = "cd HPC; sh doJob.sh " . $eid . " " . $resolution;
 	
-	system( $reconCmd );	
+	system( $reconCmd . " &" );	
 ?>
