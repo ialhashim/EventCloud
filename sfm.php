@@ -5,16 +5,19 @@
 	$verbose = true;
 	include_once('global.php');
 
-	system("s3cmd get s3://eventfulcloud-app/HPC.tar.gz");
-	system("tar -xvf HPC.tar.gz");
-
-	$eid = max(1, $eid);
+	set_include_path(get_include_path() . PATH_SEPARATOR . 'external/phpseclib');
 	
-	$resolution = 200;
-	$reconCmd = "cd HPC; sh doJob.sh " . $eid . " " . $resolution;
+	include_once('Net/SSH2.php');
+	include_once('Crypt/RSA.php');
 	
-	echo "Running: " . $reconCmd;
-	exec( $reconCmd );
-
-	shell_exec(sprintf('%s > /dev/null 2>&1 &', $reconCmd));	
+	//$key = new Crypt_RSA();
+	//$key->loadKey(file_get_contents('privatekey'));
+	
+	//$ssh = new Net_SSH2('www.domain.tld');
+	//if (!$ssh->login('username', $key)) {
+	//    exit('Login Failed');
+	//}
+	
+	//echo $ssh->exec('pwd');
+	//echo $ssh->exec('ls -la');
 ?>
