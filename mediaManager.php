@@ -214,6 +214,18 @@
 		$media = $db->Select( 'media', array( "cid" => $cid ), '*', strsql('timestamp') );
 		if($count > 0) $media = array_slice( $media, 0, $count );
 		
+		if(is_array($media) && array_key_exists('mid',$media)) 
+			$media = array(0 => $media); // Treat all results as an array
+		
+		// Get info for chunk
+		$chunk = $db->Select('chunks', array("cid"=>$cid) );
+		
+		// Add it to result
+		$length = count($media);
+		for ($i = 0; $i < $length; $i++) {
+			$media[$i]['chunk'] = $chunk;
+		}
+		
 		return $media;
 	}
 	
@@ -318,14 +330,18 @@
 		$basename = getMediaBasename( $mid, $media['type'] );
     	//$fullImage = $upload_dir.$eid."/full/".$basename;
     	
+    	@mkdir($upload_dir);
+		@mkdir($upload_dir.$eid);
+    	@mkdir($upload_dir.$eid."/tmp/");
     	$tmpFile = $upload_dir.$eid."/tmp/".$basename;
 
 		$url = getFile( $basename, $eid.'/full' );
 		$data = get_data_url( $url );
 		
 		file_put_contents($tmpFile, $data);
+		
 		$img = new Imagick($tmpFile);
-		unlink($tmpFile);
+		//unlink($tmpFile);
 
 		$img->setImageFormat("jpeg");
 		$img->scaleImage(1920,0);

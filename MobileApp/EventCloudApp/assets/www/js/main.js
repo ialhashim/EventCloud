@@ -550,7 +550,7 @@ function initialSlides() {
 					swiper.removeLastSlide();
 					
 					$("#mainScreen").fadeTo('fast', 1, function(){
-						updater = setInterval(updateLatest, 1000);
+						updater = setInterval(updateLatest, 2000);
 						
 						$(document).keyup(function(e) {	if (e.keyCode == 83) { clearInterval( updater ); } });
 					});
@@ -562,11 +562,11 @@ function initialSlides() {
 var lastChunk = 1;
 function updateLatest(){
 	getMediaForChunk(eid, LATEST_CHUNK, function($bins){
-		
-		// Skip if same as existing chunk
+		// Skip if same as existing chunk, or is the first chunk of event
 		curChunk = $bins[0][0]['cid'];
+		var chunkIndex = $bins[0][0]['chunk']['index'];
 		
-		if(curChunk == lastChunk) return;
+		if(curChunk == lastChunk || chunkIndex == 0) return;
 		else lastChunk = curChunk;
 		
 		$.each($bins, function( k, mediaBin ){

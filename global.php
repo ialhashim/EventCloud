@@ -10,7 +10,7 @@ $upload_dir = dirname(__FILE__). "/uploads/";
 $upload_url = "/uploads/";
 
 // Event parameters
-$chunkThreshold = 10; // seconds
+$chunkThreshold = 20; // seconds
 
 date_default_timezone_set('UTC');
 			

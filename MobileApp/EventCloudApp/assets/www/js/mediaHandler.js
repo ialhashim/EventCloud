@@ -217,13 +217,12 @@ function capturePhoto() {
 		return;
 	}
 	
-	/// 1) This is a better way to keep all EXIF
+	if(true)
 	{
-		//navigator.device.capture.captureImage(captureMediaSuccess, captureMediaError);
-	}
-	
-	/// 2) This is for development and be able to send smaller files
-	{
+		/// 1) This is a better way to keep all EXIF
+		navigator.device.capture.captureImage(captureMediaSuccess, captureMediaError);
+	} else {
+		/// 2) This is for development and be able to send smaller files
 		var options = {  quality: 10 };
 		navigator.camera.getPicture(function(imageURI){
 			var options = new FileUploadOptions();

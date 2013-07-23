@@ -8,23 +8,29 @@ var camera, scene, renderer;
 var mesh;
 var objectStack = new Array();
 
-var pointCloud;
-
 $(document).ready(function() {
 	$('#debug').hide();
 
 	init($('#viewportContent'));
 	animate();
-
-	var pointCloudJSON = 'https://s3-us-west-2.amazonaws.com/' + bucketOutput + eid + '/bundle/output.json';
-	$.get(pointCloudJSON, function(data) {
-		pointCloud = makePointCloud(data);
+	
+	//var bundleCloudJSON = 'https://s3-us-west-2.amazonaws.com/' + bucketOutput + eid + '/bundle/output.json';
+	//$.get(bundleCloudJSON, function(data) {
+	//	makePointCloud( data.points );
+	//});
+	
+	var fullCloudJSON = 'https://s3-us-west-2.amazonaws.com/' + bucketOutput + eid + '/models/model.json';
+	$.get(fullCloudJSON, function(data) {
+		makePointCloud( data.points );
 	});
+	
+	// Test image planes
+	initialMedia();
 });
 
 function init($parent) {
 	renderer = new THREE.WebGLRenderer({
-		'antialias' : true
+		/*'antialias' : true*/
 	});
 	//renderer = new THREE.CanvasRenderer();
 
@@ -59,9 +65,6 @@ function init($parent) {
 
 	// Axis in scene
 	objectStack.push(createCornerAxis(50, 250));
-
-	// Test image planes
-	initialMedia();
 
 	// Change view-port on resize
 	window.addEventListener('resize', onWindowResize, false);
@@ -239,25 +242,41 @@ function initialMedia() {
 	});
 }
 
-function makePointCloud(cloud, scaling) {
+function bbox( points ){
+	var minx=Number.MAX_VALUE,miny=Number.MAX_VALUE,minz=Number.MAX_VALUE;
+	var maxx=-minx,maxy=-miny,maxz=-minz;
 	
+	for (var i = 0; i < points.length; i++) {
+		var x = points[i].x, y = points[i].y, z = points[i].z;
+		minx = Math.min(minx, x);	miny = Math.min(miny, y);	minz = Math.min(minz, z);
+		maxx = Math.max(maxx, x);	maxy = Math.max(maxy, y);	maxz = Math.max(maxz, z);
+	}
+	var bbmin = new THREE.Vector3(minx, miny, minz);
+	var bbmax = new THREE.Vector3(maxx, maxy, maxz);
+	var center = bbmin.add(bbmax).divideScalar( 2 );
+	var d = bbmax.sub( bbmin );
+	var s = Math.max(d.x, Math.max(d.y, d.z));
+
+	return {min: bbmin, max: bbmax, center: center, diag: d, maxExtent: s};
+}
+
+function makePointCloud(points, scaling) {
 	// Bounding box of input points
-	var bbmin = new THREE.Vector3(cloud.min.x, cloud.min.y, cloud.min.z);
-	var bbmax = new THREE.Vector3(cloud.max.x, cloud.max.y, cloud.max.z);
-	var offset = bbmin.add(bbmax).divideScalar( 2 );
-	var d = bbmax.sub(bbmin);
+	var box = bbox( points );
+	var offset = box.center;
 	
+	// Normalize factor
 	scaling = scaling ? scaling : 300;
-	var scale = Math.max(d.x, Math.max(d.y, d.z)) / scaling;
+	var scale = box.maxExtent / scaling;
 
 	var geometry = new THREE.Geometry();
 	geometry.colors = [];
 	
 	// now create the individual particles
-	for (var i = 0; i < cloud.points.length; i++) {
+	for (var i = 0; i < points.length; i++) {
 		
 		// Set as normalized and centered
-		var pX = cloud.points[i].x, pY = cloud.points[i].y, pZ = cloud.points[i].z;
+		var pX = points[i].x, pY = points[i].y, pZ = points[i].z;
 		var particle = new THREE.Vector3(	(pX - offset.x) / scale, 
 											(pY - offset.y) / scale, 
 											(pZ - offset.z) / scale)
@@ -266,22 +285,17 @@ function makePointCloud(cloud, scaling) {
 		geometry.vertices.push(particle);
 
 		geometry.colors[i] = new THREE.Color();
-		geometry.colors[i].setRGB(cloud.points[i].r / 255.0, cloud.points[i].g / 255.0, cloud.points[i].b / 255.0);
+		geometry.colors[i].setRGB(points[i].r / 255.0, points[i].g / 255.0, points[i].b / 255.0);
 	}
 
 	// material
 	material = new THREE.ParticleBasicMaterial({
-		size : 20,
-		blending : THREE.NormalBlending,
-		/*transparent : true,
-		opacity : 0.7,*/
-		vertexColors : true
+		size : 10,
+		transparent : true,
+		vertexColors : true,
+		/*opacity : 0.7,*/
 	});
 
 	// particle system
-	particleSystem = new THREE.ParticleSystem(geometry, material);
-
-	objectStack.push(particleSystem);
-	cloud.particleSystem = particleSystem;
-	return cloud;
+	objectStack.push( new THREE.ParticleSystem(geometry, material) );
 }
