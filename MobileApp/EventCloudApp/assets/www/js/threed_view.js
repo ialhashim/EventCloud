@@ -25,7 +25,7 @@ $(document).ready(function() {
 	});
 	
 	// Test image planes
-	initialMedia();
+	//initialMedia();
 });
 
 function init($parent) {
@@ -290,7 +290,7 @@ function makePointCloud(points, scaling) {
 
 	// material
 	material = new THREE.ParticleBasicMaterial({
-		size : 10,
+		size : 20,
 		transparent : true,
 		vertexColors : true,
 		/*opacity : 0.7,*/
