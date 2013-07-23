@@ -606,7 +606,7 @@ function getThumbnail( media, specialClass ){
 }	
 
 function manualRecon(){
-	$.get(sfmURL, function(data){
+	$.post(sfmURL, { eid: eid, resolution: 300 },function(data){
 		console.log( data );
 	});
 }
