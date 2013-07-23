@@ -606,7 +606,9 @@ function getThumbnail( media, specialClass ){
 }	
 
 function manualRecon(){
-	$.post(sfmURL, { eid: eid, res: 300 }, function(data){
+	var res = prompt("Please enter reconstruction resolution", 300);
+	
+	$.post(sfmURL, { eid: eid, res: res }, function(data){
 		console.log( data );
 	});
 }
