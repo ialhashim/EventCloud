@@ -5,6 +5,9 @@
 // Server location
 $server_address = 'https://' . $_SERVER['REMOTE_ADDR'];
 
+// Worker
+$workerNode = 'ec2-54-218-167-210.us-west-2.compute.amazonaws.com'; 
+
 // Media location
 $upload_dir = dirname(__FILE__). "/uploads/";
 $upload_url = "/uploads/";
