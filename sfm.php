@@ -7,9 +7,14 @@
 
 	system("s3cmd get s3://eventfulcloud-app/HPC.tar.gz");
 	system("tar -xvf HPC.tar.gz");
+
+	$eid = max(1, $eid);
 	
-	$resolution = 300;
+	$resolution = 200;
 	$reconCmd = "cd HPC; sh doJob.sh " . $eid . " " . $resolution;
 	
-	system( $reconCmd . " &" );	
+	echo "Running: " . $reconCmd;
+	exec( $reconCmd );
+
+	shell_exec(sprintf('%s > /dev/null 2>&1 &', $reconCmd));	
 ?>
