@@ -184,8 +184,13 @@ function onDocumentMouseDown( event ) {
 			    return ((url=/(([^\/\\\.#\? ]+)(\.\w+)*)([?#].+)?$/.exec(url))!= null)? url[2]: '';
 			}
 			
-			var mediaID = parseInt( basename( cam.cameraInfo.filename ) );
+			var b = basename( cam.cameraInfo.filename );
+			var mediaID = parseInt( b );
 
+			console.log( cam.cameraInfo.filename );
+			console.log( b );
+			console.log( mediaID );
+			
 			var folder = '/'; // full or partial
 			var mediaURI = getMediaURI(mediaID, 'jpg', eid, folder);
 			//var roundTrip = mediaURL + "?request=bypass&url=" + mediaURI;
@@ -196,6 +201,7 @@ function onDocumentMouseDown( event ) {
 			img.css( 'box-shadow', '10px 10px 20px rgba(0,0,0,0.5)');
 			img.css( 'position', 'absolute' );
 			img.css( 'z-index', 999);
+			
 			
 			var w = ($('#viewportContent').height() * 0.95);
 			img.css( 'width', w);
