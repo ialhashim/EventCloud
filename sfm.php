@@ -22,7 +22,7 @@
 	$cmd  = "cd EventCloud;";
 	$cmd .= "./cleanEvent.sh $eid all;";
 	$cmd .= "./makeEvent.sh $eid $resolution;";
-	$cmd .= "cd output/1/pmvs/models;";
+	$cmd .= "cd output/$eid/pmvs/models;";
 	$cmd .= "../../../../CMVS-PMVS/bin/ply2json option-0000.ply;";
 	$cmd .= "cd ../../../..;";
 	$cmd .= "./uploadToCloud.sh $eid;";
