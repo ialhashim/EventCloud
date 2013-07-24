@@ -185,12 +185,8 @@ function onDocumentMouseDown( event ) {
 			}
 			
 			var b = basename( cam.cameraInfo.filename );
-			var mediaID = parseInt( b );
+			var mediaID = parseInt( b, 10 );
 
-			console.log( cam.cameraInfo.filename );
-			console.log( b );
-			console.log( mediaID );
-			
 			var folder = '/'; // full or partial
 			var mediaURI = getMediaURI(mediaID, 'jpg', eid, folder);
 			//var roundTrip = mediaURL + "?request=bypass&url=" + mediaURI;

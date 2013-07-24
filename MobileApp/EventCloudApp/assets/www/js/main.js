@@ -459,7 +459,7 @@ function getMediaForChunk(eid, cidx, callback, isFlat, isReversed, count){
 			for(var i = 0; i < $media.length; i++){
 				mediaTime = new Date( $media[i].timestamp );
 				diffSeconds = Math.max(0, (mediaTime - chunkTime) / 1000);
-				b = parseInt( (diffSeconds / chunkLength) * binCount );
+				b = parseInt( (diffSeconds / chunkLength) * binCount, 10 );
 				if(!$bins[b]) $bins[b] = new Array();
 				$bins[b].push( $media[i] );
 			}
