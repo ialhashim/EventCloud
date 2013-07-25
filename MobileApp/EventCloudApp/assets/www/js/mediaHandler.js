@@ -90,9 +90,9 @@ function captureMediaFromBrowser( captureIcon, buttonIcon, callback ){
 	// Resize for smaller screens
 	if($(document).height() < 500)
 	{
-		$("#captureDeviceContainer").width(100);
-		$("#captureDeviceContainer").height(100);
-		$("#captureDeviceContainer").css('margin', '0px');
+		$("#captureDeviceContainer").width(200);
+		$("#captureDeviceContainer").height(150);
+		$("#captureDeviceContainer").css('margin', '');
 	}
 	
 	// Show capture window

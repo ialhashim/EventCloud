@@ -86,3 +86,40 @@ h1{
 	height: 100%;
 }
 
+#captionContainer{
+	background: rgba(0,0,0,0.5);
+	position: absolute;
+	bottom:0;
+	padding: 0.5em;
+}
+.captionSpinner{
+	width: 0.5em;
+	height: 0.5em;
+	padding: 0.75em;
+}
+
+#captionContainer h2{
+	color: white;
+}
+#captionContainer h3, h4{
+	color: #777;
+	font-size: smaller;
+}
+#captionContainer h4{
+	font-size: small;
+}
+
+.back-button{
+    text-decoration: none;
+    position: absolute;
+    left: 0.75em;
+    padding: 0.2em;
+    margin: 0.2em;
+    border: 1px solid #AAAAAA;
+    border-radius: 4px;
+    color:#444444;
+    width: 2em;
+    text-align: center;
+}
+
+

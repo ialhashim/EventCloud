@@ -7,7 +7,6 @@ username = getUserName(userid);
 var camera, scene, renderer;
 var mesh;
 var objectStack = new Array();
-var pauseRendering = false;
 
 var bundle;
 var dense;
@@ -76,6 +75,9 @@ function init($parent) {
 	updateControls();
 	
 	// Lights
+	ambientLight = new THREE.AmbientLight( 0x4422dd );
+	scene.add( ambientLight );
+	
 	var light = new THREE.PointLight(0xffffff);
 	light.position.set(500,550,500);
 	scene.add(light);
@@ -129,6 +131,8 @@ function getClickCoordsWithinTarget(event)
 }
 
 function onDocumentMouseDown( event ) {
+	if(event.button != 0) return;
+
 	// the following line would stop any other event handler from firing
 	// (such as the mouse's TrackballControls)
 	// event.preventDefault();
@@ -191,33 +195,61 @@ function onDocumentMouseDown( event ) {
 			var mediaURI = getMediaURI(mediaID, 'jpg', eid, folder);
 			//var roundTrip = mediaURL + "?request=bypass&url=" + mediaURI;
 			
+			// Create image holder and add image
 			var imgID = "img-" + mediaID;
-			var img = $("<img id='"+imgID+"' class='imagePreview' src='" + mediaURI + "'>");
-			//img.css( 'border', '5px solid #EEEEEE');
-			img.css( 'box-shadow', '10px 10px 20px rgba(0,0,0,0.5)');
-			img.css( 'position', 'absolute' );
-			img.css( 'z-index', 999);
+			var img = $("<img src='" + mediaURI + "'>");
+			var imagePreview = $("<div id='"+imgID+"' class='imagePreview'>");
+			var imageContainer = $("<div class='imageContainer' />");
 			
-			
+			// Center + above all
 			var w = ($('#viewportContent').height() * 0.95);
-			img.css( 'width', w);
-			img.css( 'left', ($('#viewportContent').width() - w) * 0.5 );
-			img.css( 'top', 5);
-			img.hide();
+			imagePreview.css( 'width', w);
+			imagePreview.css( 'height', w);
+			imagePreview.css( 'box-shadow', '10px 10px 20px rgba(0,0,0,0.5)');
+			imagePreview.css( 'position', 'absolute' );
+			imagePreview.css( 'z-index', 999);
+			imagePreview.css( 'left', ($('#viewportContent').width() - w) * 0.5 );
+			imagePreview.css( 'top', 5);
 			
-			$('body').append( img );
+			imageContainer.css('width', '100%');
+			imageContainer.css('height', '100%');
+			imageContainer.css('position', 'relative');
 			
-			pauseRendering = true;
+			img.css('width', '100%');
+			
+			// Hierarchy
+			imageContainer.append( img );
+			imagePreview.append( imageContainer );
+			
+			imagePreview.hide();
+			$('body').append( imagePreview );
+			
+			// Get media information and add caption
+			$.post(mediaURL, {request:'getInfo', mid: mediaID}, function(data){
+				var mediaInfo = JSON.parse( data );
+				
+				$caption = $('<div id="captionContainer"/>');
+				$caption.append( $('<h2>').text( mediaInfo.caption ) );
+				$caption.append( $('<div class="captionSpinner"/>') );
+				
+				var info = $("<div/>");
+				info.append( $("<h3/>").text( mediaInfo.author.name ) );
+				info.append( $("<h4/>").text( mediaInfo.timestamp ) );
+				 
+				$caption.children('.captionSpinner').replaceWith( info.html() );
+				$caption.hide();
+				
+				imageContainer.append( $caption );
+				$caption.fadeIn();
+			});
 			
 			var $preview = $("#" + imgID);
 			$preview.fadeIn();
 			$preview.focus();
 			
-			
 			$('body').on('mousedown mousewheel', function(){ 
 				$('.imagePreview').fadeOut('fast', function(){
 					$('.imagePreview').remove();
-					pauseRendering = false;
 				}); 
 			});
 			
@@ -324,8 +356,6 @@ function updateObjects(){
 
 function animate() {
 	requestAnimationFrame( animate );
-	
-	//if(pauseRendering) return;
 	
 	controls.update();
 	updateObjects();
@@ -606,7 +636,7 @@ function createCamera( p, n, cam, q ){
     cone.cameraInfo = { filename: cam.filename, position: p, direction: n, q: q };
 
     // Selection spheres
-    var intersectSphere = new THREE.Mesh( new THREE.SphereGeometry( 80, 10, 10 ), simpleMat );
+    var intersectSphere = new THREE.Mesh( new THREE.SphereGeometry( 90, 10, 10 ), simpleMat );
     intersectSphere.position.set( p.x, p.y, p.z );
     intersectSphere.cameraID = cone.id;
     intersectSphere.visible = false;

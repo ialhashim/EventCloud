@@ -308,6 +308,8 @@ h1 {
 }
 
 #media-viewer, #media-capture{
+	display:none;
+
 	transition-property: all;
 	transition-timing-function: ease-in-out;
 	
@@ -441,7 +443,7 @@ h1 {
 
 #mediaCaption{
 	width: 100%;
-	height: 5em;
+	height: 90px;
 	-webkit-transition: -webkit-transform 0.4s, opacity 0.1s 0.3s;
 	-webkit-transform: translateY(-5em);
 }
@@ -456,13 +458,16 @@ h1 {
 }
 
 #mediaCaption.clicked{	-webkit-transform: translateY(0em);}
-#highRes.clicked{-webkit-transform: translateY(5em);}
+#highRes.clicked{-webkit-transform: translateY(77px);}
 
-#mediaCaption.clicked.not{	-webkit-transform: translateY(-5em);}
+#mediaCaption.clicked.not{	-webkit-transform: translateY(-77px);}
 #highRes.clicked.not{-webkit-transform: translateY(0em);}
 
 #captionContainer{
 	padding: 1em;
+	padding-top: 0.1em;
+	padding-bottom: 0.1em;
+	
 	background: rgba(0,0,0,0.5);
 }
 .captionSpinner{
@@ -488,6 +493,8 @@ h1 {
 	float: right;
 	margin-right: 1em;
 	text-align: center;
+	
+	font-size: 60%;
 }
 
 #media-viewer-loading{

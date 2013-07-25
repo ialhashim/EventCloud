@@ -113,3 +113,17 @@ img.mainMap{
 
 .pagename{ color:#AAA; }
 #eventNameCaption{ color: black; font-size:larger }
+
+.back-button{
+    text-decoration: none;
+    position: absolute;
+    left: 0.75em;
+    padding: 0.2em;
+    margin: 0.2em;
+    border: 1px solid #AAAAAA;
+    border-radius: 4px;
+    color:#444444;
+    width: 2em;
+    text-align: center;
+}
+
