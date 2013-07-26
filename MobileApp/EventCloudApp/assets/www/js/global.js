@@ -194,20 +194,20 @@ function getUserName(userid) {
 }
 
 function getEventStart(eid) {
-	var eventStart = '';
+	var eventObj = '';
 	$.ajax({
 		url : eventsManager,
 		data : {
-			request : 'startTime',
+			request : 'name',
 			eid : eid
 		},
 		type : "POST",
 		async : false,
 		success : function(data) {
-			eventStart = data;
+			eventObj = data;
 		}
 	});
-	return eventStart;
+	return eventObj.start;
 }
 
 /* Time functions */
@@ -231,7 +231,7 @@ function msToTime(s, isIncludeMS) {
 }
 
 function eventClock( eventStart ){
-	var from = new Date( eventStart ); 
+	var from = new Date( eventStart.replace(' ', 'T') ); 
 	var to = new Date();
 	var millisecond = Math.max(0, (new Date()) - from ); 
 

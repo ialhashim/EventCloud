@@ -307,6 +307,10 @@ h1 {
 	width: 50px;
 }
 
+#special-upload-form{
+	display:none;
+}
+
 #media-viewer, #media-capture{
 	display:none;
 

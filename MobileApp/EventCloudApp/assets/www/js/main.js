@@ -449,7 +449,7 @@ function getMediaForChunk(eid, cidx, callback, isFlat, isReversed, count){
 		$chunk = $chunk_media[0];
 		$media = $chunk_media[1];
 		
-		chunkTime = new Date( $chunk.start );
+		chunkTime = new Date( $chunk.start.replace(' ', 'T') );
 		chunkLength = $chunk.length; // seconds
 		
 		// Bin media into [X] slots
@@ -457,7 +457,7 @@ function getMediaForChunk(eid, cidx, callback, isFlat, isReversed, count){
 		
 		if ($media instanceof Array) {
 			for(var i = 0; i < $media.length; i++){
-				mediaTime = new Date( $media[i].timestamp );
+				mediaTime = new Date( $media[i].timestamp.replace(' ', 'T') );
 				diffSeconds = Math.max(0, (mediaTime - chunkTime) / 1000);
 				b = parseInt( (diffSeconds / chunkLength) * binCount, 10 );
 				if(!$bins[b]) $bins[b] = new Array();
@@ -553,6 +553,7 @@ function initialSlides() {
 						updater = setInterval(updateLatest, 2000);
 						
 						$(document).keyup(function(e) {	if (e.keyCode == 83) { clearInterval( updater ); } });
+						
 					});
 				}, true, true, ALL_MEDIA);
 			}
