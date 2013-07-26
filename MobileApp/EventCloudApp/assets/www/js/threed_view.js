@@ -53,12 +53,19 @@ $(document).ready(function() {
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 });
 
-function init($parent) {
-	renderer = new THREE.WebGLRenderer({
-		'antialias' : true
-	});
-	//renderer = new THREE.CanvasRenderer();
+var isWebGL = true;
 
+function init($parent) {
+	
+	if( !iOS ){
+		renderer = new THREE.WebGLRenderer({
+			'antialias' : true
+		});
+	}else{
+		renderer = new THREE.CanvasRenderer();
+		isWebGL = false;
+	}
+	
 	renderer.parent = $parent;
 	renderer.setSize(renderer.parent.width(), renderer.parent.height());
 	$parent.append(renderer.domElement);
@@ -570,36 +577,56 @@ function makePointCloud(points, scaling, t) {
 		scale = box.maxExtent / scaling;
 	}
 	
-	var geometry = new THREE.Geometry();
-	geometry.colors = [];
-	
-	// now create the individual particles
-	for (var i = 0; i < points.length; i++) {
+	if( isWebGL ){
+		var geometry = new THREE.Geometry();
+		geometry.colors = [];
 		
-		// Set as normalized and centered
-		var pX = points[i].x, pY = points[i].y, pZ = points[i].z;
-		var particle = new THREE.Vector3(	(pX - offset.x) / scale, 
-											(pY - offset.y) / scale, 
-											(pZ - offset.z) / scale)
-
-		// add it to the geometry
-		geometry.vertices.push(particle);
-
-		geometry.colors[i] = new THREE.Color();
-		geometry.colors[i].setRGB(points[i].r / 255.0, points[i].g / 255.0, points[i].b / 255.0);
+		// now create the individual particles
+		for (var i = 0; i < points.length; i++) {
+			
+			// Set as normalized and centered
+			var pX = points[i].x, pY = points[i].y, pZ = points[i].z;
+			var particle = new THREE.Vector3(	(pX - offset.x) / scale, 
+												(pY - offset.y) / scale, 
+												(pZ - offset.z) / scale);
+	
+			// add it to the geometry
+			geometry.vertices.push(particle);
+	
+			geometry.colors[i] = new THREE.Color();
+			geometry.colors[i].setRGB(points[i].r / 255.0, points[i].g / 255.0, points[i].b / 255.0);
+		}
+	
+		// material
+		material = new THREE.ParticleBasicMaterial({
+			size : 20,
+			transparent : true,
+			vertexColors : true,
+			/*opacity : 0.7,*/
+		});
+	
+		// particle system
+		var system = new THREE.ParticleSystem(geometry, material);
+		objectStack.push( system );
+	} else {
+		for (var i = 0; i < points.length; i+=2) {
+			// Set as normalized and centered
+			var pX = points[i].x, pY = points[i].y, pZ = points[i].z;
+			var particle = new THREE.Vector3(	(pX - offset.x) / scale, 
+												(pY - offset.y) / scale, 
+												(pZ - offset.z) / scale);
+		
+			var rgb = points[i].b | (points[i].g << 8) | (points[i].r  << 16);
+    		var color = '#' + rgb.toString(16);
+    		
+    		console.log( color );
+			
+			objectStack.push( makeSimple(particle, color) );
+		}
+		
+		// Hack
+		var system = {id:99999};
 	}
-
-	// material
-	material = new THREE.ParticleBasicMaterial({
-		size : 20,
-		transparent : true,
-		vertexColors : true,
-		/*opacity : 0.7,*/
-	});
-
-	// particle system
-	var system = new THREE.ParticleSystem(geometry, material);
-	objectStack.push( system );
 	
 	return {offset: offset, scale: scale, id: system.id };
 }
@@ -612,6 +639,15 @@ function rotationFromTo( v1, v2 ){
     q.w = Math.sqrt( (v1.length() * v1.length()) * (v2.length() * v2.length()) ) + v1.dot(v2);
     q.normalize();
     return q;
+}
+
+function makeSimple(p, color){
+	r = 2; // radius
+	var simpleMat = new THREE.MeshBasicMaterial({color: color });
+	var s = new THREE.Particle( new THREE.ParticleBasicMaterial( {color: color} ) );
+    s.position.set( p.x, p.y, p.z );
+    s.scale.set(r,r,r);
+    return s;
 }
 
 function makeSphere(p, r){

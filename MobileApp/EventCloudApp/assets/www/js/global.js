@@ -58,6 +58,11 @@ $(document).ready(function() {
 // Find out if we support flash
 var flashEnabled = !!(navigator.mimeTypes["application/x-shockwave-flash"] || window.ActiveXObject && new ActiveXObject('ShockwaveFlash.ShockwaveFlash'));
 
+var iOS = false, p = navigator.platform;
+if( p === 'iPad' || p === 'iPhone' || p === 'iPod' ){
+    iOS = true;
+}
+
 function htmlEncode(value){
   //create a in-memory div, set it's inner text(which jQuery automatically encodes)
   //then grab the encoded contents back out.  The div never exists on the page.
