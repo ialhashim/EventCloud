@@ -44,6 +44,9 @@ $(document).ready(function() {
 		    			data = [data];
 		    	}
 		    	
+		    	// Reverse array
+		    	data.reverse();
+		    	
 		    	if(data instanceof Array)
 		    	data.forEach(function(entry) {
 				    // Debug
@@ -87,7 +90,7 @@ $(document).ready(function() {
 				
 				<div id="column2">	
 					<div>
-						<h1 style="margin-bottom:1em">Live events</h1>
+						<h1 style="">Live events</h1>
 						<span class='loading'>Loading...</span>
 						<div id="eventsBox">
 							<ul id="eventsList"> </ul>

@@ -191,8 +191,15 @@ h1 {
 }
 
 #eventsBox {
-	/*overflow: auto;*/
-	/*overflow-y: scroll;*/
+	overflow: auto;
+	overflow-y: scroll;
+	height: 5em;
+	text-align: left;
+}
+
+ul#eventsList li{
+	padding: 0.1em;
+	min-width: 6em;
 }
 
 

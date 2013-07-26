@@ -23,8 +23,6 @@ $(document).ready(function() {
 	$.post(eventsManager, { request: "name", eid: eid }, function(data){ 
 		eventname = data.name; 
 		$("h2#greeting").replaceWith( "<h2 id='greeting'> " + toTitleCase(username) + " @ " + eventname + " </h2>" );
-		
-		setInterval(eventClock, 1000, [data.start.replace(/-/g, '/')]);
 	});
 	
 	// Disable scrolling
