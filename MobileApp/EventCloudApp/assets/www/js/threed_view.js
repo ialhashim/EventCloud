@@ -299,6 +299,9 @@ function interpolateCamera( cam, callback ) {
 	var posA = camera.position.clone();
 	var posB = c.position.clone();
 	var i = 0;
+	var step = 1;
+	
+	if( !isWebGL ) step = 20;
 	
 	var tA = controls.target.clone();
 	var delta = tA.clone().sub( camera.position.clone() );
@@ -306,7 +309,8 @@ function interpolateCamera( cam, callback ) {
 	var tB = c.q.clone().add( c.direction.clone().multiplyScalar(300) );
 
 	function frame() {
-		i++; // update parameters
+		i += step; // update parameters
+		
 		var t = i / 100;
 		
 		// Camera position
@@ -331,7 +335,10 @@ function interpolateCamera( cam, callback ) {
 		}
 	}
 
-	var id = setInterval(frame, 10); // draw every 10ms
+	var speed = 10;
+	if(!isWebGL) speed = 1;
+
+	var id = setInterval(frame, speed); // draw every 10ms
 }
 
 function updateControls(){
@@ -344,6 +351,10 @@ function updateControls(){
 	controls.staticMoving = false;
 	controls.dynamicDampingFactor = 0.3;
 	controls.keys = [65, 83, 68];
+	
+	if( !isWebGL ){
+		controls.staticMoving = true;
+	}
 }
 
 function onWindowResize() {
@@ -609,7 +620,11 @@ function makePointCloud(points, scaling, t) {
 		var system = new THREE.ParticleSystem(geometry, material);
 		objectStack.push( system );
 	} else {
-		for (var i = 0; i < points.length; i+=2) {
+		var step = 3;
+		
+		step = Math.max(1, Math.floor(points.length / 1000));
+		
+		for (var i = 0; i < points.length; i += step) {
 			// Set as normalized and centered
 			var pX = points[i].x, pY = points[i].y, pZ = points[i].z;
 			var particle = new THREE.Vector3(	(pX - offset.x) / scale, 
@@ -619,8 +634,6 @@ function makePointCloud(points, scaling, t) {
 			var rgb = points[i].b | (points[i].g << 8) | (points[i].r  << 16);
     		var color = '#' + rgb.toString(16);
     		
-    		console.log( color );
-			
 			objectStack.push( makeSimple(particle, color) );
 		}
 		
@@ -642,7 +655,7 @@ function rotationFromTo( v1, v2 ){
 }
 
 function makeSimple(p, color){
-	r = 2; // radius
+	r = 2.5; // radius
 	var simpleMat = new THREE.MeshBasicMaterial({color: color });
 	var s = new THREE.Particle( new THREE.ParticleBasicMaterial( {color: color} ) );
     s.position.set( p.x, p.y, p.z );
@@ -660,7 +673,10 @@ function makeSphere(p, r){
 
 function createCamera( p, n, cam, q ){
 	var simpleMat = new THREE.MeshPhongMaterial( { color:0x6644ff, transparent:true, opacity:1 } );
-    var cone = new THREE.Mesh(new THREE.CylinderGeometry(25, 5, 40, 6), simpleMat);
+	
+	var coneSegments = 5;
+	
+    var cone = new THREE.Mesh(new THREE.CylinderGeometry(25, 5, 40, coneSegments), simpleMat);
 	cone.position.set(p.x, p.y, p.z);
 	cone.useQuaternion = true;
 	
