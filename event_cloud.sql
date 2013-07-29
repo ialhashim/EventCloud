@@ -3,18 +3,12 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 13, 2013 at 11:54 PM
+-- Generation Time: Jul 29, 2013 at 08:39 PM
 -- Server version: 5.5.27
 -- PHP Version: 5.4.7
 
--- DROP DATABASE event_cloud;
-CREATE DATABASE event_cloud
-  DEFAULT CHARACTER SET utf8
-  DEFAULT COLLATE utf8_general_ci;
-USE event_cloud;
-
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = 'US/Pacific';
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -39,7 +33,16 @@ CREATE TABLE IF NOT EXISTS `chunks` (
   `start` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `length` int(11) NOT NULL,
   PRIMARY KEY (`cid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `chunks`
+--
+
+INSERT INTO `chunks` (`cid`, `eid`, `index`, `start`, `length`) VALUES
+(1, 1, 0, '2013-07-14 07:31:30', 10),
+(2, 1, 1, '2013-07-14 07:31:51', 10),
+(3, 1, 2, '2013-07-14 07:52:45', 10);
 
 -- --------------------------------------------------------
 
@@ -57,7 +60,14 @@ CREATE TABLE IF NOT EXISTS `events` (
   `long` decimal(18,14) NOT NULL,
   `poster` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`eid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `events`
+--
+
+INSERT INTO `events` (`eid`, `name`, `chunks`, `start`, `maptype`, `lat`, `long`, `poster`) VALUES
+(1, 'Event Name', 60, '2013-07-14 07:31:29', 'real', 49.27835970000000, -122.90390010000000, '');
 
 -- --------------------------------------------------------
 
@@ -76,7 +86,18 @@ CREATE TABLE IF NOT EXISTS `media` (
   `type` text COLLATE utf8_unicode_ci NOT NULL,
   `caption` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`mid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=6 ;
+
+--
+-- Dumping data for table `media`
+--
+
+INSERT INTO `media` (`mid`, `uid`, `cid`, `meta`, `timestamp`, `lat`, `long`, `type`, `caption`) VALUES
+(1, 1, 1, '', '2013-07-14 07:31:30', 49.27835970000000, -122.90390010000000, 'png', 'Event Name / 1'),
+(2, 1, 1, '', '2013-07-14 07:31:31', 49.27835970000000, -122.90390010000000, 'png', 'Event Name / 2'),
+(3, 1, 1, '', '2013-07-14 07:31:31', 49.27835970000000, -122.90390010000000, 'png', 'Event Name / 3'),
+(4, 1, 2, '', '2013-07-14 07:31:51', 49.27834120000000, -122.90387320000000, 'jpg', 'Event Name / 4'),
+(5, 1, 3, '', '2013-07-14 07:52:45', 49.22949100000000, -123.00257500000000, 'jpg', 'Event Name / 5');
 
 -- --------------------------------------------------------
 
@@ -89,6 +110,15 @@ CREATE TABLE IF NOT EXISTS `users` (
   `name` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`uid`, `name`) VALUES
+(1, 'User'),
+(2, 'hh'),
+(3, 'æŽå®åŽ');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
