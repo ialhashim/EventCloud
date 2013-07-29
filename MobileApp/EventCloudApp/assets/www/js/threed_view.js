@@ -15,6 +15,9 @@ var dense;
 var targetList = [];
 var projector, mouse = { x: 0, y: 0 };
 
+var worldScaling = 300;
+var worldPointSize = 10;
+					
 $(document).ready(function() {
 	$('#debug').hide();
 
@@ -26,18 +29,18 @@ $(document).ready(function() {
 		
 	$.get(bundleCloudJSON, function( b ) {
 		bundle = b;
+				
+		// Add sparse points
+		var t = makePointCloud( worldPointSize, bundle.points, worldScaling );
+			
+		// Add cameras
+		makeCameraObjects(worldPointSize, bundle.cameras, t );
 		
 		$.get(fullCloudJSON, function( d ) {
 			dense = d;
-			
-			// Add sparse points
-			var t = makePointCloud( bundle.points );
-			
-			// Add cameras
-			makeCameraObjects( bundle.cameras, t );
-			
+
 			// Add dense reconstruction
-			makePointCloud( dense.points, 1.0, t );
+			makePointCloud( worldPointSize * 0.5, dense.points, 1.0, t );
 			
 			// Hide sparse points
 			updateObjects();
@@ -102,6 +105,8 @@ function init($parent) {
 
 	// Axis in scene
 	//objectStack.push(createCornerAxis(50, 250));
+	
+	
 
 	// Change view-port on resize
 	window.addEventListener('resize', onWindowResize, false);
@@ -258,12 +263,21 @@ function onDocumentMouseDown( event ) {
 				$('.imagePreview').fadeOut('fast', function(){
 					$('.imagePreview').remove();
 				}); 
+				
+				// Display all cameras
+				for(var i = 0; i < scene.children.length; i++){
+					if(scene.children[i].type == "camera"){
+						scene.children[i].visible = true;
+						scene.children[i].material.opacity = 1.0;
+					}
+				}
 			});
 			
-			// Display all cameras
+			// Hide all cameras
 			for(var i = 0; i < scene.children.length; i++){
-				if(scene.children[i].type == "camera")
-					scene.children[i].material.opacity = 1.0;
+				if(scene.children[i].type == "camera"){
+					scene.children[i].visible = false;
+				}
 			}
 		});
 	}
@@ -570,7 +584,7 @@ function getObjectById(id){
 	return 0;
 }
 
-function makePointCloud(points, scaling, t) {
+function makePointCloud(pointSize, points, scaling, t) {
 
 	// Transformation
 	var offset, scale;
@@ -584,7 +598,7 @@ function makePointCloud(points, scaling, t) {
 		offset = box.center;
 	
 		// Normalize factor
-		scaling = scaling ? scaling : 300;
+		scaling = scaling ? scaling : 4000;
 		scale = box.maxExtent / scaling;
 	}
 	
@@ -610,7 +624,7 @@ function makePointCloud(points, scaling, t) {
 	
 		// material
 		material = new THREE.ParticleBasicMaterial({
-			size : 20,
+			size : pointSize,
 			transparent : true,
 			vertexColors : true,
 			/*opacity : 0.7,*/
@@ -634,7 +648,7 @@ function makePointCloud(points, scaling, t) {
 			var rgb = points[i].b | (points[i].g << 8) | (points[i].r  << 16);
     		var color = '#' + rgb.toString(16);
     		
-			objectStack.push( makeSimple(particle, color) );
+			objectStack.push( makeSimple(pointSize, particle, color) );
 		}
 		
 		// Hack
@@ -654,8 +668,8 @@ function rotationFromTo( v1, v2 ){
     return q;
 }
 
-function makeSimple(p, color){
-	r = 2.5; // radius
+function makeSimple(pointSize, p, color){
+	r = pointSize / 10; // radius
 	var simpleMat = new THREE.MeshBasicMaterial({color: color });
 	var s = new THREE.Particle( new THREE.ParticleBasicMaterial( {color: color} ) );
     s.position.set( p.x, p.y, p.z );
@@ -671,12 +685,13 @@ function makeSphere(p, r){
     return s;
 }
 
-function createCamera( p, n, cam, q ){
+function createCamera( pointSize, p, n, cam, q ){
 	var simpleMat = new THREE.MeshPhongMaterial( { color:0x6644ff, transparent:true, opacity:1 } );
 	
 	var coneSegments = 5;
+	var radius = pointSize * 0.5;
 	
-    var cone = new THREE.Mesh(new THREE.CylinderGeometry(25, 5, 40, coneSegments), simpleMat);
+    var cone = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius / 5, radius * 2, coneSegments), simpleMat);
 	cone.position.set(p.x, p.y, p.z);
 	cone.useQuaternion = true;
 	
@@ -688,7 +703,7 @@ function createCamera( p, n, cam, q ){
     cone.cameraInfo = { filename: cam.filename, position: p, direction: n, q: q };
 
     // Selection spheres
-    var intersectSphere = new THREE.Mesh( new THREE.SphereGeometry( 90, 10, 10 ), simpleMat );
+    var intersectSphere = new THREE.Mesh( new THREE.SphereGeometry( radius * 3, 10, 10 ), simpleMat );
     intersectSphere.position.set( p.x, p.y, p.z );
     intersectSphere.cameraID = cone.id;
     intersectSphere.visible = false;
@@ -699,7 +714,7 @@ function createCamera( p, n, cam, q ){
 	return cone;
 }
 
-function makeCameraObjects( cameras, t ){
+function makeCameraObjects(pointSize, cameras, t ){
 	var offset = t.offset;
 	var scale = t.scale;
 	
@@ -710,6 +725,6 @@ function makeCameraObjects( cameras, t ){
 		var camLook = new THREE.Vector3((cam.p.x - offset.x) / scale,(cam.p.y - offset.y) / scale,(cam.p.z - offset.z) / scale );	
 		camNormal.normalize();				
 										
-		objectStack.push( createCamera( camPos, camNormal, cam, camLook ) );
+		objectStack.push( createCamera(pointSize, camPos, camNormal, cam, camLook ) );
 	}
 }
