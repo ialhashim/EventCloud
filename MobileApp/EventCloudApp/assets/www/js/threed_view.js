@@ -15,8 +15,8 @@ var dense;
 var targetList = [];
 var projector, mouse = { x: 0, y: 0 };
 
-var worldScaling = 300;
-var worldPointSize = 10;
+var worldScaling = 800;
+var worldPointSize = 6;
 					
 $(document).ready(function() {
 	$('#debug').hide();
