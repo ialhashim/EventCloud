@@ -18,8 +18,27 @@
     </head>
 
     <body>
+	
+	<script>
+		var redir = window.setTimeout(function() {
+			location.href = document.getElementsByClassName("redirect")[0].getElementsByTagName("a")[0].href;
+		}, 2500);
+		
+		document.onkeypress = document.onclick = function(e){
+			// Escape to close any sub-window
+			window.clearTimeout(redir);
+			
+			document.getElementById('options').style.display = 'block';
+		};
+	</script>
+	
+	<div class='redirect'>
+		<a href="MobileApp/EventCloudApp/assets/www">Redirecting...</a>
+	</div>
+	
     
-    
+    <div id="options" style="display:none;"> 
+	
     <div id="systemInfo">
     <?php
         // Print some system details
@@ -66,6 +85,8 @@
 	<a href="rtsp://96.49.252.141:8554/test.sdp">Stream</a>
 	
 	<div> IP <?php echo echov( $server_address ) ?> </div>
+	
+	</div>
 	
     </body>
 </html>
